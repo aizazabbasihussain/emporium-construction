@@ -3,7 +3,7 @@ id: P1-02
 title: Authentication, roles and app shell
 phase: 1
 module: identity
-status: not-started
+status: done
 depends_on: [P1-01]
 requires_inputs: [H-10]
 ---
