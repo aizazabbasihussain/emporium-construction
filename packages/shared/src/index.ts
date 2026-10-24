@@ -1,4 +1,13 @@
 export { en } from './i18n/en.js';
+export {
+  approvalActions,
+  approvalStatuses,
+  approvalsPermissionGrants,
+  approvalsPermissions,
+  type ApprovalAction,
+  type ApprovalStatus,
+  type ApprovalsPermission,
+} from './approvals.js';
 export { fileStoreDrivers, type FileStoreDriver } from './enums.js';
 export { formatAmount, formatDate, formatDateTimeUtc } from './format.js';
 export {
