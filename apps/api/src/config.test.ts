@@ -41,6 +41,30 @@ describe('config loader (T-2)', () => {
     expect(failureOf({ ...valid, ADMIN_EMAIL: 'not-an-email' }).variables).toEqual(['ADMIN_EMAIL']);
   });
 
+  it('reads the optional file store driver settings (spec P1-04 BR-6)', () => {
+    const config = loadConfig({
+      ...valid,
+      FILE_STORE_LOCAL_DIR: '/srv/files',
+      FILE_URL_SECRET: 'a-long-enough-secret',
+      PUBLIC_API_URL: 'https://api.example.test/',
+      SUPABASE_URL: 'https://p.supabase.test',
+      SUPABASE_SERVICE_KEY: 'service-key',
+      SUPABASE_STORAGE_BUCKET: 'files',
+    });
+    expect(config).toMatchObject({
+      fileStoreLocalDir: '/srv/files',
+      fileUrlSecret: 'a-long-enough-secret',
+      publicApiUrl: 'https://api.example.test',
+      supabaseUrl: 'https://p.supabase.test',
+      supabaseServiceKey: 'service-key',
+      supabaseStorageBucket: 'files',
+    });
+    expect(loadConfig(valid).publicApiUrl).toBeUndefined();
+    expect(failureOf({ ...valid, FILE_URL_SECRET: 'short' }).variables).toEqual([
+      'FILE_URL_SECRET',
+    ]);
+  });
+
   it('defaults ALLOW_GOVERNMENT_DATA to false and accepts true only when set exactly', () => {
     expect(loadConfig(valid).allowGovernmentData).toBe(false);
     expect(loadConfig({ ...valid, ALLOW_GOVERNMENT_DATA: 'true' }).allowGovernmentData).toBe(true);

@@ -3,7 +3,7 @@ id: P1-04
 title: Notifications and file storage
 phase: 1
 module: files-notifications
-status: not-started
+status: done
 depends_on: [P1-02]
 requires_inputs: []
 ---

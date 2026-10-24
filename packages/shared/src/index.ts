@@ -9,6 +9,19 @@ export {
   type ApprovalsPermission,
 } from './approvals.js';
 export { fileStoreDrivers, type FileStoreDriver } from './enums.js';
+export {
+  fileOperations,
+  filesPermissionGrants,
+  filesPermissions,
+  type FileOperation,
+  type FilesPermission,
+} from './files.js';
+export {
+  approvalNotificationTemplates,
+  notificationsPermissionGrants,
+  notificationsPermissions,
+  type NotificationsPermission,
+} from './notifications.js';
 export { formatAmount, formatDate, formatDateTimeUtc } from './format.js';
 export {
   identityPermissionGrants,

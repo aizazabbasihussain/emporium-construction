@@ -1,8 +1,9 @@
-import type { FastifyInstance } from 'fastify';
+import Fastify, { type FastifyInstance } from 'fastify';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { buildApp } from '../../../app.js';
+import { registerErrorHandling } from '../../../errors.js';
 import { createLogger } from '../../../logger.js';
-import { currentUser } from '../index.js';
+import { currentUser, registerIdentityRoutes } from '../index.js';
 import {
   ADMIN,
   MANAGER,
@@ -58,6 +59,17 @@ const body = <T = Record<string, unknown>>(response: { json: () => unknown }) =>
   response.json() as T;
 
 describe('authentication on every route (AC-1, BR-1, BR-6)', () => {
+  it('leaves a route open only when it opts out with config.public', async () => {
+    const open = Fastify();
+    registerErrorHandling(open);
+    registerIdentityRoutes(open, { db: k.db, identity: k.identity });
+    open.get('/signed', { config: { public: true } }, async () => ({ ok: true }));
+    open.get('/private', async () => ({ ok: true }));
+    expect((await open.inject({ method: 'GET', url: '/signed' })).statusCode).toBe(200);
+    expect((await open.inject({ method: 'GET', url: '/private' })).statusCode).toBe(401);
+    await open.close();
+  });
+
   it('leaves /health open', async () => {
     expect((await call('GET', '/health', { as: 'none' })).statusCode).toBe(200);
   });

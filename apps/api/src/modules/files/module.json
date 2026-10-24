@@ -1,0 +1,29 @@
+{
+  "name": "files",
+  "tablePrefix": "fil_",
+  "ownedTables": ["fil_attachments"],
+  "exports": [
+    "createFiles",
+    "registerFilesRoutes",
+    "registerFileBlobRoute",
+    "createFileStore",
+    "attach",
+    "list",
+    "getSignedUrl",
+    "remove",
+    "registerFileAccess",
+    "purgeExpired"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.idempotency.execute",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions"
+  ],
+  "eventsIn": [],
+  "eventsOut": ["file.attached", "file.removed"],
+  "permissions": ["files.attachment.upload", "files.attachment.read", "files.attachment.remove"],
+  "notes": "Knows an entity only by its type string. Owning modules call registerFileAccess(entityType, check, { retainForever }) at startup. Config: FILE_STORE_DRIVER=local needs FILE_STORE_LOCAL_DIR and FILE_URL_SECRET (and optionally PUBLIC_API_URL); FILE_STORE_DRIVER=supabase needs SUPABASE_URL, SUPABASE_SERVICE_KEY and SUPABASE_STORAGE_BUCKET."
+}

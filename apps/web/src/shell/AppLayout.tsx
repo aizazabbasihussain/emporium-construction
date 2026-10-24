@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { locales } from '@emporium/shared';
 import { useAuth } from '../auth/AuthProvider';
+import { NotificationBell } from '../notifications/NotificationBell';
 import { navItems } from './nav';
 
 export function AppLayout() {
@@ -34,6 +35,7 @@ export function AppLayout() {
           onChange={(event) => setLanguage(event.target.value as string)}
           options={locales.map((locale) => ({ value: locale, label: t(`language.${locale}`) }))}
         />
+        <NotificationBell />
         <Space>
           <Typography.Text style={{ color: 'white' }}>
             {t('shell.signedInAs', { name: profile?.fullName ?? '' })}

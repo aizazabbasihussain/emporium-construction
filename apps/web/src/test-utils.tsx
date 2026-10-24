@@ -1,7 +1,9 @@
 import {
   approvalsPermissions,
+  filesPermissions,
   identityPermissions,
   importerPermissions,
+  notificationsPermissions,
   platformPermissions,
 } from '@emporium/shared';
 import type { AuthClient } from './auth/client';
@@ -12,6 +14,8 @@ export const allPermissions: string[] = [
   ...Object.values(platformPermissions),
   ...Object.values(importerPermissions),
   ...Object.values(approvalsPermissions),
+  ...Object.values(filesPermissions),
+  ...Object.values(notificationsPermissions),
 ];
 
 export const profileOf = (permissions: string[], overrides: Partial<Profile> = {}): Profile => ({

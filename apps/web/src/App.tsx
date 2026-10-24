@@ -18,6 +18,7 @@ import { RequireAuth, RequirePermission } from './shell/guards';
 import { ApprovalRulesPage } from './approvals/ApprovalRulesPage';
 import { ApprovalsInboxPage } from './approvals/ApprovalsInboxPage';
 import { ImportPage } from './importer/ImportPage';
+import { NotificationsPage } from './notifications/NotificationsPage';
 import { HomePage } from './shell/HomePage';
 import { LoginPage } from './shell/LoginPage';
 import { navItems } from './shell/nav';
@@ -84,6 +85,7 @@ export function AppRoutes() {
           path="/admin/approval-rules"
           element={guarded('/admin/approval-rules', <ApprovalRulesPage />)}
         />
+        <Route path="/notifications" element={guarded('/notifications', <NotificationsPage />)} />
         <Route path="/imports" element={guarded('/imports', <ImportPage />)} />
         <Route path="/admin/settings" element={guarded('/admin/settings', <SettingsPage />)} />
         <Route path="*" element={<NotFoundPage />} />
