@@ -9,6 +9,6 @@ export {
 } from './migrations.js';
 export { findTablesWithoutRls } from './rls.js';
 export { fromPglite } from './pglite.js';
-export { fromPool } from './node-postgres.js';
+export { connect, fromPool } from './node-postgres.js';
 export { MIGRATIONS_DIR, createTestDb, withRollback } from './test-db.js';
 export { updateWithVersion, type VersionedUpdate } from './versioned.js';

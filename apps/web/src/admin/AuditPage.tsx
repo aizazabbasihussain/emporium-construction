@@ -1,14 +1,9 @@
+import { formatDateTimeUtc } from '@emporium/shared';
 import { useQuery } from '@tanstack/react-query';
 import { Alert, Button, Form, Input, Table, Typography } from 'antd';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { adminApi, type AuditItem } from './api';
-
-const formatDate = (iso: string) => {
-  const d = new Date(iso);
-  const p = (n: number) => String(n).padStart(2, '0');
-  return `${p(d.getUTCDate())}/${p(d.getUTCMonth() + 1)}/${d.getUTCFullYear()} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
-};
 
 export function AuditPage() {
   const { t } = useTranslation();
@@ -44,7 +39,7 @@ export function AuditPage() {
         dataSource={query.data?.items ?? []}
         pagination={false}
         columns={[
-          { title: t('admin.audit.columns.at'), render: (_, r) => formatDate(r.at) },
+          { title: t('admin.audit.columns.at'), render: (_, r) => formatDateTimeUtc(r.at) },
           { title: t('admin.audit.columns.actor'), dataIndex: 'actor_user_id' },
           { title: t('admin.audit.columns.action'), dataIndex: 'action' },
           {

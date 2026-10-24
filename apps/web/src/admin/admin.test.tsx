@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppProviders, AppRoutes } from '../App';
+import { allPermissions, fakeAuth, profileOf } from '../test-utils';
 
 type Handler = (url: string, init: RequestInit) => { status?: number; body: unknown };
 let handler: Handler;
@@ -14,6 +15,13 @@ beforeEach(() => {
   vi.stubGlobal(
     'fetch',
     vi.fn((url: string, init: RequestInit) => {
+      if (url === '/me') {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve(profileOf(allPermissions)),
+        });
+      }
       calls.push({
         url,
         method: init.method ?? 'GET',
@@ -31,7 +39,7 @@ afterEach(() => {
 
 const open = (path: string) =>
   render(
-    <AppProviders>
+    <AppProviders auth={fakeAuth()}>
       <MemoryRouter initialEntries={[path]}>
         <AppRoutes />
       </MemoryRouter>

@@ -19,6 +19,7 @@ const envSchema = z
     FILE_STORE_DRIVER: z.enum(fileStoreDrivers),
     ALLOW_GOVERNMENT_DATA: booleanFlag,
     CORS_ORIGINS: z.string().min(1),
+    ADMIN_EMAIL: z.email().optional(),
   })
   .refine((env) => env.SUPABASE_JWKS_URL !== undefined || env.SUPABASE_JWT_SECRET !== undefined, {
     path: ['SUPABASE_JWKS_URL'],
@@ -35,6 +36,8 @@ export interface AppConfig {
   fileStoreDriver: FileStoreDriver;
   allowGovernmentData: boolean;
   corsOrigins: string[];
+  /** The first admin, created at startup if absent (spec P1-02 section 9). */
+  adminEmail: string | undefined;
 }
 
 export class ConfigError extends Error {
@@ -72,5 +75,6 @@ export function loadConfig(env: Record<string, string | undefined>): AppConfig {
     corsOrigins: value.CORS_ORIGINS.split(',')
       .map((origin) => origin.trim())
       .filter((origin) => origin.length > 0),
+    adminEmail: value.ADMIN_EMAIL?.toLowerCase(),
   };
 }

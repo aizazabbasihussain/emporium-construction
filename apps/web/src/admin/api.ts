@@ -11,12 +11,22 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+type TokenProvider = () => Promise<string | null>;
+let tokenProvider: TokenProvider = () => Promise.resolve(null);
+
+/** The auth layer supplies the current access token; nothing here stores or caches it (BR-9). */
+export function setTokenProvider(provider: TokenProvider): void {
+  tokenProvider = provider;
+}
+
+export async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+  const token = await tokenProvider();
   const response = await fetch(`${baseUrl}${path}`, {
     method,
     headers: {
       'content-type': 'application/json',
       'idempotency-key': crypto.randomUUID(),
+      ...(token === null ? {} : { authorization: `Bearer ${token}` }),
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
