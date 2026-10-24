@@ -4,8 +4,8 @@ title: Opening data templates and import framework
 phase: 0
 module: importer
 status: not-started
-depends_on: [P0-01]
-requires_inputs: [H-13]
+depends_on: [P1-01, P1-02]
+requires_inputs: []
 ---
 
 # P0-04 Opening data templates and import framework
@@ -16,7 +16,7 @@ Provide one safe way to load the company's paper-era data (clients, vendors, ite
 ## 2. Boundary
 - Owns: tables `imp_*`, `packages/domain/importer`, `apps/api/src/modules/importer`.
 - Provides: `registerImporter({code, label, schema, columns, dependsOn, apply})`, template generation, `runDryRun`, `commit`, importer registry listing.
-- Consumes: nothing at runtime; modules register importers in later specs.
+- Consumes: kernel (`audit.record()`, `events.publish()`) and identity (`requirePermission`, `registerPermissions`). Modules register importers in later specs.
 - Must not: write to any other module's tables directly; every write goes through the registered importer's `apply` function, which uses its own module's service.
 - Out of scope: the individual importers (each owning spec lists its importer), UI beyond the import screen.
 
@@ -64,4 +64,4 @@ Provide one safe way to load the company's paper-era data (clients, vendors, ite
 - AC-5 Definition of Done satisfied.
 
 ## 9. Open inputs
-H-13: the actual opening data. The framework does not need it to be built; it is needed only to run real imports (P2-10).
+None. H-13 (the actual opening data) is not needed to build the framework; it is needed only to run real imports (P2-10).
