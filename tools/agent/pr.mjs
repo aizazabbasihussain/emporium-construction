@@ -114,9 +114,9 @@ async function merge(number, flags) {
         5,
       );
     }
-    if (status.state === 'failure' || status.state === 'error')
+    if (status.total_count > 0 && (status.state === 'failure' || status.state === 'error'))
       fail(`Commit status ${status.state} on PR #${number}.`, 5);
-    if (seenAny && !pending.length && status.state !== 'pending') break;
+    if (seenAny && !pending.length && (status.total_count === 0 || status.state !== 'pending')) break;
     if (Date.now() > deadline)
       fail(
         `Timed out waiting for checks on PR #${number}${seenAny ? ` (pending: ${pending.join(', ')})` : ' (no checks appeared)'}.`,
