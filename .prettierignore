@@ -6,3 +6,4 @@ specs
 docs
 .env*
 tools/.selftest-tmp
+packages/db/migrations/
