@@ -1,0 +1,8 @@
+node_modules
+dist
+coverage
+pnpm-lock.yaml
+specs
+docs
+.env*
+tools/.selftest-tmp
