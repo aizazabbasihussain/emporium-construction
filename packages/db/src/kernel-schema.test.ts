@@ -99,3 +99,51 @@ describe('updateWithVersion (BR-10, T-7)', () => {
     ).rejects.toMatchObject({ code: 'protected_column' });
   });
 });
+
+describe('identity schema (P1-02)', () => {
+  it('seeds the nine roles and the minimal admin-only permission map (BR-8)', async () => {
+    const roles = await db.query<{ code: string; system: boolean }>(
+      'select code, system from sys_roles order by code',
+    );
+    expect(roles.map((r) => r.code)).toEqual([
+      'accountant',
+      'admin',
+      'estimator',
+      'management',
+      'procurement',
+      'project_manager',
+      'service_coordinator',
+      'storekeeper',
+      'supervisor',
+    ]);
+    expect(roles.every((r) => r.system)).toBe(true);
+    const grants = await db.query<{ role_code: string; permission_code: string }>(
+      "select role_code, permission_code from sys_role_permissions where permission_code like 'identity.%' order by 1, 2",
+    );
+    expect(grants).toEqual([
+      { role_code: 'admin', permission_code: 'identity.role.manage' },
+      { role_code: 'admin', permission_code: 'identity.user.manage' },
+      { role_code: 'admin', permission_code: 'identity.user.read' },
+      { role_code: 'management', permission_code: 'identity.user.read' },
+    ]);
+  });
+
+  it('keeps emails lower case and unique and subjects unique', async () => {
+    const insert = (id: string, email: string, subject: string | null) =>
+      db.query(
+        "insert into sys_users (id, auth_subject, email, full_name) values ($1, $2, $3, 'N')",
+        [id, subject, email],
+      );
+    await insert('018f0000-0000-7000-8000-0000000000a1', 'one@example.test', 's1');
+    await expect(
+      insert('018f0000-0000-7000-8000-0000000000a2', 'One@example.test', null),
+    ).rejects.toThrow();
+    await expect(
+      insert('018f0000-0000-7000-8000-0000000000a3', 'one@example.test', null),
+    ).rejects.toThrow();
+    await expect(
+      insert('018f0000-0000-7000-8000-0000000000a4', 'two@example.test', 's1'),
+    ).rejects.toThrow();
+    await db.query("delete from sys_users where id = '018f0000-0000-7000-8000-0000000000a1'");
+  });
+});

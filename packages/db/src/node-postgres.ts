@@ -1,4 +1,4 @@
-import type pg from 'pg';
+import pg from 'pg';
 import type { SqlDb } from './types.js';
 
 const noNesting: SqlDb['transaction'] = () => {
@@ -33,4 +33,10 @@ export function fromPool(pool: pg.Pool): SqlDb {
       client.release();
     }
   });
+}
+
+/** A pool-backed database for the running API; call `close` on shutdown. */
+export function connect(databaseUrl: string): { db: SqlDb; close: () => Promise<void> } {
+  const pool = new pg.Pool({ connectionString: databaseUrl });
+  return { db: fromPool(pool), close: () => pool.end() };
 }
