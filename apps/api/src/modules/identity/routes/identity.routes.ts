@@ -38,12 +38,21 @@ const scopesBody = z.object({
 });
 const permissionsBody = z.object({ permissions: z.array(z.string().min(1)).max(500) });
 
+declare module 'fastify' {
+  interface FastifyContextConfig {
+    /** Skips the bearer-token hook; only for routes that verify their own credential. */
+    public?: boolean;
+  }
+}
+
 /** Authentication for every route except /health (BR-1, AC-1), then the identity endpoints. */
 export function registerIdentityRoutes(app: FastifyInstance, deps: IdentityRouteDeps): void {
   const { db, identity } = deps;
 
   app.addHook('onRequest', async (request) => {
     if (request.method === 'OPTIONS' || request.url.split('?')[0] === '/health') return;
+    // A route that carries its own credential (a signed link) opts out with `config: { public: true }`.
+    if (request.routeOptions.config.public === true) return;
     const header = request.headers.authorization;
     const match = header === undefined ? null : /^Bearer\s+(\S+)$/i.exec(header);
     if (match === null) throw new UnauthorizedError('missing_token', 'Bearer token required');

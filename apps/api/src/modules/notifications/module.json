@@ -1,0 +1,37 @@
+{
+  "name": "notifications",
+  "tablePrefix": "ntf_",
+  "ownedTables": ["ntf_notifications", "ntf_reminders"],
+  "exports": [
+    "createNotifications",
+    "registerNotificationsRoutes",
+    "notify",
+    "notifyRole",
+    "scheduleReminder",
+    "registerTemplate",
+    "tickReminders",
+    "purgeOld"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.events.subscribe",
+    "platform.idempotency.execute",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "identity.users.list",
+    "approvals.getApprovalState"
+  ],
+  "eventsIn": [
+    "approval.requested",
+    "approval.step_approved",
+    "approval.approved",
+    "approval.rejected",
+    "approval.returned",
+    "approval.cancelled"
+  ],
+  "eventsOut": ["notification.created"],
+  "permissions": ["notifications.read.own"],
+  "notes": "In-app only; email, SMS and WhatsApp delivery are out of scope (Phase 7). Identity users and approval state reach this module through functions injected at composition, not by importing those modules."
+}

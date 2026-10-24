@@ -20,6 +20,12 @@ const envSchema = z
     ALLOW_GOVERNMENT_DATA: booleanFlag,
     CORS_ORIGINS: z.string().min(1),
     ADMIN_EMAIL: z.email().optional(),
+    FILE_STORE_LOCAL_DIR: z.string().min(1).optional(),
+    FILE_URL_SECRET: z.string().min(16).optional(),
+    PUBLIC_API_URL: z.url().optional(),
+    SUPABASE_URL: z.url().optional(),
+    SUPABASE_SERVICE_KEY: z.string().min(1).optional(),
+    SUPABASE_STORAGE_BUCKET: z.string().min(1).optional(),
   })
   .refine((env) => env.SUPABASE_JWKS_URL !== undefined || env.SUPABASE_JWT_SECRET !== undefined, {
     path: ['SUPABASE_JWKS_URL'],
@@ -38,6 +44,13 @@ export interface AppConfig {
   corsOrigins: string[];
   /** The first admin, created at startup if absent (spec P1-02 section 9). */
   adminEmail: string | undefined;
+  /** Settings of the selected file store driver (spec P1-04 BR-6); checked when the driver is created. */
+  fileStoreLocalDir: string | undefined;
+  fileUrlSecret: string | undefined;
+  publicApiUrl: string | undefined;
+  supabaseUrl: string | undefined;
+  supabaseServiceKey: string | undefined;
+  supabaseStorageBucket: string | undefined;
 }
 
 export class ConfigError extends Error {
@@ -76,5 +89,11 @@ export function loadConfig(env: Record<string, string | undefined>): AppConfig {
       .map((origin) => origin.trim())
       .filter((origin) => origin.length > 0),
     adminEmail: value.ADMIN_EMAIL?.toLowerCase(),
+    fileStoreLocalDir: value.FILE_STORE_LOCAL_DIR,
+    fileUrlSecret: value.FILE_URL_SECRET,
+    publicApiUrl: value.PUBLIC_API_URL?.replace(/\/$/, ''),
+    supabaseUrl: value.SUPABASE_URL,
+    supabaseServiceKey: value.SUPABASE_SERVICE_KEY,
+    supabaseStorageBucket: value.SUPABASE_STORAGE_BUCKET,
   };
 }

@@ -6,8 +6,17 @@ import pkg from '../package.json' with { type: 'json' };
 import type { AppConfig } from './config.js';
 import { registerErrorHandling } from './errors.js';
 import { registerApprovalsRoutes, type ApprovalsRouteDeps } from './modules/approvals/index.js';
+import {
+  registerFileBlobRoute,
+  registerFilesRoutes,
+  type FilesRouteDeps,
+} from './modules/files/index.js';
 import { registerIdentityRoutes, type IdentityRouteDeps } from './modules/identity/index.js';
 import { registerImporterRoutes, type ImporterRouteDeps } from './modules/importer/index.js';
+import {
+  registerNotificationsRoutes,
+  type NotificationsRouteDeps,
+} from './modules/notifications/index.js';
 import { registerPlatformRoutes, type PlatformRouteDeps } from './modules/platform/index.js';
 
 export interface AppDeps {
@@ -22,6 +31,10 @@ export interface AppDeps {
   importer?: ImporterRouteDeps;
   /** The approval endpoints; they rely on the authentication hook of `identity`. */
   approvals?: ApprovalsRouteDeps;
+  /** The file endpoints; they rely on the authentication hook of `identity`. */
+  files?: FilesRouteDeps;
+  /** The notification endpoints; they rely on the authentication hook of `identity`. */
+  notifications?: NotificationsRouteDeps;
 }
 
 export async function buildApp({
@@ -32,6 +45,8 @@ export async function buildApp({
   identity,
   importer,
   approvals,
+  files,
+  notifications,
 }: AppDeps): Promise<FastifyInstance> {
   const loggerInstance: FastifyBaseLogger = logger;
   const app = Fastify({
@@ -59,6 +74,9 @@ export async function buildApp({
   if (platform) registerPlatformRoutes(app, platform);
   if (importer) registerImporterRoutes(app, importer);
   if (approvals) registerApprovalsRoutes(app, approvals);
+  if (files) await registerFilesRoutes(app, files);
+  if (files?.local) registerFileBlobRoute(app, files.local);
+  if (notifications) registerNotificationsRoutes(app, notifications);
 
   return app;
 }
