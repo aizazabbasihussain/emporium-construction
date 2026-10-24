@@ -1,4 +1,4 @@
-import { identityPermissions, platformPermissions } from '@emporium/shared';
+import { identityPermissions, importerPermissions, platformPermissions } from '@emporium/shared';
 
 export interface NavItem {
   path: string;
@@ -19,6 +19,7 @@ export const navItems: readonly NavItem[] = [
     label: 'nav.series',
     permission: platformPermissions.seriesManage,
   },
+  { path: '/imports', label: 'nav.imports', permission: importerPermissions.batchRead },
   {
     path: '/admin/settings',
     label: 'nav.settings',
