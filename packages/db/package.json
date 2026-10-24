@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.11",
-    "pg": "^8.23.1"
+    "pg": "^8.23.1",
+    "@emporium/domain": "workspace:*"
   },
   "devDependencies": {
     "@types/pg": "^8.23.1"

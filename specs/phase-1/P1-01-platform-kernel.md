@@ -3,7 +3,7 @@ id: P1-01
 title: Platform kernel
 phase: 1
 module: platform
-status: not-started
+status: done
 depends_on: [P0-01]
 requires_inputs: [H-04, H-24, H-27]
 ---
