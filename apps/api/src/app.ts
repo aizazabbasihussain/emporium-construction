@@ -5,6 +5,7 @@ import type { Logger } from 'pino';
 import pkg from '../package.json' with { type: 'json' };
 import type { AppConfig } from './config.js';
 import { registerErrorHandling } from './errors.js';
+import { registerApprovalsRoutes, type ApprovalsRouteDeps } from './modules/approvals/index.js';
 import { registerIdentityRoutes, type IdentityRouteDeps } from './modules/identity/index.js';
 import { registerImporterRoutes, type ImporterRouteDeps } from './modules/importer/index.js';
 import { registerPlatformRoutes, type PlatformRouteDeps } from './modules/platform/index.js';
@@ -19,6 +20,8 @@ export interface AppDeps {
   identity?: IdentityRouteDeps;
   /** The import endpoints; they rely on the authentication hook of `identity`. */
   importer?: ImporterRouteDeps;
+  /** The approval endpoints; they rely on the authentication hook of `identity`. */
+  approvals?: ApprovalsRouteDeps;
 }
 
 export async function buildApp({
@@ -28,6 +31,7 @@ export async function buildApp({
   platform,
   identity,
   importer,
+  approvals,
 }: AppDeps): Promise<FastifyInstance> {
   const loggerInstance: FastifyBaseLogger = logger;
   const app = Fastify({
@@ -54,6 +58,7 @@ export async function buildApp({
 
   if (platform) registerPlatformRoutes(app, platform);
   if (importer) registerImporterRoutes(app, importer);
+  if (approvals) registerApprovalsRoutes(app, approvals);
 
   return app;
 }

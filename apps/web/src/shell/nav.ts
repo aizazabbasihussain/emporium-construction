@@ -1,4 +1,9 @@
-import { identityPermissions, importerPermissions, platformPermissions } from '@emporium/shared';
+import {
+  approvalsPermissions,
+  identityPermissions,
+  importerPermissions,
+  platformPermissions,
+} from '@emporium/shared';
 
 export interface NavItem {
   path: string;
@@ -18,6 +23,12 @@ export const navItems: readonly NavItem[] = [
     path: '/admin/number-series',
     label: 'nav.series',
     permission: platformPermissions.seriesManage,
+  },
+  { path: '/approvals', label: 'nav.approvals', permission: approvalsPermissions.inboxRead },
+  {
+    path: '/admin/approval-rules',
+    label: 'nav.approvalRules',
+    permission: approvalsPermissions.ruleManage,
   },
   { path: '/imports', label: 'nav.imports', permission: importerPermissions.batchRead },
   {

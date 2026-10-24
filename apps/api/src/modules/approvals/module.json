@@ -1,0 +1,32 @@
+{
+  "name": "approvals",
+  "tablePrefix": "apr_",
+  "ownedTables": ["apr_rules", "apr_rule_steps", "apr_requests", "apr_actions"],
+  "exports": [
+    "createApprovals",
+    "registerApprovalsRoutes",
+    "requestApproval",
+    "getApprovalState",
+    "cancelApproval"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.idempotency.execute",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "identity.roles.list"
+  ],
+  "eventsIn": [],
+  "eventsOut": [
+    "approval.requested",
+    "approval.step_approved",
+    "approval.approved",
+    "approval.rejected",
+    "approval.returned",
+    "approval.cancelled"
+  ],
+  "permissions": ["approvals.inbox.read", "approvals.rule.manage", "approvals.request.read"],
+  "notes": "Owning modules call requestApproval inside their own transaction and react to approval.* events; this module never changes the business document."
+}
