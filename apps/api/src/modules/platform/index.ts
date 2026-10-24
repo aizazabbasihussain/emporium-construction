@@ -36,6 +36,7 @@ export function createPlatform(deps: { clock: Clock; newId?: IdGenerator }): Pla
 }
 
 export { registerPlatformRoutes, type PlatformRouteDeps } from './routes/admin.routes.js';
+export { uuidv7, type IdGenerator } from './ids.js';
 export type { Principal, Db } from './types.js';
 export type { AuditEntry } from './service/audit.service.js';
 export type { DomainEvent, DeliveredEvent, EventHandler } from './service/events.service.js';

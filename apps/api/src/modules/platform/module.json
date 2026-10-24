@@ -3,6 +3,7 @@
   "tablePrefix": "sys_",
   "exports": [
     "createPlatform",
+    "uuidv7",
     "registerPlatformRoutes",
     "audit.record",
     "numbering.next",

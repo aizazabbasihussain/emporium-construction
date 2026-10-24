@@ -33,6 +33,14 @@ describe('config loader (T-2)', () => {
     });
   });
 
+  it('reads the optional first-admin email in lower case and rejects a malformed one', () => {
+    expect(loadConfig(valid).adminEmail).toBeUndefined();
+    expect(loadConfig({ ...valid, ADMIN_EMAIL: 'Owner@Example.com' }).adminEmail).toBe(
+      'owner@example.com',
+    );
+    expect(failureOf({ ...valid, ADMIN_EMAIL: 'not-an-email' }).variables).toEqual(['ADMIN_EMAIL']);
+  });
+
   it('defaults ALLOW_GOVERNMENT_DATA to false and accepts true only when set exactly', () => {
     expect(loadConfig(valid).allowGovernmentData).toBe(false);
     expect(loadConfig({ ...valid, ALLOW_GOVERNMENT_DATA: 'true' }).allowGovernmentData).toBe(true);

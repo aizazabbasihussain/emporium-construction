@@ -20,3 +20,11 @@ cp .env.example .env    # fill in values locally; never commit .env
 | `pnpm module:new <name>`               | Scaffold an API module and its domain folder                                                                    |
 | `pnpm spec:check` / `pnpm spec:status` | Validate specs / also regenerate `specs/STATUS.md`                                                              |
 | `pnpm docs:check`                      | Validate `docs/discovery` (forms, workflows, links, no real CNIC or phone numbers)                              |
+
+## Sign-in (P1-02)
+
+Users sign in with Supabase Auth; the API verifies the JWT and maps it to a row in `sys_users`. There is no self-registration.
+
+- **First admin:** set `ADMIN_EMAIL` in `.env` before the first start. The API creates that user with the `admin` role if it does not exist. The person then signs in with a Supabase account that has the same email; the first login binds the Supabase subject to the user. All other users are created by that admin in the UI.
+- **Web app:** set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (both are public values) when running or building `apps/web`.
+- **API:** set `SUPABASE_JWKS_URL` (or the legacy `SUPABASE_JWT_SECRET`). Tokens must carry the `authenticated` audience.

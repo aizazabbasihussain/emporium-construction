@@ -5,6 +5,7 @@ import type { Logger } from 'pino';
 import pkg from '../package.json' with { type: 'json' };
 import type { AppConfig } from './config.js';
 import { registerErrorHandling } from './errors.js';
+import { registerIdentityRoutes, type IdentityRouteDeps } from './modules/identity/index.js';
 import { registerPlatformRoutes, type PlatformRouteDeps } from './modules/platform/index.js';
 
 export interface AppDeps {
@@ -13,6 +14,8 @@ export interface AppDeps {
   clock?: () => Date;
   /** Database, kernel services and caller resolution; the admin routes are mounted only when given. */
   platform?: PlatformRouteDeps;
+  /** Authentication and the identity endpoints; when given, every route except /health needs a JWT. */
+  identity?: IdentityRouteDeps;
 }
 
 export async function buildApp({
@@ -20,6 +23,7 @@ export async function buildApp({
   logger,
   clock = () => new Date(),
   platform,
+  identity,
 }: AppDeps): Promise<FastifyInstance> {
   const loggerInstance: FastifyBaseLogger = logger;
   const app = Fastify({
@@ -34,6 +38,9 @@ export async function buildApp({
 
   registerErrorHandling(app);
   await app.register(cors, { origin: config.corsOrigins });
+
+  // Registered before any route so the authentication hook covers all of them (BR-1, AC-1).
+  if (identity) registerIdentityRoutes(app, identity);
 
   app.get('/health', async () => ({
     status: 'ok',

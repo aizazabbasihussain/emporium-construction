@@ -1,0 +1,39 @@
+{
+  "name": "identity",
+  "tablePrefix": "sys_",
+  "ownedTables": [
+    "sys_users",
+    "sys_roles",
+    "sys_role_permissions",
+    "sys_user_roles",
+    "sys_user_scopes"
+  ],
+  "exports": [
+    "createIdentity",
+    "registerIdentityRoutes",
+    "createJwtVerifier",
+    "requirePermission",
+    "requireAdminRole",
+    "currentUser",
+    "assertPermission",
+    "assertScopeForRead",
+    "userHasScope",
+    "scopeFilterFor",
+    "registerPermissions",
+    "registerRole"
+  ],
+  "consumes": ["platform.audit.record", "platform.events.publish", "platform.idempotency.execute"],
+  "eventsIn": [],
+  "eventsOut": [
+    "identity.user.created",
+    "identity.user.updated",
+    "identity.user.disabled",
+    "identity.user.enabled",
+    "identity.user.roles_changed",
+    "identity.user.scopes_changed",
+    "identity.user.first_login",
+    "identity.role.permissions_changed"
+  ],
+  "permissions": ["identity.user.manage", "identity.role.manage", "identity.user.read"],
+  "notes": "Platform tables with other sys_ names belong to the platform module (P1-01)."
+}
