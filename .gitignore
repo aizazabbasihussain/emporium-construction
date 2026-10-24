@@ -18,3 +18,7 @@ Thumbs.db
 # Tooling self-test scratch space
 tools/.selftest-tmp/
 docs/archive/
+
+# Autonomous run
+.agent-logs/
+.agent-stop

@@ -16,15 +16,16 @@ Created from plan v2 (`construction-ops-crm-plan-v2.md`) and the user's answers.
 6. **Cost objects** (`project`, `work_order`, `overhead`) are part of the cost ledger from P1-09 so maintenance (Phase 3) needs no redesign.
 7. **Cost ledger statuses:** committed, approved, posted, reversed; "paid" is tracked elsewhere.
 
-### 2026-10-24: P0-04 reordered after the kernel and identity modules (option A)
+### 2026-10-24: autonomous run with auto-merge (user request)
 
-Approved by the user. P0-04 needs audit and events from P1-01 and the permission guard from P1-02 (BR-9 and the `importer.batch.*` permissions), and its input H-13 is not needed to build the framework. Changes to `specs/phase-0/P0-04-opening-data-and-import-framework.md`:
+Approved by the user ("merge automatically if there is no error in the git actions", "start the next phase with a new agent session always"). Adds `specs/04-autonomous-run.md`, `specs/tools/next-spec.mjs`, `tools/agent/pr.mjs` and `tools/agent/loop.mjs`. Effects on `01-agent-workflow.md` for runs started by the loop:
 
-1. `depends_on` changed from `[P0-01]` to `[P1-01, P1-02]`.
-2. `requires_inputs` changed from `[H-13]` to `[]`. H-13 stays on P2-10, where real opening data is imported.
-3. Boundary "Consumes" now names the kernel and identity interfaces; section 9 now says there are no open inputs.
+1. One fresh agent session per spec. A driver script starts each session and judges the result from `main`.
+2. A PR is merged automatically only after every CI check on its head commit passes. The spec is set to `done` and `STATUS.md` regenerated inside the same PR, replacing the separate "in-review" step and the follow-up status PR.
+3. PRs that touch the constitution, workflow files, `CHANGES.md`, spec tools, CI, hooks, lint, coverage or dependency rules, another spec, or `.env*` are never auto-merged; a human reviews them.
+4. Spec selection skips a spec that waits on an open human input with "default allowed: no" and takes the next eligible spec by dependency order, instead of stopping the whole run. The loop ends when none is eligible and lists the inputs needed.
 
-P1-05 already depends on P1-02 and P0-04, so no other spec moves. Rejected alternatives: B (placeholder ports with later wiring in P1-02) and C (a different order).
+Human review of ordinary spec PRs now happens after the merge. Branch protection on `main` (needs the Administration permission on the token) would make the "checks must pass" rule enforced by GitHub as well.
 
 ## Proposed
 
