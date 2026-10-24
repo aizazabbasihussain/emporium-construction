@@ -15,14 +15,14 @@ Identify users, check their permissions on every request, scope supervisors to t
 
 ## 2. Boundary
 - Owns: tables `sys_users`, `sys_roles`, `sys_role_permissions`, `sys_user_roles`, `sys_user_scopes`; module `identity`; the web shell.
-- Provides: `AuthVerifier` interface (Supabase JWT implementation), `requirePermission(code)` route guard, `currentUser()` context, `userHasScope(user, scopeType, scopeId)`, permission registry helper `registerPermissions(module, codes)`.
+- Provides: `AuthVerifier` interface (Supabase JWT implementation), `requirePermission(code)` route guard, `currentUser()` context, `userHasScope(user, scopeType, scopeId)`, permission registry helper `registerPermissions(module, codes)`, role registry helper `registerRole(code, name, description)` (idempotent; used by modules that own a role, for example `worker` in P1-22).
 - Consumes: kernel audit and settings.
 - Must not: store passwords or run its own login (Supabase Auth does).
 - Out of scope: approvals (P1-03), per-module permission lists (each module registers its own).
 
 ## 3. Data model
 - `sys_users(id, auth_subject unique, email unique, full_name, phone, status active|disabled, locale default 'en', last_login_at, ...base)`.
-- `sys_roles(code pk, name, description, system bool)`; seeded: `admin`, `management`, `project_manager`, `procurement`, `storekeeper`, `supervisor`, `accountant`, `service_coordinator`.
+- `sys_roles(code pk, name, description, system bool)`; seeded: `admin`, `management`, `project_manager`, `procurement`, `storekeeper`, `supervisor`, `accountant`, `service_coordinator`, `estimator`.
 - `sys_role_permissions(role_code, permission_code)`; permissions are text codes registered by modules.
 - `sys_user_roles(user_id, role_code)`; `sys_user_scopes(user_id, scope_type project|team, scope_id)`.
 
