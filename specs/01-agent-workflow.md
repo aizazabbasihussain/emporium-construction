@@ -1,6 +1,6 @@
 # 01. Agent Workflow
 
-How the coding agent works through the specs. Follow these steps for **each** spec, in order.
+How the coding agent works through the specs. Follow these steps for **each** spec, in order. Runs started by `tools/agent/loop.mjs` follow `04-autonomous-run.md` where it differs (auto-merge on green CI, one session per spec).
 
 ## 1. Pick the next spec
 
