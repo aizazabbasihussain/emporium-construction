@@ -39,17 +39,3 @@ Options for the human to decide:
 3. Defer to BACKLOG and rely on site visit notes with photos through `fil_attachments`.
 
 No spec is blocked. Awaiting a decision.
-
-### 2026-10-24: P0-04 needs the kernel and identity modules, and its input H-13 blocks it
-
-Found when starting P0-04 (rule: stop and propose, do not invent).
-
-1. **Dependency conflict.** P0-04 `depends_on: [P0-01]` and "Consumes: nothing at runtime", but BR-9 requires audit entries and an `import.committed` outbox event, and section 6 requires permission codes `importer.batch.run|force|read` on every route. Audit and events are provided by P1-01 (`audit.record()`, `events.publish()`), and the route guard by P1-02 (`requirePermission`, `registerPermissions`). Neither exists yet, and P1-01 and P1-02 are scheduled after P0-04.
-2. **Input gate.** P0-04 lists H-13 (opening data) in `requires_inputs`, which is open with "default allowed: no", so the workflow says to stop. Section 9 of the spec says the framework does not need H-13 and that it is needed only to run real imports in P2-10.
-
-Options for the human to decide:
-- **A (recommended):** change P0-04 to `depends_on: [P1-01, P1-02]` and `requires_inputs: []`, and keep H-13 on P2-10 only. P1-05 already depends on both P1-02 and P0-04, so nothing else moves. Nothing is built twice.
-- **B:** keep P0-04 first, but have it define small ports (`AuditSink`, `EventPublisher`, `PermissionGuard`) with test fakes, and move the real wiring, the permission seeding and the BR-9 acceptance checks into P1-02. This needs wording changes in P0-04 and P1-02.
-- **C:** reject this proposal and approve a different order.
-
-Effect on the next work: with A, the next buildable spec is P1-01, which first needs H-04 (tax-invoice numbering rules) and H-27 (document number series and starting numbers) answered, because neither allows a default. H-24 can use its default of 3 days. P0-03 is also waiting on the accountant (H-01, H-04, H-05, H-07, H-09, H-10, H-25, H-27).

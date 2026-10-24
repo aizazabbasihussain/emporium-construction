@@ -11,7 +11,7 @@ Specs: 40 (not-started: 38, in-progress: 0, in-review: 0, done: 2, blocked: 0)
 | P0-01 | Repo bootstrap and quality gates | done | - | no | - |
 | P0-02 | Discovery pack and paper-form intake | done | P0-01 | no | H-14 |
 | P0-03 | Accounting, tax and roles decision records | not-started | P0-02 | yes | H-01, H-04, H-05, H-07, H-09, H-10, H-25, H-27 |
-| P0-04 | Opening data templates and import framework | not-started | P0-01 | yes | H-13 |
+| P0-04 | Opening data templates and import framework | not-started | P1-01, P1-02 | no | - |
 | P1-01 | Platform kernel | not-started | P0-01 | yes | H-04, H-24, H-27 |
 | P1-02 | Authentication, roles and app shell | not-started | P1-01 | no | H-10 |
 | P1-03 | Approval engine | not-started | P1-02 | no | H-09 |
