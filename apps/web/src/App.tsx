@@ -15,6 +15,8 @@ import { i18n } from './i18n';
 import { AppLayout } from './shell/AppLayout';
 import { NotFoundPage } from './shell/ErrorPages';
 import { RequireAuth, RequirePermission } from './shell/guards';
+import { ApprovalRulesPage } from './approvals/ApprovalRulesPage';
+import { ApprovalsInboxPage } from './approvals/ApprovalsInboxPage';
 import { ImportPage } from './importer/ImportPage';
 import { HomePage } from './shell/HomePage';
 import { LoginPage } from './shell/LoginPage';
@@ -76,6 +78,11 @@ export function AppRoutes() {
         <Route
           path="/admin/number-series"
           element={guarded('/admin/number-series', <NumberSeriesPage />)}
+        />
+        <Route path="/approvals" element={guarded('/approvals', <ApprovalsInboxPage />)} />
+        <Route
+          path="/admin/approval-rules"
+          element={guarded('/admin/approval-rules', <ApprovalRulesPage />)}
         />
         <Route path="/imports" element={guarded('/imports', <ImportPage />)} />
         <Route path="/admin/settings" element={guarded('/admin/settings', <SettingsPage />)} />
