@@ -3,7 +3,7 @@ id: P0-04
 title: Opening data templates and import framework
 phase: 0
 module: importer
-status: not-started
+status: done
 depends_on: [P1-01, P1-02]
 requires_inputs: []
 ---

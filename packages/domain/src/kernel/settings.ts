@@ -21,6 +21,11 @@ export const settingRegistry: SettingRegistry = {
     min: 0,
     max: 365,
   },
+  import_date_formats: {
+    type: 'string',
+    description: 'Date spellings accepted in import files: iso, dmy or both',
+    default: 'both',
+  },
 };
 
 export function settingDefinition(

@@ -19,6 +19,27 @@ export function setTokenProvider(provider: TokenProvider): void {
   tokenProvider = provider;
 }
 
+/** Authenticated call that returns the raw response: file downloads and multipart uploads. */
+export async function rawRequest(method: string, path: string, body?: FormData): Promise<Response> {
+  const token = await tokenProvider();
+  const response = await fetch(`${baseUrl}${path}`, {
+    method,
+    headers: token === null ? {} : { authorization: `Bearer ${token}` },
+    ...(body === undefined ? {} : { body }),
+  });
+  if (!response.ok) {
+    const data = (await response.json().catch(() => ({}))) as {
+      error?: { code?: string; message?: string };
+    };
+    throw new ApiError(
+      response.status,
+      data.error?.code ?? 'request_failed',
+      data.error?.message ?? 'Request failed',
+    );
+  }
+  return response;
+}
+
 export async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
   const token = await tokenProvider();
   const response = await fetch(`${baseUrl}${path}`, {

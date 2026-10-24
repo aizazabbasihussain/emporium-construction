@@ -6,6 +6,7 @@ import pkg from '../package.json' with { type: 'json' };
 import type { AppConfig } from './config.js';
 import { registerErrorHandling } from './errors.js';
 import { registerIdentityRoutes, type IdentityRouteDeps } from './modules/identity/index.js';
+import { registerImporterRoutes, type ImporterRouteDeps } from './modules/importer/index.js';
 import { registerPlatformRoutes, type PlatformRouteDeps } from './modules/platform/index.js';
 
 export interface AppDeps {
@@ -16,6 +17,8 @@ export interface AppDeps {
   platform?: PlatformRouteDeps;
   /** Authentication and the identity endpoints; when given, every route except /health needs a JWT. */
   identity?: IdentityRouteDeps;
+  /** The import endpoints; they rely on the authentication hook of `identity`. */
+  importer?: ImporterRouteDeps;
 }
 
 export async function buildApp({
@@ -24,6 +27,7 @@ export async function buildApp({
   clock = () => new Date(),
   platform,
   identity,
+  importer,
 }: AppDeps): Promise<FastifyInstance> {
   const loggerInstance: FastifyBaseLogger = logger;
   const app = Fastify({
@@ -49,6 +53,7 @@ export async function buildApp({
   }));
 
   if (platform) registerPlatformRoutes(app, platform);
+  if (importer) registerImporterRoutes(app, importer);
 
   return app;
 }

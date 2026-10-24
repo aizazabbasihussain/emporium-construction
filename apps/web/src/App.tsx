@@ -15,6 +15,7 @@ import { i18n } from './i18n';
 import { AppLayout } from './shell/AppLayout';
 import { NotFoundPage } from './shell/ErrorPages';
 import { RequireAuth, RequirePermission } from './shell/guards';
+import { ImportPage } from './importer/ImportPage';
 import { HomePage } from './shell/HomePage';
 import { LoginPage } from './shell/LoginPage';
 import { navItems } from './shell/nav';
@@ -76,6 +77,7 @@ export function AppRoutes() {
           path="/admin/number-series"
           element={guarded('/admin/number-series', <NumberSeriesPage />)}
         />
+        <Route path="/imports" element={guarded('/imports', <ImportPage />)} />
         <Route path="/admin/settings" element={guarded('/admin/settings', <SettingsPage />)} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
