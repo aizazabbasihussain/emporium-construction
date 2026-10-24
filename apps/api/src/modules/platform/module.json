@@ -1,0 +1,28 @@
+{
+  "name": "platform",
+  "tablePrefix": "sys_",
+  "exports": [
+    "createPlatform",
+    "registerPlatformRoutes",
+    "audit.record",
+    "numbering.next",
+    "events.publish",
+    "events.subscribe",
+    "events.dispatchDue",
+    "idempotency.execute",
+    "settings.get",
+    "settings.set",
+    "backdating.check"
+  ],
+  "consumes": [],
+  "eventsIn": [],
+  "eventsOut": [],
+  "permissions": [
+    "platform.audit.read",
+    "platform.settings.manage",
+    "platform.series.manage",
+    "platform.outbox.manage",
+    "platform.backdate.override"
+  ],
+  "notes": "Tables sys_users, sys_roles and related belong to P1-02. sys_migrations belongs to packages/db."
+}

@@ -16,7 +16,8 @@
     "pino": "^10.4.0",
     "zod": "^4.6.7",
     "@emporium/domain": "workspace:*",
-    "@emporium/shared": "workspace:*"
+    "@emporium/shared": "workspace:*",
+    "@emporium/db": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^9.0.0"
