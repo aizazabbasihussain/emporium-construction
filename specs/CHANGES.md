@@ -18,4 +18,13 @@ Created from plan v2 (`construction-ops-crm-plan-v2.md`) and the user's answers.
 
 ## Proposed
 
-_None yet._
+### 2026-10-24: P0-02 proposes a pre-project survey record for demolition and restructuring (GAP-01)
+
+Found while mapping the demolition workflow (`docs/discovery/workflows/demolition-job.md`, `docs/discovery/gaps.md` GAP-01). Plan v2 section 9 lists "survey and inspection records with before/after photos" for demolition and restructuring, but no Phase 1 spec holds a record of the structure before a job is quoted or started. P1-06 has site visits, P1-15 has daily reports (only after a project exists), and before and after photos exist only on Phase 3 work orders (P3-02).
+
+Options for the human to decide:
+1. Extend the site visit in P1-06 with a survey section and photo attachments (smallest change).
+2. Add a survey record to P1-15 once a project exists.
+3. Defer to BACKLOG and rely on site visit notes with photos through `fil_attachments`.
+
+No spec is blocked. Awaiting a decision.

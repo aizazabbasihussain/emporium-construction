@@ -5,6 +5,8 @@ export const businessLogicGlobs = [
   'packages/domain/**/*.ts',
   'apps/api/src/modules/*/service/**/*.ts',
   'apps/api/src/modules/*/policy/**/*.ts',
+  // Repository tooling with real logic (P0-02 T-4).
+  'tools/docs-check/src/**/*.ts',
 ];
 
 /** Exclusions are limited to tests, generated code, type files, index re-exports and config. */

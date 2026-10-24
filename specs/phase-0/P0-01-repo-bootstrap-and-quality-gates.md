@@ -3,7 +3,7 @@ id: P0-01
 title: Repo bootstrap and quality gates
 phase: 0
 module: tooling
-status: in-review
+status: done
 depends_on: []
 requires_inputs: []
 ---
