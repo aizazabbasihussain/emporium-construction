@@ -85,7 +85,7 @@ describe('web shell (T-8)', () => {
   it('shows every item to a user holding every permission', async () => {
     open('/');
     const menu = await screen.findByRole('menu');
-    expect(within(menu).getAllByRole('menuitem')).toHaveLength(9);
+    expect(within(menu).getAllByRole('menuitem')).toHaveLength(10);
   });
 
   it('shows the 403 page on a direct URL without the permission', async () => {

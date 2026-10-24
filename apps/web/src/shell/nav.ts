@@ -2,6 +2,7 @@ import {
   approvalsPermissions,
   identityPermissions,
   importerPermissions,
+  notificationsPermissions,
   platformPermissions,
 } from '@emporium/shared';
 
@@ -29,6 +30,11 @@ export const navItems: readonly NavItem[] = [
     path: '/admin/approval-rules',
     label: 'nav.approvalRules',
     permission: approvalsPermissions.ruleManage,
+  },
+  {
+    path: '/notifications',
+    label: 'nav.notifications',
+    permission: notificationsPermissions.readOwn,
   },
   { path: '/imports', label: 'nav.imports', permission: importerPermissions.batchRead },
   {
