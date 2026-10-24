@@ -3,7 +3,7 @@ id: P0-02
 title: Discovery pack and paper-form intake
 phase: 0
 module: discovery
-status: in-review
+status: done
 depends_on: [P0-01]
 requires_inputs: [H-14]
 ---
