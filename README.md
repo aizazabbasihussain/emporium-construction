@@ -19,3 +19,4 @@ cp .env.example .env    # fill in values locally; never commit .env
 | `pnpm --filter @emporium/db migrate`   | Apply SQL migrations to `DATABASE_URL`                                                                          |
 | `pnpm module:new <name>`               | Scaffold an API module and its domain folder                                                                    |
 | `pnpm spec:check` / `pnpm spec:status` | Validate specs / also regenerate `specs/STATUS.md`                                                              |
+| `pnpm docs:check`                      | Validate `docs/discovery` (forms, workflows, links, no real CNIC or phone numbers)                              |

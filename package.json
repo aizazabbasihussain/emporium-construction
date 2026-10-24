@@ -18,8 +18,9 @@
     "spec:check": "node specs/tools/spec-index.mjs",
     "spec:status": "node specs/tools/spec-index.mjs --write",
     "build": "pnpm -r build",
-    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm test:tools && pnpm boundaries && pnpm spec:check && pnpm build",
-    "module:new": "node tools/module-new.mjs"
+    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm test:tools && pnpm boundaries && pnpm spec:check && pnpm docs:check && pnpm build",
+    "module:new": "node tools/module-new.mjs",
+    "docs:check": "node tools/docs-check/run.ts"
   },
   "lint-staged": {
     "*.{ts,tsx,mjs,cjs,js}": [

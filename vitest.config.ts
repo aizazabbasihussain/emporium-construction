@@ -3,7 +3,7 @@ import { coverageOptions } from './vitest.coverage.ts';
 
 export default defineConfig({
   test: {
-    projects: ['packages/*', 'apps/*'],
+    projects: ['packages/*', 'apps/*', 'tools/docs-check'],
     coverage: coverageOptions(),
   },
 });
