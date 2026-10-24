@@ -27,6 +27,12 @@ Approved by the user ("merge automatically if there is no error in the git actio
 
 Human review of ordinary spec PRs now happens after the merge. Branch protection on `main` (needs the Administration permission on the token) would make the "checks must pass" rule enforced by GitHub as well.
 
+### 2026-10-24: answers to H-04, H-10, H-24 and H-27 change three specs (options chosen by the user)
+
+1. **Worker login: new spec** (option 1). Added `specs/phase-1/P1-22-worker-self-service.md` (depends on P1-02, P1-16, P1-17, P1-18; not part of Gate A). P1-02 gains `registerRole()` and the seeded role `estimator`.
+2. **Backdating: admin override with reason** (direct override, not an approval request). P1-01 BR-5 and T-3 extended and permission `platform.backdate.override` added (admin).
+3. **Number format:** P1-01 BR-1 produced `<prefix>/<yy>`, which cannot give the requested `INV-2026-0001`. It now produces `<prefix>-<yyyy>-<number>` for yearly series and `<prefix>-<number>` otherwise.
+
 ## Proposed
 
 ### 2026-10-24: P0-02 proposes a pre-project survey record for demolition and restructuring (GAP-01)
@@ -39,20 +45,3 @@ Options for the human to decide:
 3. Defer to BACKLOG and rely on site visit notes with photos through `fil_attachments`.
 
 No spec is blocked. Awaiting a decision.
-
-### 2026-10-24: worker login with self-service view (from H-10)
-
-The owner wants labourers to be able to log in and see only their own records. No spec has this: workers are records in P1-16 (workforce), attendance is P1-17 and payroll P1-18, and the only scoped role in P1-02 is the supervisor.
-
-Options for the human to decide:
-1. Add a new spec after P1-18, "Worker self-service": a `worker` role linked to a worker record; read-only screens for the worker's own attendance, advances and pay slips; policy code limits every query to the linked worker. Recommended: nothing exists to show before P1-17 and P1-18, and it keeps P1-02 unchanged.
-2. Fold it into P1-18. Fewer specs, but a larger P1-18.
-3. Defer to BACKLOG.
-
-No spec is blocked. Awaiting a decision.
-
-### 2026-10-24: backdating beyond 3 days needs admin approval (from H-24)
-
-The owner wants entries older than the allowance (3 days) to be possible only with approval from an admin user. P1-01 BR-5 only rejects such dates.
-
-Proposal: P1-01 adds a permission `platform.backdate.override` (held by `admin`) and lets `assertWithinBackdating` accept an override from a caller who holds it; the override requires a reason, and the audit log records who overrode and why. This is a direct override by an admin, not a request-and-approve flow through the approval engine (P1-03), which does not exist yet. Alternative: a full request flow through P1-03 later. Awaiting a decision; P1-01 can be built without it.
