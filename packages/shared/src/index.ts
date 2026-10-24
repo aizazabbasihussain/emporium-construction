@@ -15,6 +15,13 @@ export {
   type UserStatus,
 } from './identity.js';
 export {
+  importBatchStatuses,
+  importerPermissionGrants,
+  importerPermissions,
+  type ImportBatchStatus,
+  type ImporterPermission,
+} from './importer.js';
+export {
   platformPermissionGrants,
   platformPermissions,
   type PlatformPermission,
