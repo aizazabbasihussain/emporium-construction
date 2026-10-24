@@ -1,7 +1,8 @@
 import { connect } from '@emporium/db';
 import { createPlatform, uuidv7 } from './modules/platform/index.js';
 import { createIdentity, createJwtVerifier, type Identity } from './modules/identity/index.js';
-import { identityPermissions, platformPermissions } from '@emporium/shared';
+import { createImporter, type Importer } from './modules/importer/index.js';
+import { identityPermissions, importerPermissions, platformPermissions } from '@emporium/shared';
 import { createRemoteJWKSet } from 'jose';
 import type { AppConfig } from './config.js';
 import type { Db } from './modules/platform/index.js';
@@ -19,6 +20,7 @@ export function verifierFor(config: Pick<AppConfig, 'supabaseJwksUrl' | 'supabas
 export interface Runtime {
   db: Db;
   identity: Identity;
+  importer: Importer;
   platform: ReturnType<typeof createPlatform>;
   close: () => Promise<void>;
 }
@@ -35,9 +37,11 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
   });
   identity.registerPermissions('platform', Object.values(platformPermissions));
   identity.registerPermissions('identity', Object.values(identityPermissions));
+  identity.registerPermissions('importer', Object.values(importerPermissions));
+  const importer = createImporter({ platform, clock, newId: () => uuidv7(clock.now()) });
   if (config.adminEmail !== undefined) {
     const email = config.adminEmail;
     await db.transaction((tx) => identity.users.ensureAdmin(email, tx));
   }
-  return { db, identity, platform, close };
+  return { db, identity, importer, platform, close };
 }

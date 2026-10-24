@@ -7,12 +7,13 @@ import { currentUser } from './modules/identity/index.js';
 try {
   const config = loadConfig(process.env);
   const logger = createLogger(config.logLevel);
-  const { db, identity, platform } = await createRuntime(config);
+  const { db, identity, importer, platform } = await createRuntime(config);
   const app = await buildApp({
     config,
     logger,
     identity: { db, identity },
     platform: { db, platform, resolvePrincipal: currentUser },
+    importer: { db, importer },
   });
   await app.listen({ port: config.port, host: '0.0.0.0' });
 } catch (error) {

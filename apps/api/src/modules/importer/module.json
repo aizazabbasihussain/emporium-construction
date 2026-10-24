@@ -1,0 +1,26 @@
+{
+  "name": "importer",
+  "tablePrefix": "imp_",
+  "ownedTables": ["imp_batches", "imp_errors"],
+  "exports": [
+    "createImporter",
+    "registerImporterRoutes",
+    "registerImporter",
+    "listImporters",
+    "template",
+    "dryRun",
+    "commit"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.settings.get",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions"
+  ],
+  "eventsIn": [],
+  "eventsOut": ["import.committed"],
+  "permissions": ["importer.batch.run", "importer.batch.force", "importer.batch.read"],
+  "notes": "Each module registers its own importer through registerImporter; apply() writes only through that module's service."
+}
