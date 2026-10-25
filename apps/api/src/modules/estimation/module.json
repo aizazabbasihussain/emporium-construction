@@ -1,0 +1,37 @@
+{
+  "name": "estimation",
+  "tablePrefix": "est_",
+  "ownedTables": ["est_templates", "est_template_lines", "est_estimates", "est_estimate_lines"],
+  "exports": [
+    "createEstimation",
+    "registerEstimationRoutes",
+    "getEstimate",
+    "lockEstimate",
+    "getEstimateCostLines"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.idempotency.execute",
+    "platform.numbering.next",
+    "platform.settings.get",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "masterdata.getParty",
+    "masterdata.getItem",
+    "masterdata.catalog.listUnits",
+    "masterdata.costing.listCostCodes",
+    "masterdata.costing.searchPrices"
+  ],
+  "eventsIn": [],
+  "eventsOut": ["estimate.locked", "estimation.estimate.changed", "estimation.template.changed"],
+  "permissions": [
+    "estimation.template.manage",
+    "estimation.estimate.read",
+    "estimation.estimate.create",
+    "estimation.estimate.update",
+    "estimation.estimate.lock"
+  ],
+  "notes": "Owns job templates and internal cost estimates. Does not create quotations or tax. Estimate numbers come from the number series ESTIMATE; a revision keeps the number and raises its revision. lead_id and party_id are plain references with no foreign keys into other modules. The default overhead, contingency and target margin are the typed settings estimation.overhead_percent, estimation.contingency_percent and estimation.target_margin_percent (H-15)."
+}
