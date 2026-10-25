@@ -10,10 +10,11 @@ const makeJobs = (overrides: { failing?: string } = {}) => {
       : Promise.resolve(0);
   };
   const jobs = {
-    db: {},
+    db: { transaction: (fn: (tx: unknown) => Promise<unknown>) => fn({}) },
     platform: { events: { dispatchDue: job('events') } },
     notifications: { tickReminders: job('reminders'), purgeOld: job('notifications-purge') },
     files: { purgeExpired: job('files-purge') },
+    quotations: { expireDue: job('quotations-expire') },
   } as unknown as Parameters<typeof runSchedulerTick>[0];
   return { jobs, calls };
 };
@@ -30,7 +31,13 @@ describe('runSchedulerTick (BR-8)', () => {
     const day = 24 * 60 * 60 * 1000;
 
     await runSchedulerTick(jobs, state, new Date(day), logger().logger);
-    expect(calls).toEqual(['events', 'reminders', 'files-purge', 'notifications-purge']);
+    expect(calls).toEqual([
+      'events',
+      'reminders',
+      'files-purge',
+      'notifications-purge',
+      'quotations-expire',
+    ]);
 
     calls.length = 0;
     await runSchedulerTick(jobs, state, new Date(day + 60_000), logger().logger);
@@ -38,14 +45,26 @@ describe('runSchedulerTick (BR-8)', () => {
 
     calls.length = 0;
     await runSchedulerTick(jobs, state, new Date(2 * day), logger().logger);
-    expect(calls).toEqual(['events', 'reminders', 'files-purge', 'notifications-purge']);
+    expect(calls).toEqual([
+      'events',
+      'reminders',
+      'files-purge',
+      'notifications-purge',
+      'quotations-expire',
+    ]);
   });
 
   it('logs a failing job and still runs the others', async () => {
     const { jobs, calls } = makeJobs({ failing: 'events' });
     const { errors, logger: log } = logger();
     await runSchedulerTick(jobs, { lastPurgeAt: 0 }, new Date(Date.now()), log);
-    expect(calls).toEqual(['events', 'reminders', 'files-purge', 'notifications-purge']);
+    expect(calls).toEqual([
+      'events',
+      'reminders',
+      'files-purge',
+      'notifications-purge',
+      'quotations-expire',
+    ]);
     expect(errors).toHaveLength(1);
     expect(errors[0]?.[1]).toBe('scheduled job failed');
     expect(errors[0]?.[0]).toMatchObject({ job: 'events' });

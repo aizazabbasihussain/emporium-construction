@@ -1,0 +1,40 @@
+{
+  "name": "quotations",
+  "tablePrefix": "qte_",
+  "ownedTables": ["qte_quotations", "qte_stages", "qte_status_history"],
+  "exports": ["createQuotations", "registerQuotationsRoutes", "getQuotation", "expireDue"],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.events.subscribe",
+    "platform.idempotency.execute",
+    "platform.numbering.next",
+    "platform.settings.get",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "estimation.getEstimate",
+    "approvals.requestApproval",
+    "approvals.getApprovalState",
+    "crm.getLead",
+    "masterdata.getParty",
+    "masterdata.listLocations",
+    "masterdata.company.getCompany",
+    "masterdata.company.listRegistrations",
+    "files.list",
+    "files.registerFileAccess"
+  ],
+  "eventsIn": ["approval.approved", "approval.rejected", "approval.returned", "approval.cancelled"],
+  "eventsOut": ["quotation.issued", "quotation.accepted", "quotations.quotation.changed"],
+  "permissions": [
+    "quotations.quotation.read",
+    "quotations.quotation.create",
+    "quotations.quotation.update",
+    "quotations.quotation.submit",
+    "quotations.quotation.issue",
+    "quotations.quotation.accept",
+    "quotations.quotation.reject",
+    "quotations.margin.read"
+  ],
+  "notes": "Owns lump-sum quotations, their payment-stage schedule and status history. Does not compute tax or create projects: P1-09 reacts to quotation.accepted. Quotation numbers come from the number series quotation (prefix QUO, H-27); a revision keeps the number and raises its revision, printed as number/revision. estimate_id, lead_id, party_id and location_id are plain references with no foreign keys into other modules. The approval document type is quotation (H-09); the margin floor is the typed setting quotations.margin_floor_percent and is passed to the approval request as context. The client acceptance document is a file of entity type qte_quotation. The scheduler calls expireDue once a day (BR-5)."
+}
