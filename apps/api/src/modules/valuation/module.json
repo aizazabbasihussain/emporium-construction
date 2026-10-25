@@ -1,0 +1,53 @@
+{
+  "name": "valuation",
+  "tablePrefix": "val_",
+  "ownedTables": [
+    "val_policies",
+    "val_keys",
+    "val_wa_state",
+    "val_layers",
+    "val_movements",
+    "val_consumptions",
+    "val_return_parts",
+    "val_transitions"
+  ],
+  "exports": [
+    "createValuation",
+    "registerValuationRoutes",
+    "recordReceipt",
+    "valueIssue",
+    "recordTransfer",
+    "recordReturn",
+    "getStockValue",
+    "getTotalValue",
+    "resolvePolicy",
+    "setPolicy",
+    "requestTransition"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.events.subscribe",
+    "platform.idempotency.execute",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "masterdata.getItem",
+    "masterdata.getItemCategory",
+    "approvals.requestApproval",
+    "approvals.getApprovalState"
+  ],
+  "eventsIn": ["approval.approved", "approval.rejected", "approval.returned", "approval.cancelled"],
+  "eventsOut": [
+    "valuation.policy.changed",
+    "valuation.transition.completed",
+    "valuation.movement.recorded"
+  ],
+  "permissions": [
+    "valuation.policy.read",
+    "valuation.policy.request",
+    "valuation.transition.run",
+    "valuation.report.read"
+  ],
+  "notes": "Works on opaque (storeId, itemId) keys and knows nothing of inventory tables, projects or ledgers; inventory calls it, never the reverse. Reads item to category mapping through master data. Policy changes use the approval document type valuation_policy (rule seeded in migration 0008). H-07 default used: company policy weighted average from 2000-01-01, no category overrides. Beyond the spec's data model the module adds val_keys (current method of a key and its last posting date, also the lock row), val_return_parts (what each return gave back of each consumed part, BR-9) and val_layers.remaining_value (BR-5 value tracking). It also emits valuation.movement.recorded so that every mutation writes an outbox row (constitution 11)."
+}

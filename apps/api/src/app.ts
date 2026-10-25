@@ -20,6 +20,7 @@ import {
   type NotificationsRouteDeps,
 } from './modules/notifications/index.js';
 import { registerPlatformRoutes, type PlatformRouteDeps } from './modules/platform/index.js';
+import { registerValuationRoutes, type ValuationRouteDeps } from './modules/valuation/index.js';
 
 export interface AppDeps {
   config: Pick<AppConfig, 'corsOrigins'>;
@@ -41,6 +42,8 @@ export interface AppDeps {
   masterData?: MasterDataRouteDeps;
   /** The CRM endpoints; they rely on the authentication hook of `identity`. */
   crm?: CrmRouteDeps;
+  /** The valuation endpoints; they rely on the authentication hook of `identity`. */
+  valuation?: ValuationRouteDeps;
 }
 
 export async function buildApp({
@@ -55,6 +58,7 @@ export async function buildApp({
   notifications,
   masterData,
   crm,
+  valuation,
 }: AppDeps): Promise<FastifyInstance> {
   const loggerInstance: FastifyBaseLogger = logger;
   const app = Fastify({
@@ -87,6 +91,7 @@ export async function buildApp({
   if (notifications) registerNotificationsRoutes(app, notifications);
   if (masterData) registerMasterDataRoutes(app, masterData);
   if (crm) registerCrmRoutes(app, crm);
+  if (valuation) registerValuationRoutes(app, valuation);
 
   return app;
 }

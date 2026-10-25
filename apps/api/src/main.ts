@@ -15,6 +15,7 @@ try {
     importer,
     masterData,
     crm,
+    valuation,
     approvals,
     files,
     localFileStore,
@@ -32,6 +33,7 @@ try {
     notifications: { db, notifications, platform },
     masterData: { db, masterData, platform },
     crm: { db, crm, platform },
+    valuation: { db, valuation, platform },
   });
   await app.listen({ port: config.port, host: '0.0.0.0' });
   startScheduler(runtime, logger);

@@ -3,7 +3,7 @@ id: P1-13
 title: Stock valuation engine (configurable)
 phase: 1
 module: valuation
-status: not-started
+status: done
 depends_on: [P1-05]
 requires_inputs: [H-07]
 ---

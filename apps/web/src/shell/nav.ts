@@ -6,6 +6,7 @@ import {
   masterdataPermissions,
   notificationsPermissions,
   platformPermissions,
+  valuationPermissions,
 } from '@emporium/shared';
 
 export interface NavItem {
@@ -64,6 +65,21 @@ export const navItems: readonly NavItem[] = [
   },
   { path: '/crm/leads', label: 'nav.crmLeads', permission: crmPermissions.leadRead },
   { path: '/crm/follow-ups', label: 'nav.crmFollowUps', permission: crmPermissions.leadRead },
+  {
+    path: '/valuation/settings',
+    label: 'nav.valuationSettings',
+    permission: valuationPermissions.policyRead,
+  },
+  {
+    path: '/valuation/report',
+    label: 'nav.valuationReport',
+    permission: valuationPermissions.reportRead,
+  },
+  {
+    path: '/valuation/transitions',
+    label: 'nav.valuationTransitions',
+    permission: valuationPermissions.reportRead,
+  },
   {
     path: '/admin/settings',
     label: 'nav.settings',
