@@ -16,6 +16,7 @@ import {
 import { createImporter, type Importer } from './modules/importer/index.js';
 import { createCrm, type Crm } from './modules/crm/index.js';
 import { createMasterData, type MasterData } from './modules/masterdata/index.js';
+import { createValuation, type Valuation } from './modules/valuation/index.js';
 import {
   approvalsPermissions,
   crmPermissions,
@@ -25,6 +26,7 @@ import {
   masterdataPermissions,
   notificationsPermissions,
   platformPermissions,
+  valuationPermissions,
 } from '@emporium/shared';
 import { randomUUID } from 'node:crypto';
 import { createRemoteJWKSet } from 'jose';
@@ -58,6 +60,7 @@ export interface Runtime {
   importer: Importer;
   masterData: MasterData;
   crm: Crm;
+  valuation: Valuation;
   approvals: Approvals;
   files: Files;
   /** Set when FILE_STORE_DRIVER=local: it serves its own signed download links. */
@@ -85,6 +88,7 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
   identity.registerPermissions('notifications', Object.values(notificationsPermissions));
   identity.registerPermissions('master', Object.values(masterdataPermissions));
   identity.registerPermissions('crm', Object.values(crmPermissions));
+  identity.registerPermissions('valuation', Object.values(valuationPermissions));
   const importer = createImporter({ platform, clock, newId: () => uuidv7(clock.now()) });
   const masterData = createMasterData({
     platform,
@@ -144,6 +148,13 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     notifications,
     files,
   });
+  const valuation = createValuation({
+    platform,
+    clock,
+    newId: () => uuidv7(clock.now()),
+    masterData,
+    approvals,
+  });
   if (config.adminEmail !== undefined) {
     const email = config.adminEmail;
     await db.transaction((tx) => identity.users.ensureAdmin(email, tx));
@@ -154,6 +165,7 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     importer,
     masterData,
     crm,
+    valuation,
     approvals,
     files,
     localFileStore: local,

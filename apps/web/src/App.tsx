@@ -32,6 +32,9 @@ import { NotificationsPage } from './notifications/NotificationsPage';
 import { HomePage } from './shell/HomePage';
 import { LoginPage } from './shell/LoginPage';
 import { navItems } from './shell/nav';
+import { ValuationReportPage } from './valuation/ReportPage';
+import { ValuationSettingsPage } from './valuation/SettingsPage';
+import { TransitionsPage } from './valuation/TransitionsPage';
 
 /** Layout direction and the document language follow the active language (BR-11). */
 function DirectionProvider({ children }: { children: ReactNode }) {
@@ -111,6 +114,18 @@ export function AppRoutes() {
         />
         <Route path="/crm/leads" element={guarded('/crm/leads', <LeadsPage />)} />
         <Route path="/crm/leads/:id" element={guarded('/crm/leads', <LeadDetailPage />)} />
+        <Route
+          path="/valuation/settings"
+          element={guarded('/valuation/settings', <ValuationSettingsPage />)}
+        />
+        <Route
+          path="/valuation/report"
+          element={guarded('/valuation/report', <ValuationReportPage />)}
+        />
+        <Route
+          path="/valuation/transitions"
+          element={guarded('/valuation/transitions', <TransitionsPage />)}
+        />
         <Route path="/crm/follow-ups" element={guarded('/crm/follow-ups', <FollowUpsPage />)} />
         <Route path="/imports" element={guarded('/imports', <ImportPage />)} />
         <Route path="/admin/settings" element={guarded('/admin/settings', <SettingsPage />)} />
