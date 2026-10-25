@@ -13,6 +13,7 @@ import {
 } from './modules/files/index.js';
 import { registerIdentityRoutes, type IdentityRouteDeps } from './modules/identity/index.js';
 import { registerImporterRoutes, type ImporterRouteDeps } from './modules/importer/index.js';
+import { registerMasterDataRoutes, type MasterDataRouteDeps } from './modules/masterdata/index.js';
 import {
   registerNotificationsRoutes,
   type NotificationsRouteDeps,
@@ -35,6 +36,8 @@ export interface AppDeps {
   files?: FilesRouteDeps;
   /** The notification endpoints; they rely on the authentication hook of `identity`. */
   notifications?: NotificationsRouteDeps;
+  /** The master data endpoints; they rely on the authentication hook of `identity`. */
+  masterData?: MasterDataRouteDeps;
 }
 
 export async function buildApp({
@@ -47,6 +50,7 @@ export async function buildApp({
   approvals,
   files,
   notifications,
+  masterData,
 }: AppDeps): Promise<FastifyInstance> {
   const loggerInstance: FastifyBaseLogger = logger;
   const app = Fastify({
@@ -77,6 +81,7 @@ export async function buildApp({
   if (files) await registerFilesRoutes(app, files);
   if (files?.local) registerFileBlobRoute(app, files.local);
   if (notifications) registerNotificationsRoutes(app, notifications);
+  if (masterData) registerMasterDataRoutes(app, masterData);
 
   return app;
 }

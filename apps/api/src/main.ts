@@ -9,8 +9,17 @@ try {
   const config = loadConfig(process.env);
   const logger = createLogger(config.logLevel);
   const runtime = await createRuntime(config);
-  const { db, identity, importer, approvals, files, localFileStore, notifications, platform } =
-    runtime;
+  const {
+    db,
+    identity,
+    importer,
+    masterData,
+    approvals,
+    files,
+    localFileStore,
+    notifications,
+    platform,
+  } = runtime;
   const app = await buildApp({
     config,
     logger,
@@ -20,6 +29,7 @@ try {
     approvals: { db, approvals, platform },
     files: { db, files, platform, local: localFileStore },
     notifications: { db, notifications, platform },
+    masterData: { db, masterData, platform },
   });
   await app.listen({ port: config.port, host: '0.0.0.0' });
   startScheduler(runtime, logger);

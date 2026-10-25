@@ -1,0 +1,56 @@
+{
+  "name": "masterdata",
+  "tablePrefix": "mst_",
+  "ownedTables": [
+    "mst_company",
+    "mst_tax_registrations",
+    "mst_parties",
+    "mst_party_contacts",
+    "mst_units",
+    "mst_unit_conversions",
+    "mst_item_categories",
+    "mst_items",
+    "mst_cost_codes",
+    "mst_locations",
+    "mst_vendor_prices"
+  ],
+  "exports": [
+    "createMasterData",
+    "registerMasterDataRoutes",
+    "getParty",
+    "searchParties",
+    "getItem",
+    "getItemCategory",
+    "getUnit",
+    "convertQuantity",
+    "getCostCode",
+    "getRegistration",
+    "listLocations",
+    "registerReferenceCheck",
+    "registerCostCodeUsage"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.idempotency.execute",
+    "platform.numbering.next",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "importer.registerImporter"
+  ],
+  "eventsIn": [],
+  "eventsOut": ["master.party.changed", "master.item.changed"],
+  "permissions": [
+    "master.company.manage",
+    "master.reference.read",
+    "master.party.read",
+    "master.party.manage",
+    "master.item.read",
+    "master.item.manage",
+    "master.costcode.manage",
+    "master.price.read",
+    "master.price.manage"
+  ],
+  "notes": "Holds no transactional data. Other modules call registerReferenceCheck('party' | 'item', isReferenced) at startup (BR-8) and the cost ledger calls registerCostCodeUsage (BR-6, P1-09). Party codes come from the number series party_client, party_vendor, party_subcontractor and party_labour_contractor. The importer registers through the registerImporter function injected at composition."
+}
