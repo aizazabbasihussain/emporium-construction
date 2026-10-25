@@ -1,7 +1,5 @@
 import { createHash } from 'node:crypto';
-import multipart from '@fastify/multipart';
 import { ValidationError } from '@emporium/domain';
-import { MAX_FILE_BYTES } from '@emporium/domain/files';
 import { filesPermissions } from '@emporium/shared';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { z } from 'zod';
@@ -80,7 +78,6 @@ export async function registerFilesRoutes(
   deps: FilesRouteDeps,
 ): Promise<void> {
   const { db, files, platform } = deps;
-  await app.register(multipart, { limits: { fileSize: MAX_FILE_BYTES, files: 1, fields: 8 } });
 
   /** One transaction per command; with an Idempotency-Key header a retry replays the first response. */
   const command = async (

@@ -1,5 +1,7 @@
 import { randomUUID } from 'node:crypto';
+import { MAX_FILE_BYTES } from '@emporium/domain/files';
 import cors from '@fastify/cors';
+import multipart from '@fastify/multipart';
 import Fastify, { type FastifyBaseLogger, type FastifyInstance } from 'fastify';
 import type { Logger } from 'pino';
 import pkg from '../package.json' with { type: 'json' };
@@ -73,6 +75,8 @@ export async function buildApp({
 
   registerErrorHandling(app);
   await app.register(cors, { origin: config.corsOrigins });
+  // One registration for every upload route (importer, files); the plugin can only be added once.
+  await app.register(multipart, { limits: { fileSize: MAX_FILE_BYTES, files: 1, fields: 8 } });
 
   // Registered before any route so the authentication hook covers all of them (BR-1, AC-1).
   if (identity) registerIdentityRoutes(app, identity);
