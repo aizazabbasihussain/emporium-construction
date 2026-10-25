@@ -21,6 +21,8 @@ import { FollowUpsPage } from './crm/FollowUpsPage';
 import { EstimateEditorPage } from './estimation/EstimateEditorPage';
 import { EstimatesPage } from './estimation/EstimatesPage';
 import { TemplatesPage } from './estimation/TemplatesPage';
+import { QuotationEditorPage } from './quotations/QuotationEditorPage';
+import { QuotationsPage } from './quotations/QuotationsPage';
 import { LeadDetailPage } from './crm/LeadDetailPage';
 import { LeadsPage } from './crm/LeadsPage';
 import { ImportPage } from './importer/ImportPage';
@@ -129,6 +131,8 @@ export function AppRoutes() {
           path="/estimation/estimates/:id"
           element={guarded('/estimation/estimates', <EstimateEditorPage />)}
         />
+        <Route path="/quotations" element={guarded('/quotations', <QuotationsPage />)} />
+        <Route path="/quotations/:id" element={guarded('/quotations', <QuotationEditorPage />)} />
         <Route
           path="/valuation/settings"
           element={guarded('/valuation/settings', <ValuationSettingsPage />)}

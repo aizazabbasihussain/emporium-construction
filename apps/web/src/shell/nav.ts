@@ -5,6 +5,7 @@ import {
   identityPermissions,
   importerPermissions,
   masterdataPermissions,
+  quotationsPermissions,
   notificationsPermissions,
   platformPermissions,
   valuationPermissions,
@@ -75,6 +76,11 @@ export const navItems: readonly NavItem[] = [
     path: '/estimation/estimates',
     label: 'nav.estimates',
     permission: estimationPermissions.estimateRead,
+  },
+  {
+    path: '/quotations',
+    label: 'nav.quotations',
+    permission: quotationsPermissions.read,
   },
   {
     path: '/valuation/settings',

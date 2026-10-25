@@ -3,7 +3,7 @@ id: P1-08
 title: Quotations (lump sum)
 phase: 1
 module: quotations
-status: not-started
+status: done
 depends_on: [P1-07, P1-03, P1-06]
 requires_inputs: [H-09]
 ---
