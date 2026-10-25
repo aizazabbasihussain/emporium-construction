@@ -1,0 +1,46 @@
+{
+  "name": "crm",
+  "tablePrefix": "crm_",
+  "ownedTables": [
+    "crm_stages",
+    "crm_sources",
+    "crm_loss_reasons",
+    "crm_leads",
+    "crm_site_visits",
+    "crm_follow_ups",
+    "crm_stage_history"
+  ],
+  "exports": ["createCrm", "registerCrmRoutes", "getLead"],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.idempotency.execute",
+    "platform.numbering.next",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "masterdata.parties.create",
+    "masterdata.getParty",
+    "masterdata.listLocations",
+    "notifications.scheduleReminder",
+    "notifications.registerTemplate",
+    "files.registerFileAccess"
+  ],
+  "eventsIn": [],
+  "eventsOut": [
+    "crm.lead.changed",
+    "crm.lead.stage_changed",
+    "crm.lead.won",
+    "crm.visit.recorded",
+    "crm.followup.changed"
+  ],
+  "permissions": [
+    "crm.lead.read",
+    "crm.lead.create",
+    "crm.lead.update",
+    "crm.lead.reopen",
+    "crm.visit.manage",
+    "crm.followup.manage"
+  ],
+  "notes": "Owns leads, site visits, follow-ups and the pipeline. Does not create quotations, projects or invoices. The createQuotationRequest hook of spec section 2 is consumed by P1-08, which reads the lead through getLead and subscribes to crm.lead.won; this module adds no quotation table. Lead numbers come from the number series LEAD. Site visit photos use the file entity type crm_site_visit."
+}

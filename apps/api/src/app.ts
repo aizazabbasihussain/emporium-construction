@@ -11,6 +11,7 @@ import {
   registerFilesRoutes,
   type FilesRouteDeps,
 } from './modules/files/index.js';
+import { registerCrmRoutes, type CrmRouteDeps } from './modules/crm/index.js';
 import { registerIdentityRoutes, type IdentityRouteDeps } from './modules/identity/index.js';
 import { registerImporterRoutes, type ImporterRouteDeps } from './modules/importer/index.js';
 import { registerMasterDataRoutes, type MasterDataRouteDeps } from './modules/masterdata/index.js';
@@ -38,6 +39,8 @@ export interface AppDeps {
   notifications?: NotificationsRouteDeps;
   /** The master data endpoints; they rely on the authentication hook of `identity`. */
   masterData?: MasterDataRouteDeps;
+  /** The CRM endpoints; they rely on the authentication hook of `identity`. */
+  crm?: CrmRouteDeps;
 }
 
 export async function buildApp({
@@ -51,6 +54,7 @@ export async function buildApp({
   files,
   notifications,
   masterData,
+  crm,
 }: AppDeps): Promise<FastifyInstance> {
   const loggerInstance: FastifyBaseLogger = logger;
   const app = Fastify({
@@ -82,6 +86,7 @@ export async function buildApp({
   if (files?.local) registerFileBlobRoute(app, files.local);
   if (notifications) registerNotificationsRoutes(app, notifications);
   if (masterData) registerMasterDataRoutes(app, masterData);
+  if (crm) registerCrmRoutes(app, crm);
 
   return app;
 }

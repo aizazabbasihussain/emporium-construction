@@ -8,6 +8,21 @@ export {
   type ApprovalStatus,
   type ApprovalsPermission,
 } from './approvals.js';
+export {
+  crmNotificationTemplates,
+  crmPermissionGrants,
+  crmPermissions,
+  followUpStatuses,
+  leadSectors,
+  leadWorkTypes,
+  siteVisitEntityType,
+  stageKinds,
+  type CrmPermission,
+  type FollowUpStatus,
+  type LeadSector,
+  type LeadWorkType,
+  type StageKind,
+} from './crm.js';
 export { fileStoreDrivers, type FileStoreDriver } from './enums.js';
 export {
   fileOperations,
