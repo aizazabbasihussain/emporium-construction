@@ -74,3 +74,13 @@ P1-05 (PR #14) was left open by the agent because six points were unclear, and w
 6. Importers: a file with a row that repeats an existing party fails the whole commit instead of skipping that row.
 
 Options for the human to decide: approve all six and update the P1-05 spec text to match, or list which points to change.
+
+### 2026-10-25: P1-07 stores the revision as `revision`, and adds items beyond its data model
+
+P1-07 (PR #20) is open and not auto-merged. Its data model lists a column `version` on `est_estimates` for the revision number, but the constitution (5.2) reserves `version` for optimistic concurrency, so one table cannot hold both under one name. Decision needed:
+
+1. **Revision column.** The code stores the revision as `revision` (first estimate 1, first revision 2) and keeps `version` as the concurrency counter. A revision keeps the estimate number; `unique (number, revision)`. Option A: approve and change the P1-07 text (data model, BR-8, AC-3) from `version` to `revision`. Option B: keep `version` for the revision and add a differently named concurrency column to this table only, which departs from constitution 5.2.
+2. **Beyond the data model and API** (all listed in the PR body): columns `template_id` and `locked_at`; endpoints `POST /estimation/templates/:id/copy`, `POST /estimation/formula-preview`, `POST /estimation/estimates/preview`, `GET /estimation/estimates/:id`; template reads need `estimation.estimate.read`; events `estimation.template.changed` and `estimation.estimate.changed`; number series `estimate` / `EST`; work types `room` and `slab`; the `admin` role holds the five permissions. Option: approve and add them to the P1-07 text, or list which to remove.
+3. **AC-4 lint rule.** `eslint.config.js` is protected, so `no-eval`, `no-new-func` and `no-implied-eval` are switched on by an inline directive in `formula.ts`, plus a test that scans the source. Option: approve, or add the rules to the shared config in a human-reviewed change.
+
+The PR can be merged once the first point is decided.
