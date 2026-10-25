@@ -3,7 +3,7 @@ id: P1-06
 title: CRM and leads
 phase: 1
 module: crm
-status: not-started
+status: done
 depends_on: [P1-05, P1-04]
 requires_inputs: [H-16]
 ---
