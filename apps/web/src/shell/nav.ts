@@ -1,6 +1,7 @@
 import {
   approvalsPermissions,
   crmPermissions,
+  estimationPermissions,
   identityPermissions,
   importerPermissions,
   masterdataPermissions,
@@ -65,6 +66,16 @@ export const navItems: readonly NavItem[] = [
   },
   { path: '/crm/leads', label: 'nav.crmLeads', permission: crmPermissions.leadRead },
   { path: '/crm/follow-ups', label: 'nav.crmFollowUps', permission: crmPermissions.leadRead },
+  {
+    path: '/estimation/templates',
+    label: 'nav.estimationTemplates',
+    permission: estimationPermissions.estimateRead,
+  },
+  {
+    path: '/estimation/estimates',
+    label: 'nav.estimates',
+    permission: estimationPermissions.estimateRead,
+  },
   {
     path: '/valuation/settings',
     label: 'nav.valuationSettings',
