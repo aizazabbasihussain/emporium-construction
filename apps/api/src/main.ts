@@ -16,6 +16,7 @@ try {
     masterData,
     crm,
     valuation,
+    estimation,
     approvals,
     files,
     localFileStore,
@@ -34,6 +35,7 @@ try {
     masterData: { db, masterData, platform },
     crm: { db, crm, platform },
     valuation: { db, valuation, platform },
+    estimation: { db, estimation, platform },
   });
   await app.listen({ port: config.port, host: '0.0.0.0' });
   startScheduler(runtime, logger);

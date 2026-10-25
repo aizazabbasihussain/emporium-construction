@@ -26,6 +26,22 @@ export const settingRegistry: SettingRegistry = {
     description: 'Date spellings accepted in import files: iso, dmy or both',
     default: 'both',
   },
+  // H-15 working defaults for new estimates; percentages are decimal text so 7.5 is possible.
+  'estimation.overhead_percent': {
+    type: 'string',
+    description: 'Overhead percent copied into a new estimate (H-15)',
+    default: '10',
+  },
+  'estimation.contingency_percent': {
+    type: 'string',
+    description: 'Contingency percent copied into a new estimate (H-15)',
+    default: '5',
+  },
+  'estimation.target_margin_percent': {
+    type: 'string',
+    description: 'Target margin percent shown against a new estimate (H-15)',
+    default: '15',
+  },
 };
 
 export function settingDefinition(

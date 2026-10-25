@@ -3,7 +3,7 @@ id: P1-07
 title: Job templates and internal estimation
 phase: 1
 module: estimation
-status: not-started
+status: done
 depends_on: [P1-05]
 requires_inputs: [H-15]
 ---

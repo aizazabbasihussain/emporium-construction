@@ -15,11 +15,13 @@ import {
 } from './modules/notifications/index.js';
 import { createImporter, type Importer } from './modules/importer/index.js';
 import { createCrm, type Crm } from './modules/crm/index.js';
+import { createEstimation, type Estimation } from './modules/estimation/index.js';
 import { createMasterData, type MasterData } from './modules/masterdata/index.js';
 import { createValuation, type Valuation } from './modules/valuation/index.js';
 import {
   approvalsPermissions,
   crmPermissions,
+  estimationPermissions,
   filesPermissions,
   identityPermissions,
   importerPermissions,
@@ -61,6 +63,7 @@ export interface Runtime {
   masterData: MasterData;
   crm: Crm;
   valuation: Valuation;
+  estimation: Estimation;
   approvals: Approvals;
   files: Files;
   /** Set when FILE_STORE_DRIVER=local: it serves its own signed download links. */
@@ -89,6 +92,7 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
   identity.registerPermissions('master', Object.values(masterdataPermissions));
   identity.registerPermissions('crm', Object.values(crmPermissions));
   identity.registerPermissions('valuation', Object.values(valuationPermissions));
+  identity.registerPermissions('estimation', Object.values(estimationPermissions));
   const importer = createImporter({ platform, clock, newId: () => uuidv7(clock.now()) });
   const masterData = createMasterData({
     platform,
@@ -155,6 +159,12 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     masterData,
     approvals,
   });
+  const estimation = createEstimation({
+    platform,
+    clock,
+    newId: () => uuidv7(clock.now()),
+    masterData,
+  });
   if (config.adminEmail !== undefined) {
     const email = config.adminEmail;
     await db.transaction((tx) => identity.users.ensureAdmin(email, tx));
@@ -166,6 +176,7 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     masterData,
     crm,
     valuation,
+    estimation,
     approvals,
     files,
     localFileStore: local,

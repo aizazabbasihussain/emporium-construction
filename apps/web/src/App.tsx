@@ -18,6 +18,9 @@ import { RequireAuth, RequirePermission } from './shell/guards';
 import { ApprovalRulesPage } from './approvals/ApprovalRulesPage';
 import { ApprovalsInboxPage } from './approvals/ApprovalsInboxPage';
 import { FollowUpsPage } from './crm/FollowUpsPage';
+import { EstimateEditorPage } from './estimation/EstimateEditorPage';
+import { EstimatesPage } from './estimation/EstimatesPage';
+import { TemplatesPage } from './estimation/TemplatesPage';
 import { LeadDetailPage } from './crm/LeadDetailPage';
 import { LeadsPage } from './crm/LeadsPage';
 import { ImportPage } from './importer/ImportPage';
@@ -114,6 +117,18 @@ export function AppRoutes() {
         />
         <Route path="/crm/leads" element={guarded('/crm/leads', <LeadsPage />)} />
         <Route path="/crm/leads/:id" element={guarded('/crm/leads', <LeadDetailPage />)} />
+        <Route
+          path="/estimation/templates"
+          element={guarded('/estimation/templates', <TemplatesPage />)}
+        />
+        <Route
+          path="/estimation/estimates"
+          element={guarded('/estimation/estimates', <EstimatesPage />)}
+        />
+        <Route
+          path="/estimation/estimates/:id"
+          element={guarded('/estimation/estimates', <EstimateEditorPage />)}
+        />
         <Route
           path="/valuation/settings"
           element={guarded('/valuation/settings', <ValuationSettingsPage />)}

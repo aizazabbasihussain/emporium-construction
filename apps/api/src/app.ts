@@ -14,6 +14,7 @@ import {
   type FilesRouteDeps,
 } from './modules/files/index.js';
 import { registerCrmRoutes, type CrmRouteDeps } from './modules/crm/index.js';
+import { registerEstimationRoutes, type EstimationRouteDeps } from './modules/estimation/index.js';
 import { registerIdentityRoutes, type IdentityRouteDeps } from './modules/identity/index.js';
 import { registerImporterRoutes, type ImporterRouteDeps } from './modules/importer/index.js';
 import { registerMasterDataRoutes, type MasterDataRouteDeps } from './modules/masterdata/index.js';
@@ -46,6 +47,8 @@ export interface AppDeps {
   crm?: CrmRouteDeps;
   /** The valuation endpoints; they rely on the authentication hook of `identity`. */
   valuation?: ValuationRouteDeps;
+  /** The estimation endpoints; they rely on the authentication hook of `identity`. */
+  estimation?: EstimationRouteDeps;
 }
 
 export async function buildApp({
@@ -61,6 +64,7 @@ export async function buildApp({
   masterData,
   crm,
   valuation,
+  estimation,
 }: AppDeps): Promise<FastifyInstance> {
   const loggerInstance: FastifyBaseLogger = logger;
   const app = Fastify({
@@ -96,6 +100,7 @@ export async function buildApp({
   if (masterData) registerMasterDataRoutes(app, masterData);
   if (crm) registerCrmRoutes(app, crm);
   if (valuation) registerValuationRoutes(app, valuation);
+  if (estimation) registerEstimationRoutes(app, estimation);
 
   return app;
 }
