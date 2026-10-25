@@ -14,11 +14,13 @@ import {
   type UserDirectory,
 } from './modules/notifications/index.js';
 import { createImporter, type Importer } from './modules/importer/index.js';
+import { createMasterData, type MasterData } from './modules/masterdata/index.js';
 import {
   approvalsPermissions,
   filesPermissions,
   identityPermissions,
   importerPermissions,
+  masterdataPermissions,
   notificationsPermissions,
   platformPermissions,
 } from '@emporium/shared';
@@ -52,6 +54,7 @@ export interface Runtime {
   db: Db;
   identity: Identity;
   importer: Importer;
+  masterData: MasterData;
   approvals: Approvals;
   files: Files;
   /** Set when FILE_STORE_DRIVER=local: it serves its own signed download links. */
@@ -77,7 +80,14 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
   identity.registerPermissions('approvals', Object.values(approvalsPermissions));
   identity.registerPermissions('files', Object.values(filesPermissions));
   identity.registerPermissions('notifications', Object.values(notificationsPermissions));
+  identity.registerPermissions('master', Object.values(masterdataPermissions));
   const importer = createImporter({ platform, clock, newId: () => uuidv7(clock.now()) });
+  const masterData = createMasterData({
+    platform,
+    clock,
+    newId: () => uuidv7(clock.now()),
+    registerImporter: (definition) => importer.registerImporter(definition),
+  });
   const approvals = createApprovals({
     platform,
     clock,
@@ -130,6 +140,7 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     db,
     identity,
     importer,
+    masterData,
     approvals,
     files,
     localFileStore: local,

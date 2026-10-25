@@ -3,6 +3,7 @@ import {
   filesPermissions,
   identityPermissions,
   importerPermissions,
+  masterdataPermissions,
   notificationsPermissions,
   platformPermissions,
 } from '@emporium/shared';
@@ -16,6 +17,7 @@ export const allPermissions: string[] = [
   ...Object.values(approvalsPermissions),
   ...Object.values(filesPermissions),
   ...Object.values(notificationsPermissions),
+  ...Object.values(masterdataPermissions),
 ];
 
 export const profileOf = (permissions: string[], overrides: Partial<Profile> = {}): Profile => ({

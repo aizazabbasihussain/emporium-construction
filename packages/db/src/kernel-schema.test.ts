@@ -20,7 +20,19 @@ describe('platform kernel schema (P1-01)', () => {
     const series = await db.query<{ code: string; prefix: string; gapless: boolean }>(
       'select code, prefix, gapless from sys_number_series order by code',
     );
-    expect(series.map((s) => s.prefix).sort()).toEqual(['INV', 'PO', 'PV', 'QUO', 'RV', 'VAR']);
+    // The H-27 document series, then the party series added by P1-05.
+    expect(series.map((s) => s.prefix).sort()).toEqual([
+      'CL',
+      'INV',
+      'LC',
+      'PO',
+      'PV',
+      'QUO',
+      'RV',
+      'SC',
+      'VAR',
+      'VN',
+    ]);
     expect(series.find((s) => s.code === 'invoice')?.gapless).toBe(true);
     const [setting] = await db.query<{ value: number }>(
       "select value from sys_settings where key = 'backdating_days'",
