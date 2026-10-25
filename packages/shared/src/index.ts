@@ -23,6 +23,20 @@ export {
   type LeadWorkType,
   type StageKind,
 } from './crm.js';
+export {
+  estimateLineKinds,
+  estimateSectors,
+  estimateSuppliers,
+  estimateWorkTypes,
+  estimationPermissionGrants,
+  estimationPermissions,
+  estimationSettingKeys,
+  type EstimateLineKind,
+  type EstimateSector,
+  type EstimateSupplier,
+  type EstimateWorkType,
+  type EstimationPermission,
+} from './estimation.js';
 export { fileStoreDrivers, type FileStoreDriver } from './enums.js';
 export {
   fileOperations,
