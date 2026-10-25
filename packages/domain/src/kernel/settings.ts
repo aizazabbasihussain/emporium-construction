@@ -42,6 +42,12 @@ export const settingRegistry: SettingRegistry = {
     description: 'Target margin percent shown against a new estimate (H-15)',
     default: '15',
   },
+  // H-09: no margin floor for now; a quotation below the floor is flagged on its approval request.
+  'quotations.margin_floor_percent': {
+    type: 'string',
+    description: 'Margin percent below which a quotation approval request is flagged (H-09)',
+    default: '0',
+  },
 };
 
 export function settingDefinition(
