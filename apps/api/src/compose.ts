@@ -14,9 +14,11 @@ import {
   type UserDirectory,
 } from './modules/notifications/index.js';
 import { createImporter, type Importer } from './modules/importer/index.js';
+import { createCrm, type Crm } from './modules/crm/index.js';
 import { createMasterData, type MasterData } from './modules/masterdata/index.js';
 import {
   approvalsPermissions,
+  crmPermissions,
   filesPermissions,
   identityPermissions,
   importerPermissions,
@@ -55,6 +57,7 @@ export interface Runtime {
   identity: Identity;
   importer: Importer;
   masterData: MasterData;
+  crm: Crm;
   approvals: Approvals;
   files: Files;
   /** Set when FILE_STORE_DRIVER=local: it serves its own signed download links. */
@@ -81,6 +84,7 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
   identity.registerPermissions('files', Object.values(filesPermissions));
   identity.registerPermissions('notifications', Object.values(notificationsPermissions));
   identity.registerPermissions('master', Object.values(masterdataPermissions));
+  identity.registerPermissions('crm', Object.values(crmPermissions));
   const importer = createImporter({ platform, clock, newId: () => uuidv7(clock.now()) });
   const masterData = createMasterData({
     platform,
@@ -132,6 +136,14 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     directory: identityDirectory(identity),
     getApprovalState: approvals.getApprovalState,
   });
+  const crm = createCrm({
+    platform,
+    clock,
+    newId: () => uuidv7(clock.now()),
+    masterData,
+    notifications,
+    files,
+  });
   if (config.adminEmail !== undefined) {
     const email = config.adminEmail;
     await db.transaction((tx) => identity.users.ensureAdmin(email, tx));
@@ -141,6 +153,7 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     identity,
     importer,
     masterData,
+    crm,
     approvals,
     files,
     localFileStore: local,
