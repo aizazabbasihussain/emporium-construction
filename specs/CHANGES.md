@@ -84,3 +84,12 @@ P1-07 (PR #20) is open and not auto-merged. Its data model lists a column `versi
 3. **AC-4 lint rule.** `eslint.config.js` is protected, so `no-eval`, `no-new-func` and `no-implied-eval` are switched on by an inline directive in `formula.ts`, plus a test that scans the source. Option: approve, or add the rules to the shared config in a human-reviewed change.
 
 The PR can be merged once the first point is decided.
+
+### 2026-10-26: P1-08 settles four points that the spec text leaves open or contradicts
+
+P1-08 (PR #22) is open and not auto-merged, because its "Deviations and questions" section is not "none". The code follows the constitution and answered inputs where they conflict with the spec text. Decide, then update the P1-08 text to match or tell the agent what to change:
+
+1. **Revision column.** The data model lists `version` for the revision number; constitution 5.2 reserves `version` for the concurrency counter. The code stores `revision` (same as the P1-07 proposal above). Option A: change P1-08 data model and BR-7 from `version` to `revision`. Option B: keep `version` for the revision and add another concurrency column, which departs from 5.2.
+2. **Number series.** BR-7 says `QTE`; the answered input H-27 and the existing series say `QUO` (`QUO-YYYY-0001`). The code uses `QUO` and prints a revision as `QUO-2026-0001/2`. Option: change BR-7 to `QUO`, or add a second series `QTE` (and drop `QUO`).
+3. **Approver says no.** BR-4 has no transition for an approval request that is rejected, returned or cancelled. The code moves `pending_approval` back to `draft` so the quotation can be edited and resubmitted; a client's refusal is the separate `rejected` status. Option: approve and add `pending_approval to draft` to BR-4, or define a different outcome.
+4. **Beyond the data model, API and events** (listed in the PR body): column `accepted_by_name`; `qte_status_history` columns `from_status`, `to_status`, `changed_by` and an `id`; `issued`, `rejected` and `expired` become `superseded` when their revision is issued; acceptance is refused after the expiry date even before the daily job runs; `DELETE /quotations/:id` for drafts; event `quotations.quotation.changed`; typed setting `quotations.margin_floor_percent` (default 0, H-09); the `admin` role holds none of the P1-08 permissions. Option: approve and add them to the P1-08 text, or list which to remove.
