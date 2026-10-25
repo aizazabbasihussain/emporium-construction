@@ -3,7 +3,7 @@ id: P1-05
 title: Master data and company profile
 phase: 1
 module: masterdata
-status: not-started
+status: done
 depends_on: [P1-02, P0-04]
 requires_inputs: [H-01, H-25, H-26]
 ---
