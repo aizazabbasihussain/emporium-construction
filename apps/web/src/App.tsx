@@ -18,6 +18,13 @@ import { RequireAuth, RequirePermission } from './shell/guards';
 import { ApprovalRulesPage } from './approvals/ApprovalRulesPage';
 import { ApprovalsInboxPage } from './approvals/ApprovalsInboxPage';
 import { ImportPage } from './importer/ImportPage';
+import { CompanyPage } from './master/CompanyPage';
+import { CostCodesPage } from './master/CostCodesPage';
+import { ItemsPage } from './master/ItemsPage';
+import { LocationsPage } from './master/LocationsPage';
+import { PartiesPage } from './master/PartiesPage';
+import { UnitsPage } from './master/UnitsPage';
+import { VendorPricesPage } from './master/VendorPricesPage';
 import { NotificationsPage } from './notifications/NotificationsPage';
 import { HomePage } from './shell/HomePage';
 import { LoginPage } from './shell/LoginPage';
@@ -86,6 +93,19 @@ export function AppRoutes() {
           element={guarded('/admin/approval-rules', <ApprovalRulesPage />)}
         />
         <Route path="/notifications" element={guarded('/notifications', <NotificationsPage />)} />
+        <Route path="/master/company" element={guarded('/master/company', <CompanyPage />)} />
+        <Route path="/master/parties" element={guarded('/master/parties', <PartiesPage />)} />
+        <Route path="/master/items" element={guarded('/master/items', <ItemsPage />)} />
+        <Route path="/master/units" element={guarded('/master/units', <UnitsPage />)} />
+        <Route
+          path="/master/cost-codes"
+          element={guarded('/master/cost-codes', <CostCodesPage />)}
+        />
+        <Route path="/master/locations" element={guarded('/master/locations', <LocationsPage />)} />
+        <Route
+          path="/master/vendor-prices"
+          element={guarded('/master/vendor-prices', <VendorPricesPage />)}
+        />
         <Route path="/imports" element={guarded('/imports', <ImportPage />)} />
         <Route path="/admin/settings" element={guarded('/admin/settings', <SettingsPage />)} />
         <Route path="*" element={<NotFoundPage />} />

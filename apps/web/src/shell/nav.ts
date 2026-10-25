@@ -2,6 +2,7 @@ import {
   approvalsPermissions,
   identityPermissions,
   importerPermissions,
+  masterdataPermissions,
   notificationsPermissions,
   platformPermissions,
 } from '@emporium/shared';
@@ -37,6 +38,29 @@ export const navItems: readonly NavItem[] = [
     permission: notificationsPermissions.readOwn,
   },
   { path: '/imports', label: 'nav.imports', permission: importerPermissions.batchRead },
+  {
+    path: '/master/company',
+    label: 'nav.company',
+    permission: masterdataPermissions.referenceRead,
+  },
+  { path: '/master/parties', label: 'nav.parties', permission: masterdataPermissions.partyRead },
+  { path: '/master/items', label: 'nav.items', permission: masterdataPermissions.itemRead },
+  { path: '/master/units', label: 'nav.units', permission: masterdataPermissions.referenceRead },
+  {
+    path: '/master/cost-codes',
+    label: 'nav.costCodes',
+    permission: masterdataPermissions.referenceRead,
+  },
+  {
+    path: '/master/locations',
+    label: 'nav.locations',
+    permission: masterdataPermissions.referenceRead,
+  },
+  {
+    path: '/master/vendor-prices',
+    label: 'nav.vendorPrices',
+    permission: masterdataPermissions.priceRead,
+  },
   {
     path: '/admin/settings',
     label: 'nav.settings',
