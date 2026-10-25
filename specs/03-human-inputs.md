@@ -17,10 +17,10 @@ Status: `open` or `answered`. "Default allowed": whether the agent may proceed w
 | H-09 | Approval matrix and amount limits (requisition, PO, expense, payment, quotation margin floor, write-offs) | Owner | P1-03 and all approvers | no | none | answered |
 | H-10 | Role holders: which people hold which roles | Owner | P1-02 | no | none | answered |
 | H-11 | Wage rules: working-days basis per month (26 or 30), overtime multiplier, rounding of net pay | Owner, accountant | P1-17, P1-18 | no | none | open |
-| H-12 | Worker pay basis and rates (daily rate or monthly salary) | Owner | P1-16 | no | none | open |
+| H-12 | Worker pay basis and rates (daily rate or monthly salary) | Owner | P1-16 | yes | build with synthetic data; rates are per worker, effective-dated and entered by an admin from the screen, none in code | open |
 | H-13 | Opening data: cash, bank, receivables, payables, advances, PDCs, stock, open projects, workers, vendors, clients | Accountant, owner | P0-04, P2-10 | no | none | open |
 | H-14 | Samples of paper forms (quotation, site report, voucher, labour register, attendance sheet, invoice) | Owner | P0-02 | yes | specs' own fields | open |
-| H-15 | Job templates and unit rates (boundary wall, room, slab, demolition, others) | Owner | P1-07 | no | none | open |
+| H-15 | Job templates and unit rates (boundary wall, room, slab, demolition, others) | Owner | P1-07 | yes | build the editor and evaluator; templates are data loaded by an admin, rates empty, overhead 10%, contingency 5%, margin 15% as editable settings | open |
 | H-16 | Lead sources, pipeline stages, loss reasons | Owner | P1-06 | yes | stages: New, Visited, Quoted, Negotiation, Won, Lost | open |
 | H-17 | Government contract terms: Pakistan-only storage wording, backups covered or not | Owner | Phase 4 | no | none | open |
 | H-18 | Hosting provider shortlist and quotes | Owner | Phase 4 | no | none | open |
@@ -49,3 +49,5 @@ Details behind each `answered` row. Dated 2026-10-24, given by the owner. Nothin
 - **H-25** Cost codes: 100 Materials, 200 Labour, 300 Subcontractors, 400 Equipment and tools, 500 Site expenses (transport, food, small items), 600 Other. Sub-codes (for example 101 Cement, 102 Steel, 103 Bricks) are added from the UI.
 - **H-27** Prefixes `INV`, `QUO`, `PO`, `PV`, `RV`, `VAR`, each as `PREFIX-YYYY-0001`, all starting from 0001. Prefix, padding and next number are editable from the UI. A change affects new documents only.
 - **H-05** Still `open`. The owner has no chart of accounts yet. A draft for the accountant to review is in `docs/decisions/chart-of-accounts-draft.md`. It becomes an answer only when the accountant approves it.
+- **H-12** Partly answered 2026-10-25. Permanent workers and supervisors are paid monthly; daily-wage and contractor workers daily. Contractor labour is paid as a total on the contractor bill and not tracked per worker. Rates must be configurable, not fixed. Worker records are entered by an admin from the screen. Defaults and open points are in `docs/decisions/h12-h15-owner-answers-and-defaults.md`. Status stays `open` until real rates are loaded.
+- **H-15** Partly answered 2026-10-25. Common jobs are demolition and restructuring (about 10 a year each); pricing is both lump sum and per unit; material prices come from the market. Template contents and the percentages were left to us; assumed values are in `docs/decisions/h12-h15-owner-answers-and-defaults.md`. Status stays `open` until the owner confirms real templates and rates.
