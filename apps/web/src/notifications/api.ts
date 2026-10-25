@@ -1,4 +1,4 @@
-import { approvalNotificationTemplates } from '@emporium/shared';
+import { approvalNotificationTemplates, crmNotificationTemplates } from '@emporium/shared';
 import { request } from '../admin/api';
 
 export interface NotificationItem {
@@ -22,6 +22,9 @@ export const notificationsApi = {
 
 /** The i18n key of a template code (BR-9); modules that register their own template add it here. */
 export function templateKey(code: string): string {
-  const known: Record<string, string> = approvalNotificationTemplates;
+  const known: Record<string, string> = {
+    ...approvalNotificationTemplates,
+    ...crmNotificationTemplates,
+  };
   return known[code] ?? 'notifications.unknown';
 }

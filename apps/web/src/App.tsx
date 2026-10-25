@@ -17,6 +17,9 @@ import { NotFoundPage } from './shell/ErrorPages';
 import { RequireAuth, RequirePermission } from './shell/guards';
 import { ApprovalRulesPage } from './approvals/ApprovalRulesPage';
 import { ApprovalsInboxPage } from './approvals/ApprovalsInboxPage';
+import { FollowUpsPage } from './crm/FollowUpsPage';
+import { LeadDetailPage } from './crm/LeadDetailPage';
+import { LeadsPage } from './crm/LeadsPage';
 import { ImportPage } from './importer/ImportPage';
 import { CompanyPage } from './master/CompanyPage';
 import { CostCodesPage } from './master/CostCodesPage';
@@ -106,6 +109,9 @@ export function AppRoutes() {
           path="/master/vendor-prices"
           element={guarded('/master/vendor-prices', <VendorPricesPage />)}
         />
+        <Route path="/crm/leads" element={guarded('/crm/leads', <LeadsPage />)} />
+        <Route path="/crm/leads/:id" element={guarded('/crm/leads', <LeadDetailPage />)} />
+        <Route path="/crm/follow-ups" element={guarded('/crm/follow-ups', <FollowUpsPage />)} />
         <Route path="/imports" element={guarded('/imports', <ImportPage />)} />
         <Route path="/admin/settings" element={guarded('/admin/settings', <SettingsPage />)} />
         <Route path="*" element={<NotFoundPage />} />

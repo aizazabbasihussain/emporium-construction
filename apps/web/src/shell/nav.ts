@@ -1,5 +1,6 @@
 import {
   approvalsPermissions,
+  crmPermissions,
   identityPermissions,
   importerPermissions,
   masterdataPermissions,
@@ -61,6 +62,8 @@ export const navItems: readonly NavItem[] = [
     label: 'nav.vendorPrices',
     permission: masterdataPermissions.priceRead,
   },
+  { path: '/crm/leads', label: 'nav.crmLeads', permission: crmPermissions.leadRead },
+  { path: '/crm/follow-ups', label: 'nav.crmFollowUps', permission: crmPermissions.leadRead },
   {
     path: '/admin/settings',
     label: 'nav.settings',
