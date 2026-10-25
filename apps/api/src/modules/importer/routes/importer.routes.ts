@@ -1,6 +1,5 @@
-import multipart from '@fastify/multipart';
 import { ValidationError } from '@emporium/domain';
-import { MAX_FILE_BYTES, importFormats } from '@emporium/domain/importer';
+import { importFormats } from '@emporium/domain/importer';
 import { importerPermissions } from '@emporium/shared';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { z } from 'zod';
@@ -36,7 +35,6 @@ const send = (reply: FastifyReply, file: FileDownload) =>
 /** The importer endpoints (spec P0-04 section 5). Uploaded files are held in memory only (BR-10). */
 export function registerImporterRoutes(app: FastifyInstance, deps: ImporterRouteDeps): void {
   const { db, importer } = deps;
-  void app.register(multipart, { limits: { fileSize: MAX_FILE_BYTES, files: 1, fields: 5 } });
 
   const actorOf = (request: FastifyRequest) => ({
     userId: currentUser(request).userId,
