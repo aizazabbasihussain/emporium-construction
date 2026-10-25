@@ -45,3 +45,32 @@ Options for the human to decide:
 3. Defer to BACKLOG and rely on site visit notes with photos through `fil_attachments`.
 
 No spec is blocked. Awaiting a decision.
+
+### 2026-10-25: P1-13 adds tables, a column, an event and a grant beyond its data model
+
+P1-13 was built and auto-merged (PR #16) with "Deviations and questions: none". The agent treated these as implementation details, but they go beyond the spec's data model and need a human decision:
+
+1. Table `val_keys`: the current method of each store and item, also the lock row for concurrent movements.
+2. Table `val_return_parts`: records which layers a return gave back.
+3. Column `val_layers.remaining_value`.
+4. Event `valuation.movement.recorded`, so every mutation writes an outbox row.
+5. The `admin` role can read the valuation policy and report screens.
+
+Options for the human to decide:
+1. Approve and add them to P1-13 section "Data model" and "Interfaces" (the code already matches).
+2. Reject and ask for a rework spec; this changes migration `0008_valuation.sql` after it has shipped.
+
+P1-12 reads these tables, so the decision should come before it starts.
+
+### 2026-10-25: P1-05 judgment calls to ratify
+
+P1-05 (PR #14) was left open by the agent because six points were unclear, and was merged afterwards. Nothing in the repository records the answers, so ratify or change them:
+
+1. `getRegistration(authority)` picks one registration when several types are active, preferring ntn, then strn, pra, other, with an optional `type` argument.
+2. BR-6: a cost code is blocked from deactivation only when it has both posted costs and open budget lines.
+3. T-4 property test: a unit conversion round trip cannot hold for every factor (0.3048 can lose up to 1.6 units), so it is tested for factors 1 to 1000.
+4. Three read permissions not listed in the spec were added: `master.reference.read`, `master.item.read`, `master.price.read`.
+5. Duplicate parties: a repeated NTN or CNIC is always refused; a repeated name plus phone is a warning the user can confirm.
+6. Importers: a file with a row that repeats an existing party fails the whole commit instead of skipping that row.
+
+Options for the human to decide: approve all six and update the P1-05 spec text to match, or list which points to change.
