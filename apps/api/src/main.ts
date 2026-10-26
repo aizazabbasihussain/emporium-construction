@@ -19,6 +19,7 @@ try {
     estimation,
     quotations,
     projects,
+    variations,
     approvals,
     files,
     localFileStore,
@@ -40,6 +41,7 @@ try {
     estimation: { db, estimation, platform },
     quotations: { db, quotations, platform },
     projects: { db, projects, platform },
+    variations: { db, variations, platform },
   });
   await app.listen({ port: config.port, host: '0.0.0.0' });
   startScheduler(runtime, logger);

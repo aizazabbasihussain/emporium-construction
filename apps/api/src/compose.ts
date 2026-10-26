@@ -19,6 +19,7 @@ import { createEstimation, type Estimation } from './modules/estimation/index.js
 import { createMasterData, type MasterData } from './modules/masterdata/index.js';
 import { createProjects, type Projects } from './modules/projects/index.js';
 import { createQuotations, type Quotations } from './modules/quotations/index.js';
+import { createVariations, type Variations } from './modules/variations/index.js';
 import { createValuation, type Valuation } from './modules/valuation/index.js';
 import {
   approvalsPermissions,
@@ -33,6 +34,7 @@ import {
   projectsPermissions,
   quotationsPermissions,
   valuationPermissions,
+  variationsPermissions,
 } from '@emporium/shared';
 import { randomUUID } from 'node:crypto';
 import { createRemoteJWKSet } from 'jose';
@@ -70,6 +72,7 @@ export interface Runtime {
   estimation: Estimation;
   quotations: Quotations;
   projects: Projects;
+  variations: Variations;
   approvals: Approvals;
   files: Files;
   /** Set when FILE_STORE_DRIVER=local: it serves its own signed download links. */
@@ -101,6 +104,7 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
   identity.registerPermissions('estimation', Object.values(estimationPermissions));
   identity.registerPermissions('quotations', Object.values(quotationsPermissions));
   identity.registerPermissions('projects', Object.values(projectsPermissions));
+  identity.registerPermissions('variations', Object.values(variationsPermissions));
   const importer = createImporter({ platform, clock, newId: () => uuidv7(clock.now()) });
   const masterData = createMasterData({
     platform,
@@ -193,6 +197,15 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     quotations,
     estimation,
   });
+  const variations = createVariations({
+    platform,
+    clock,
+    newId: () => uuidv7(clock.now()),
+    projects,
+    approvals,
+    masterData,
+    files,
+  });
   if (config.adminEmail !== undefined) {
     const email = config.adminEmail;
     await db.transaction((tx) => identity.users.ensureAdmin(email, tx));
@@ -207,6 +220,7 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     estimation,
     quotations,
     projects,
+    variations,
     approvals,
     files,
     localFileStore: local,

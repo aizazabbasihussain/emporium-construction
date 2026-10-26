@@ -1,3 +1,4 @@
+import { variationsPermissions } from '@emporium/shared';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ConfigProvider } from 'antd';
 import { useEffect, useState, type ReactNode } from 'react';
@@ -22,6 +23,7 @@ import { EstimateEditorPage } from './estimation/EstimateEditorPage';
 import { EstimatesPage } from './estimation/EstimatesPage';
 import { TemplatesPage } from './estimation/TemplatesPage';
 import { ProjectPage } from './projects/ProjectPage';
+import { VariationEditorPage } from './variations/VariationEditorPage';
 import { ProjectsPage } from './projects/ProjectsPage';
 import { QuotationEditorPage } from './quotations/QuotationEditorPage';
 import { QuotationsPage } from './quotations/QuotationsPage';
@@ -137,6 +139,14 @@ export function AppRoutes() {
         <Route path="/quotations/:id" element={guarded('/quotations', <QuotationEditorPage />)} />
         <Route path="/projects" element={guarded('/projects', <ProjectsPage />)} />
         <Route path="/projects/:id" element={guarded('/projects', <ProjectPage />)} />
+        <Route
+          path="/variations/:id"
+          element={
+            <RequirePermission permission={variationsPermissions.read}>
+              <VariationEditorPage />
+            </RequirePermission>
+          }
+        />
         <Route
           path="/valuation/settings"
           element={guarded('/valuation/settings', <ValuationSettingsPage />)}
