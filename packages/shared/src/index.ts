@@ -68,6 +68,15 @@ export {
   type ProjectsPermission,
   type TaskStatus,
 } from './projects.js';
+export {
+  variationDocType,
+  variationEntityType,
+  variationStatuses,
+  variationsPermissionGrants,
+  variationsPermissions,
+  type VariationStatus,
+  type VariationsPermission,
+} from './variations.js';
 export { fileStoreDrivers, type FileStoreDriver } from './enums.js';
 export {
   fileOperations,

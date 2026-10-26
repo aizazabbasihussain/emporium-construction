@@ -1,0 +1,38 @@
+{
+  "name": "variations",
+  "tablePrefix": "var_",
+  "ownedTables": ["var_variations", "var_lines", "var_counters", "var_status_history"],
+  "exports": [
+    "createVariations",
+    "registerVariationsRoutes",
+    "getCurrentContractValue",
+    "listApprovedVariations"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.idempotency.execute",
+    "platform.settings.get",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "projects.getProject",
+    "projects.addBudgetLine",
+    "projects.costing.listEntries",
+    "approvals.requestApproval",
+    "approvals.getApprovalState",
+    "approvals.cancelApproval",
+    "masterdata.getCostCode",
+    "files.list",
+    "files.registerFileAccess"
+  ],
+  "eventsIn": [],
+  "eventsOut": ["variation.approved", "variation.rejected", "variations.variation.changed"],
+  "permissions": [
+    "variations.variation.read",
+    "variations.variation.create",
+    "variations.variation.update",
+    "variations.variation.client_approve"
+  ],
+  "notes": "Owns project variations (changes of scope), their lines, the status history and the per-project number counter. Numbers are the project code plus -V<n> (BR-1), not the platform series. The original contract value is never written: the current value is computed as original plus the price impacts of client-approved variations. Internal approval is the approval engine's document type variation (H-09); the engine's state, not a status, tells whether a variation may go to the client, and an approver's rejection leaves the variation as it is until it is cancelled. On client approval each line that costs something is added to the project budget through projects.addBudgetLine (source variation); the status change is the once-only guard. The client's document is a file of entity type var_variation. Costs at risk (BR-8) are read from the project cost ledger through projects.costing.listEntries."
+}

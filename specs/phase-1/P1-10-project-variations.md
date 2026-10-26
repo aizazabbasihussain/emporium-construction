@@ -3,7 +3,7 @@ id: P1-10
 title: Project variations
 phase: 1
 module: variations
-status: not-started
+status: done
 depends_on: [P1-09, P1-03, P1-04]
 requires_inputs: [H-09]
 ---

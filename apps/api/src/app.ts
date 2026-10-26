@@ -25,6 +25,7 @@ import {
   type NotificationsRouteDeps,
 } from './modules/notifications/index.js';
 import { registerPlatformRoutes, type PlatformRouteDeps } from './modules/platform/index.js';
+import { registerVariationsRoutes, type VariationsRouteDeps } from './modules/variations/index.js';
 import { registerValuationRoutes, type ValuationRouteDeps } from './modules/valuation/index.js';
 
 export interface AppDeps {
@@ -55,6 +56,8 @@ export interface AppDeps {
   quotations?: QuotationsRouteDeps;
   /** The project endpoints; they rely on the authentication hook of `identity`. */
   projects?: ProjectsRouteDeps;
+  /** The variation endpoints; they rely on the authentication hook of `identity`. */
+  variations?: VariationsRouteDeps;
 }
 
 export async function buildApp({
@@ -73,6 +76,7 @@ export async function buildApp({
   estimation,
   quotations,
   projects,
+  variations,
 }: AppDeps): Promise<FastifyInstance> {
   const loggerInstance: FastifyBaseLogger = logger;
   const app = Fastify({
@@ -111,6 +115,7 @@ export async function buildApp({
   if (estimation) registerEstimationRoutes(app, estimation);
   if (quotations) registerQuotationsRoutes(app, quotations);
   if (projects) registerProjectsRoutes(app, projects);
+  if (variations) registerVariationsRoutes(app, variations);
 
   return app;
 }

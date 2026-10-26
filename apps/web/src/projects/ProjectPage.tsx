@@ -3,6 +3,7 @@ import {
   projectStatuses,
   projectsPermissions as perm,
   taskStatuses,
+  variationsPermissions,
   type ProjectStatus,
   type TaskStatus,
 } from '@emporium/shared';
@@ -33,6 +34,7 @@ import {
   type SummaryLine,
   type Task,
 } from './api';
+import { ProjectVariations } from '../variations/ProjectVariations';
 import { BudgetEditor } from './BudgetEditor';
 
 const FLAG_COLOUR: Record<BudgetFlag, string> = {
@@ -295,6 +297,15 @@ export function ProjectPage() {
               </div>
             ),
           },
+          ...(can(variationsPermissions.read)
+            ? [
+                {
+                  key: 'variations',
+                  label: t('projects.tabs.variations'),
+                  children: <ProjectVariations projectId={id} active={data.status === 'active'} />,
+                },
+              ]
+            : []),
           {
             key: 'costs',
             label: t('projects.tabs.costs'),
