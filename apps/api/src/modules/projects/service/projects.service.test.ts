@@ -353,6 +353,20 @@ describe('budget (BR-8)', () => {
   });
 });
 
+describe('variation budget lines', () => {
+  it('stores a blank description as an empty one', async () => {
+    const project = await kit.project();
+    const line = await tx((db) =>
+      kit.projects.addBudgetLine(
+        project.id,
+        { costCodeId: kit.codes['300'] as string, description: '  ', budgetAmount: '5' },
+        db,
+      ),
+    );
+    expect([line.description, line.source]).toEqual(['', 'variation']);
+  });
+});
+
 describe('tasks (BR-10)', () => {
   it('creates, updates and averages the progress', async () => {
     const project = await kit.project();

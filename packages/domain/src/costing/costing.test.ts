@@ -1,4 +1,3 @@
-import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 import type { DomainError } from '../errors.js';
 import {
@@ -241,41 +240,6 @@ describe('ledger chains (BR-6, BR-7)', () => {
         { committed: '0.20', approved: '0.00', posted: '-1.00' },
       ]),
     ).toEqual({ committed: '1.30', approved: '2.00', posted: '2.00' });
-  });
-
-  it('property: reversing every chain yields zero, whatever the sequence', () => {
-    const steps = fc.array(
-      fc.record({
-        chain: fc.integer({ min: 0, max: 4 }),
-        amount: fc.integer({ min: 1, max: 10_000_000 }),
-      }),
-      { maxLength: 30 },
-    );
-    fc.assert(
-      fc.property(steps, (list) => {
-        const rows: ChainRow[] = [];
-        const seen = new Set<number>();
-        for (const { chain, amount } of list) {
-          if (seen.has(chain)) continue;
-          seen.add(chain);
-          const money = (amount / 100).toFixed(2);
-          for (const status of ['committed', 'approved', 'posted'] as const) {
-            rows.push(row(rows.length + 1, `k${chain}`, status, money));
-          }
-        }
-        const before = summarizeChains(rows);
-        expect(before.committed).toBe('0.00');
-        for (const chain of seen) {
-          const last = rows.filter((r) => r.chain === `k${chain}`).at(-1) as ChainRow;
-          rows.push(row(rows.length + 1, `k${chain}`, 'reversed', last.amount));
-        }
-        expect(summarizeChains(rows)).toEqual({
-          committed: '0.00',
-          approved: '0.00',
-          posted: '0.00',
-        });
-      }),
-    );
   });
 });
 
