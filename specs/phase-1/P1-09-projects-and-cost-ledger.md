@@ -3,7 +3,7 @@ id: P1-09
 title: Projects and cost ledger
 phase: 1
 module: projects
-status: not-started
+status: done
 depends_on: [P1-08]
 requires_inputs: [H-25]
 ---

@@ -49,6 +49,25 @@ export {
   type QuotationsPermission,
   type StageBasis,
 } from './quotations.js';
+export {
+  budgetSources,
+  costObjectTypes,
+  costStatuses,
+  projectNumberSeries,
+  projectSectors,
+  projectSettingKeys,
+  projectStatuses,
+  projectsPermissionGrants,
+  projectsPermissions,
+  taskStatuses,
+  type BudgetSource,
+  type CostObjectType,
+  type CostStatus,
+  type ProjectSector,
+  type ProjectStatus,
+  type ProjectsPermission,
+  type TaskStatus,
+} from './projects.js';
 export { fileStoreDrivers, type FileStoreDriver } from './enums.js';
 export {
   fileOperations,
