@@ -9,3 +9,4 @@ Ideas and deferred items. The agent adds entries here instead of building them. 
 - [P1-13] Additional costing methods (standard cost) behind the same valuation strategy interface
 - [P1-12] Landed-cost allocation (freight, loading) into receipt cost
 - [P3-04] Recurring service contracts (AMC) and preventive maintenance
+- [P1-09] Admin manual journal for overhead cost entries with approval (named in section 5 but with no route, permission, approval document type or test in the spec; postCost already accepts overhead from other modules)

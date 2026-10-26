@@ -1,0 +1,62 @@
+{
+  "name": "projects",
+  "tablePrefix": "prj_",
+  "ownedTables": [
+    "prj_projects",
+    "prj_budget_lines",
+    "prj_cost_entries",
+    "prj_tasks",
+    "prj_supervisor_assignments"
+  ],
+  "ownedViews": ["prj_v_cost_summary"],
+  "exports": [
+    "createProjects",
+    "registerProjectsRoutes",
+    "getProject",
+    "listProjectsForUser",
+    "postCost",
+    "reverseCost",
+    "transitionCost",
+    "getCostSummary",
+    "addBudgetLine",
+    "getEstimateBudgetSource"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.events.subscribe",
+    "platform.idempotency.execute",
+    "platform.numbering.next",
+    "platform.settings.get",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "identity.users.list",
+    "identity.users.setScopes",
+    "quotations.getQuotation",
+    "estimation.getEstimateCostLines",
+    "masterdata.getParty",
+    "masterdata.listLocations",
+    "masterdata.getCostCode",
+    "masterdata.registerCostCodeUsage",
+    "masterdata.registerReferenceCheck"
+  ],
+  "eventsIn": ["quotation.accepted"],
+  "eventsOut": [
+    "project.created",
+    "project.status.changed",
+    "projects.project.changed",
+    "projects.cost.changed"
+  ],
+  "permissions": [
+    "projects.project.read",
+    "projects.project.create",
+    "projects.project.update",
+    "projects.project.status",
+    "projects.budget.manage",
+    "projects.task.manage",
+    "projects.cost.read",
+    "projects.cost.post"
+  ],
+  "notes": "Owns projects, budget lines, tasks, supervisor assignments and the append-only cost ledger (constitution 5.11). Other modules post costs only through postCost; a status change appends a row of the same chain (the source line) and the latest row of a chain is its current state, read through the view prj_v_cost_summary. A database trigger refuses any update, delete or truncate of prj_cost_entries. Project codes come from the number series project (prefix PRJ). One project is made per accepted quotation (event quotation.accepted); contract value is the quotation price and never changes. A government project is refused unless ALLOW_GOVERNMENT_DATA=true. Supervisor assignments write project scopes through identity.users.setScopes. Work orders are refused as cost objects until the setting projects.work_orders_enabled is on (P3-02). The manual overhead journal with approval named in section 5 of the spec is not built here (see BACKLOG)."
+}

@@ -8,6 +8,7 @@ import {
   quotationsPermissions,
   notificationsPermissions,
   platformPermissions,
+  projectsPermissions,
   valuationPermissions,
 } from '@emporium/shared';
 
@@ -81,6 +82,11 @@ export const navItems: readonly NavItem[] = [
     path: '/quotations',
     label: 'nav.quotations',
     permission: quotationsPermissions.read,
+  },
+  {
+    path: '/projects',
+    label: 'nav.projects',
+    permission: projectsPermissions.read,
   },
   {
     path: '/valuation/settings',
