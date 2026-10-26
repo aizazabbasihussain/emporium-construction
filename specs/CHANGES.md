@@ -99,3 +99,14 @@ P1-08 (PR #22) is open and not auto-merged, because its "Deviations and question
 P1-09 (PR #24) is open and not auto-merged, because its "Deviations and questions" section is not "none". Section 5 ("Interfaces") says `postCost` has no public route "except an admin manual journal for overhead entries with approval". The spec gives no route, permission, approval document type or test for it, and `BACKLOG.md` already lists it as deferred. The code leaves it out; `postCost` already accepts overhead cost objects from other modules. Decision (deferred): remove the exception from the P1-09 text and keep the journal in `BACKLOG.md`.
 
 Options for the human to decide: approve the deferral and change the P1-09 interface line to "`postCost` is service-level only (no public route)", or ask for a follow-up spec that defines the route, permission, approval document type and tests.
+
+### 2026-10-27: P1-10 renames one permission and settles five points the spec text leaves open
+
+P1-10 (PR #26) is open and not auto-merged, because its "Deviations and questions" section is not "none". Decide, then update the P1-10 text to match or tell the agent what to change:
+
+1. **Permission code.** Section 6 names `variations.variation.client-approve`, but `sys_role_permissions` accepts only letters, digits and underscores in a code, so the hyphen is refused. The code uses `variations.variation.client_approve`. Option A: change the P1-10 text to `client_approve`. Option B: relax the identity constraint in a human-reviewed change and keep the hyphen.
+2. **Approver says no.** The spec has no status for an internal rejection. The variation stays `pending_internal_approval` (it cannot go to the client) until it is cancelled, and only a client-rejected variation can be copied (BR-7). Option: approve, or add a step from `pending_internal_approval` back to `draft`.
+3. **Numbering.** BR-1 (`<project code>-V<n>`, per project) differs from the answered H-27 (`VAR-YYYY-0001`). The code follows BR-1 and leaves the seeded `variation` series unused. Option: approve, or switch to the H-27 format.
+4. **Deductive variations and the budget.** A line cost must be zero or more, because `addBudgetLine` only appends non-negative lines. A deductive variation lowers the price but not the budget. Option: approve, or define how the budget is reduced.
+5. **At risk.** Counted for open variations only, for costs dated on or after `discovered_on`, `approved` and `posted`, on the cost codes of the lines. Option: approve, or state a different window.
+6. **Beyond the spec lists.** Event `variations.variation.changed` (an outbox entry per mutation, constitution 5.9), `DELETE` of a draft, and `POST /variations/:id/copy`. Option: approve and add them to the P1-10 text.
