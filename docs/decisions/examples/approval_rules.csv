@@ -1,0 +1,4 @@
+document_type,min_amount,max_amount,steps
+example_doc,0,1000.00,example_clerk
+example_doc,1000.00,5000.00,example_clerk|example_approver
+example_doc,5000.00,,example_approver

@@ -1,0 +1,4 @@
+direction,party_type,nature,rate_percent,base,effective_from,effective_to
+client_withholds,company,services,2,invoice_amount,2026-01-01,
+we_withhold,vendor,goods,1.5,bill_amount,2026-01-01,2026-06-30
+we_withhold,vendor,goods,2,bill_amount,2026-07-01,

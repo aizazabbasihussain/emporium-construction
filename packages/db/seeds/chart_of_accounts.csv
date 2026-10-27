@@ -1,0 +1,65 @@
+code,name,type,parent_code,active
+1000,Assets,asset,,true
+1100,Cash and bank,asset,1000,true
+1110,Cash in hand,asset,1100,true
+1120,Petty cash and site imprest,asset,1100,true
+1130,Bank account (one line per bank),asset,1100,true
+1140,Post-dated cheques received,asset,1100,true
+1200,Receivables,asset,1000,true
+1210,Trade receivables (clients),asset,1200,true
+1220,Retention receivable,asset,1200,true
+1230,Unbilled work in progress,asset,1200,true
+1300,Advances and deposits,asset,1000,true
+1310,Advances to vendors,asset,1300,true
+1320,Advances to subcontractors,asset,1300,true
+1330,Staff and worker advances,asset,1300,true
+1340,Security deposits paid,asset,1300,true
+1400,Tax receivable,asset,1000,true
+1410,Input sales tax,asset,1400,true
+1420,Income tax withheld by clients (adjustable),asset,1400,true
+1500,Inventory (company-owned stock),asset,1000,true
+1600,Fixed assets,asset,1000,true
+1610,Equipment and tools,asset,1600,true
+1620,Vehicles,asset,1600,true
+1690,Accumulated depreciation,asset,1600,true
+2000,Liabilities,liability,,true
+2100,Payables,liability,2000,true
+2110,Trade payables (vendors),liability,2100,true
+2120,Subcontractor payables,liability,2100,true
+2130,Retention payable,liability,2100,true
+2140,Accrued expenses,liability,2100,true
+2200,Payroll liabilities,liability,2000,true
+2210,Wages payable,liability,2200,true
+2220,Advances recoverable from wages,liability,2200,true
+2300,Taxes payable,liability,2000,true
+2310,Output sales tax (FBR),liability,2300,true
+2320,"Output sales tax (PRA, when registered)",liability,2300,true
+2330,"Tax withheld from vendors, payable",liability,2300,true
+2400,Client advances and deposits received,liability,2000,true
+2500,Loans and borrowings,liability,2000,true
+3000,Equity,equity,,true
+3100,Owner capital,equity,3000,true
+3200,Owner drawings,equity,3000,true
+3300,Retained earnings,equity,3000,true
+4000,Income,income,,true
+4100,"Contract revenue, construction",income,4000,true
+4110,"Contract revenue, demolition and restructuring",income,4000,true
+4120,Variation revenue,income,4000,true
+4200,Maintenance and service revenue,income,4000,true
+4900,Other income,income,4000,true
+5000,Direct project costs,expense,,true
+5100,Materials,expense,5000,true
+5200,Direct labour,expense,5000,true
+5300,Subcontractors,expense,5000,true
+5400,Equipment and tools hire,expense,5000,true
+5500,Site expenses,expense,5000,true
+5600,Other direct costs,expense,5000,true
+5900,Stock adjustments and wastage,expense,5000,true
+6000,Overheads,expense,,true
+6100,Office salaries,expense,6000,true
+6200,Rent and utilities,expense,6000,true
+6300,Vehicle and fuel,expense,6000,true
+6400,Professional fees,expense,6000,true
+6500,Bank charges,expense,6000,true
+6600,Depreciation,expense,6000,true
+6900,Other overheads,expense,6000,true

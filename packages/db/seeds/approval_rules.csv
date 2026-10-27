@@ -1,0 +1,7 @@
+document_type,min_amount,max_amount,steps
+requisition,0,,owner
+purchase_order,0,,owner
+expense,0,,owner
+payment,0,,owner
+quotation,0,,owner
+write_off,0,,owner
