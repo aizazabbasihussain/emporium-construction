@@ -1,4 +1,4 @@
-import { variationsPermissions } from '@emporium/shared';
+import { procurementPermissions, variationsPermissions } from '@emporium/shared';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ConfigProvider } from 'antd';
 import { useEffect, useState, type ReactNode } from 'react';
@@ -23,6 +23,10 @@ import { EstimateEditorPage } from './estimation/EstimateEditorPage';
 import { EstimatesPage } from './estimation/EstimatesPage';
 import { TemplatesPage } from './estimation/TemplatesPage';
 import { ProjectPage } from './projects/ProjectPage';
+import { GrnPage } from './procurement/GrnPage';
+import { PurchaseOrderPage, PurchaseOrdersPage } from './procurement/OrderPages';
+import { RequisitionPage, RequisitionsPage } from './procurement/RequisitionPages';
+import { RfqPage } from './procurement/RfqPage';
 import { VariationEditorPage } from './variations/VariationEditorPage';
 import { ProjectsPage } from './projects/ProjectsPage';
 import { QuotationEditorPage } from './quotations/QuotationEditorPage';
@@ -144,6 +148,34 @@ export function AppRoutes() {
           element={
             <RequirePermission permission={variationsPermissions.read}>
               <VariationEditorPage />
+            </RequirePermission>
+          }
+        />
+        <Route
+          path="/procurement/requisitions"
+          element={guarded('/procurement/requisitions', <RequisitionsPage />)}
+        />
+        <Route
+          path="/procurement/requisitions/:id"
+          element={guarded('/procurement/requisitions', <RequisitionPage />)}
+        />
+        <Route
+          path="/procurement/rfqs/:id"
+          element={guarded('/procurement/requisitions', <RfqPage />)}
+        />
+        <Route
+          path="/procurement/purchase-orders"
+          element={guarded('/procurement/purchase-orders', <PurchaseOrdersPage />)}
+        />
+        <Route
+          path="/procurement/purchase-orders/:id"
+          element={guarded('/procurement/purchase-orders', <PurchaseOrderPage />)}
+        />
+        <Route
+          path="/procurement/receiving/:poId"
+          element={
+            <RequirePermission permission={procurementPermissions.grnCreate}>
+              <GrnPage />
             </RequirePermission>
           }
         />

@@ -69,6 +69,23 @@ export {
   type TaskStatus,
 } from './projects.js';
 export {
+  destinationTypes,
+  grnEntityType,
+  grnStatuses,
+  procurementPermissionGrants,
+  procurementPermissions,
+  procurementSettingKeys,
+  purchaseOrderDocType,
+  purchaseOrderStatuses,
+  requisitionDocType,
+  requisitionStatuses,
+  type DestinationType,
+  type GrnStatus,
+  type ProcurementPermission,
+  type PurchaseOrderStatus,
+  type RequisitionStatus,
+} from './procurement.js';
+export {
   variationDocType,
   variationEntityType,
   variationStatuses,
