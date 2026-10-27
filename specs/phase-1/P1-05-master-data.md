@@ -24,7 +24,7 @@ The shared reference data every module uses: company profile and tax registratio
 - `mst_company(id, name, address, phone, email, logo_file_id)` single row; `mst_tax_registrations(id, authority code, registration_type ntn|strn|pra|other, number, valid_from, valid_to nullable)`.
 - `mst_parties(id, code unique, name, legal_name, kind jsonb roles: client|vendor|subcontractor|labour_contractor, ntn nullable, strn nullable, cnic nullable, phone, email, address, city, status, notes, ...base)`; `mst_party_contacts(party_id, name, phone, email, role)`.
 - `mst_units(code pk, name, kind count|length|area|volume|weight|time|lump)`, `mst_unit_conversions(from_unit, to_unit, factor numeric(18,6))`.
-- `mst_item_categories(id, code unique, name, parent_id)`; `mst_items(id, code unique, name, category_id, unit_code, item_kind material|consumable|service|labour|equipment, stockable bool, default_tax_kind goods|services, reorder_level nullable, active)`.
+- `mst_item_categories(id, code unique, name, parent_id)`; `mst_items(id, code unique, name, category_id, unit_code, item_kind material|consumable|service|labour|equipment, stockable bool, default_tax_kind goods|services, reorder_level nullable, default_cost_code_id nullable references mst_cost_codes, active)`.
 - `mst_cost_codes(id, code unique, name, parent_id, kind material|labour|subcontract|equipment|overhead, active)`.
 - `mst_locations(id, name, region islamabad|punjab, city)`.
 - `mst_vendor_prices(id, vendor_id, item_id, unit_code, rate numeric(18,4), valid_from, valid_to nullable)`.
@@ -33,7 +33,7 @@ The shared reference data every module uses: company profile and tax registratio
 - BR-1 Party codes are generated from a number series per kind; names are required; a party can hold several roles.
 - BR-2 Duplicate protection: same normalized name plus phone, same NTN, or same CNIC (13 digits, validated format) returns a duplicate warning; NTN and CNIC are unique among active parties when present.
 - BR-3 CNIC format `13 digits` (hyphens stripped); phone normalized to E.164 for Pakistan (`+92...`), invalid numbers rejected.
-- BR-4 Items: `stockable` is true only for kinds `material` and `consumable`; `service` and `labour` items cannot be stockable; item code unique; unit must exist.
+- BR-4 Items: `default_cost_code_id`, when set, must be a live cost code; it is the cost code inventory issues use unless the issue command supplies another (added by P1-12, see CHANGES 2026-10-27); `stockable` is true only for kinds `material` and `consumable`; `service` and `labour` items cannot be stockable; item code unique; unit must exist.
 - BR-5 Unit conversion: conversions are directed pairs; `convertQuantity` uses a direct pair or its inverse; no chained conversion; missing pair is an error; conversion rounds to 4 decimals half-up.
 - BR-6 Cost code hierarchy has no cycles; the cost code structure and kinds come from H-25 (seed from P0-03 when accepted); a code with posted costs (checked via the cost ledger query interface, P1-09, once available) cannot be deactivated unless it has no open budget lines.
 - BR-7 Registrations: at most one active registration per `(authority, registration_type)` on a date; `getRegistration(authority)` returns the active one or null.
@@ -43,7 +43,7 @@ The shared reference data every module uses: company profile and tax registratio
 
 ## 5. API and UI
 CRUD under `/master/*` for each table with search, pagination (default 50, max 200), sorting; `POST /master/parties/check-duplicate`; `GET /master/units/convert`.
-Screens: company profile, parties list and form, items and categories, units, cost code tree, locations, vendor price list.
+Screens: company profile, parties list and form, items and categories (the item form has an optional default cost code picker), units, cost code tree, locations, vendor price list.
 
 ## 6. Permissions
 `master.company.manage` (admin), `master.party.read|manage` (office roles; `read` also for supervisors limited to clients and vendors of their projects is not required: supervisors read parties only through project context), `master.item.manage` (procurement, storekeeper read), `master.costcode.manage` (accountant, management), `master.price.manage` (procurement).
