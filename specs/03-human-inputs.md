@@ -10,7 +10,7 @@ Status: `open` or `answered`. "Default allowed": whether the agent may proceed w
 | H-02 | Sales tax rules and rates by authority, service type and location (effective-dated) | Accountant | P2-01 | no | none | open |
 | H-03 | Withholding tax rules: tax withheld by clients; tax withheld from vendors and subcontractors; rates and bases | Accountant | P2-01 | no | none | open |
 | H-04 | Tax-invoice numbering: format, series per authority, must it be gapless | Accountant | P1-01, P2-02 | no | none | answered |
-| H-05 | Chart of accounts (codes, names, types) | Accountant | P0-03, P2-09 | no | none | open |
+| H-05 | Chart of accounts (codes, names, types) | Accountant | P0-03, P2-09 | no | none | answered |
 | H-06 | Fiscal year start month | Accountant | P2-09 | yes | July | open |
 | H-07 | Initial stock valuation policy: company default method (weighted_average or fifo) and any category overrides | Accountant | P1-13 | yes | company default weighted_average, no overrides | open |
 | H-08 | Tax rounding: per line or per document | Accountant | P2-01 | yes | per document | open |
@@ -48,6 +48,6 @@ Details behind each `answered` row. Dated 2026-10-24, given by the owner. Nothin
 - **H-24** Backdating allowance 3 days. Older dates need approval from an admin user (see the proposal in `CHANGES.md`).
 - **H-25** Cost codes: 100 Materials, 200 Labour, 300 Subcontractors, 400 Equipment and tools, 500 Site expenses (transport, food, small items), 600 Other. Sub-codes (for example 101 Cement, 102 Steel, 103 Bricks) are added from the UI.
 - **H-27** Prefixes `INV`, `QUO`, `PO`, `PV`, `RV`, `VAR`, each as `PREFIX-YYYY-0001`, all starting from 0001. Prefix, padding and next number are editable from the UI. A change affects new documents only.
-- **H-05** Still `open`. The owner has no chart of accounts yet. A draft for the accountant to review is in `docs/decisions/chart-of-accounts-draft.md`. It becomes an answer only when the accountant approves it.
+- **H-05** Answered provisionally 2026-10-27. The owner accepted the draft in `docs/decisions/chart-of-accounts-draft.md` as it stands, to unblock the build; the accountant has not reviewed it yet. The owner may change it later, so the chart must be editable from the UI (see the proposal in `CHANGES.md`). When the accountant reviews it, any changes are made from the UI, not by a new build.
 - **H-12** Partly answered 2026-10-25. Permanent workers and supervisors are paid monthly; daily-wage and contractor workers daily. Contractor labour is paid as a total on the contractor bill and not tracked per worker. Rates must be configurable, not fixed. Worker records are entered by an admin from the screen. Defaults and open points are in `docs/decisions/h12-h15-owner-answers-and-defaults.md`. Status stays `open` until real rates are loaded.
 - **H-15** Partly answered 2026-10-25. Common jobs are demolition and restructuring (about 10 a year each); pricing is both lump sum and per unit; material prices come from the market. Template contents and the percentages were left to us; assumed values are in `docs/decisions/h12-h15-owner-answers-and-defaults.md`. Status stays `open` until the owner confirms real templates and rates.
