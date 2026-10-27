@@ -56,6 +56,18 @@ export const settingRegistry: SettingRegistry = {
     min: 1,
     max: 100,
   },
+  // P1-11 BR-11: a delivery challan photo is mandatory on a goods receipt unless this is off.
+  'procurement.grn_photo_required': {
+    type: 'boolean',
+    description: 'Whether a goods receipt needs a photo of the delivery challan',
+    default: true,
+  },
+  // P1-11 BR-6, H-23: default 0%; decimal text so 2.5 is possible.
+  'procurement.over_receipt_tolerance_percent': {
+    type: 'string',
+    description: 'Percent of the ordered quantity that may be received over the order (H-23)',
+    default: '0',
+  },
   // P1-09 BR-11: P3-02 switches it on when work orders become cost objects.
   'projects.work_orders_enabled': {
     type: 'boolean',

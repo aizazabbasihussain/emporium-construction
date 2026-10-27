@@ -9,6 +9,7 @@ import {
   quotationsPermissions,
   notificationsPermissions,
   platformPermissions,
+  procurementPermissions,
   projectsPermissions,
   valuationPermissions,
   variationsPermissions,
@@ -30,6 +31,7 @@ export const allPermissions: string[] = [
   ...Object.values(quotationsPermissions),
   ...Object.values(projectsPermissions),
   ...Object.values(variationsPermissions),
+  ...Object.values(procurementPermissions),
 ];
 
 export const profileOf = (permissions: string[], overrides: Partial<Profile> = {}): Profile => ({

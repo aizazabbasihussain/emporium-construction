@@ -3,7 +3,7 @@ id: P1-11
 title: Procurement
 phase: 1
 module: procurement
-status: not-started
+status: done
 depends_on: [P1-09, P1-03, P1-05, P1-04]
 requires_inputs: [H-09, H-23]
 ---

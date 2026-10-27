@@ -1,0 +1,72 @@
+{
+  "name": "procurement",
+  "tablePrefix": "prc_",
+  "ownedTables": [
+    "prc_counters",
+    "prc_requisitions",
+    "prc_requisition_lines",
+    "prc_rfqs",
+    "prc_rfq_vendors",
+    "prc_quotes",
+    "prc_quote_lines",
+    "prc_selections",
+    "prc_purchase_orders",
+    "prc_po_lines",
+    "prc_grns",
+    "prc_grn_lines"
+  ],
+  "exports": [
+    "createProcurement",
+    "registerProcurementRoutes",
+    "getPurchaseOrder",
+    "listOpenPoLines",
+    "getGrn"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.events.subscribe",
+    "platform.idempotency.execute",
+    "platform.numbering.next",
+    "platform.settings.get",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "projects.getProject",
+    "projects.postCost",
+    "projects.reverseCost",
+    "approvals.requestApproval",
+    "approvals.getApprovalState",
+    "approvals.cancelApproval",
+    "masterdata.getParty",
+    "masterdata.getItem",
+    "masterdata.getCostCode",
+    "files.list",
+    "files.attach",
+    "files.registerFileAccess"
+  ],
+  "eventsIn": ["approval.approved", "approval.rejected", "approval.returned", "approval.cancelled"],
+  "eventsOut": [
+    "po.approved",
+    "po.cancelled",
+    "goods.received",
+    "goods.receipt.cancelled",
+    "procurement.requisition.changed",
+    "procurement.rfq.changed",
+    "procurement.po.changed",
+    "procurement.grn.changed"
+  ],
+  "permissions": [
+    "procurement.requisition.create",
+    "procurement.requisition.read",
+    "procurement.rfq.manage",
+    "procurement.po.create",
+    "procurement.po.read",
+    "procurement.po.amend",
+    "procurement.po.close",
+    "procurement.grn.create",
+    "procurement.grn.read",
+    "procurement.grn.cancel"
+  ],
+  "notes": "Owns requisitions, request for quotation with quote comparison, purchase orders and goods receipts. Requisition and purchase order approval use the approval engine document types requisition and purchase_order (H-09); the module reacts to approval.* events. Each project-destined order line has at most one live committed entry in the project cost ledger (prc_po_lines.commit_entry_id): approval posts it with key po:<line>:v<revision>; a receipt posts an approved entry at the order rate for the accepted quantity and replaces the commitment by the remainder; closing, cancelling and cancelling a receipt reverse and re-post, so the ledger keeps the whole history. Store-destined orders post no project cost; inventory reacts to goods.received. Stores belong to inventory (P1-12): store_id is an opaque key until then, and the checks that stock from a receipt was issued or that a bill refers to it (BR-8) are injected as GrnGuards, which default to none. The delivery challan photo is a file of entity type prc_grn, attached in the same transaction as the receipt."
+}
