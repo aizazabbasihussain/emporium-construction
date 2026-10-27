@@ -120,3 +120,16 @@ The owner accepted the draft chart of accounts (`docs/decisions/chart-of-account
 3. This adds one permission, one small admin screen and a handful of rules to P2-09; it does not touch P0-03.
 
 Options for the human to decide: approve and update the P2-09 text, or keep the chart read-only and change it only through a new seed file.
+
+### 2026-10-27: P1-12 BR-3 refers to an "item default cost code mapping" that no spec defines
+
+Found while starting P1-12 (inventory core). BR-3 says the project cost entry of an issue takes its cost code "from the item's default cost code mapping or the command's cost code". Master data (P1-05) holds no such mapping: `mst_items` and `ItemDto` carry a category, unit, kind and reorder level, but no cost code, and no other spec adds one. P1-12 owns only `inv_*` tables and must not write to `mst_`. The agent stopped before building, because the issue cost code cannot be chosen without inventing a rule.
+
+Options for the human to decide:
+1. The command always supplies the cost code (issue form field, required). P1-12 BR-3 drops "item's default cost code mapping". Smallest change; the stock-loss cost code (BR-8) is already a setting.
+2. Add a nullable `default_cost_code_id` to items in P1-05 (column, item form field, importer column) and keep BR-3 as written, with the command's cost code overriding it. This changes P1-05, which is already `done`.
+3. Add an inventory setting `default_issue_cost_code` (H-25 code 100 Materials) used when the command has none.
+
+Smaller points the agent would settle in code unless told otherwise, listed so they are not silent: `hasIssuesFromGrn(grnId)` is true when any issue, transfer-out or adjustment-out of a GRN line's item and store was posted after that GRN's receipt rows; the settings `allow_negative_stock`, `stock_loss_cost_code`, `supervisor_can_issue` and `salvage_value_mode` are added to the kernel setting registry as procurement did.
+
+P1-12 stays `not-started`; P1-14, P1-15 and others that do not depend on it can proceed.
