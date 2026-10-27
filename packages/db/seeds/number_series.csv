@@ -1,0 +1,7 @@
+code,prefix,padding,reset_yearly,gapless,start_value
+invoice,INV,4,true,true,1
+quotation,QUO,4,true,false,1
+purchase_order,PO,4,true,false,1
+payment_voucher,PV,4,true,false,1
+receipt_voucher,RV,4,true,false,1
+variation,VAR,4,true,false,1

@@ -1,0 +1,7 @@
+code,name,parent_code,kind
+100,Materials,,material
+200,Labour,,labour
+300,Subcontractors,,subcontract
+400,Equipment and tools,,equipment
+500,Site expenses,,overhead
+600,Other,,overhead

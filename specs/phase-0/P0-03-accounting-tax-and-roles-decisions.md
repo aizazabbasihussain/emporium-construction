@@ -3,7 +3,7 @@ id: P0-03
 title: Accounting, tax and roles decision records
 phase: 0
 module: decisions
-status: not-started
+status: done
 depends_on: [P0-02]
 requires_inputs: [H-01, H-04, H-05, H-07, H-09, H-10, H-25, H-27]
 ---

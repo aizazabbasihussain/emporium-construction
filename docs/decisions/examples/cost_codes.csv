@@ -1,0 +1,4 @@
+code,name,parent_code,kind
+X100,Example materials,,material
+X101,Example sand,X100,material
+X200,Example labour,,labour

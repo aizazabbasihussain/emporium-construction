@@ -1,0 +1,4 @@
+authority,applies_to,region,rate_percent,effective_from,effective_to,note
+EXA,services,Region One,5,2026-01-01,2026-12-31,synthetic rate
+EXA,services,Region One,6,2027-01-01,,synthetic rate
+EXB,goods,Region Two,1,2026-01-01,,synthetic rate

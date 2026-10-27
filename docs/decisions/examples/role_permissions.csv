@@ -1,0 +1,3 @@
+role_code,permission_code
+example_clerk,example.thing.view
+example_approver,example.thing.approve

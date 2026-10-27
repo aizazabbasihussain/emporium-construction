@@ -1,0 +1,4 @@
+code,name,type,parent_code,active
+9000,Example assets,asset,,true
+9100,Example cash,asset,9000,true
+9200,Example payables,liability,,true
