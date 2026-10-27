@@ -110,3 +110,13 @@ P1-10 (PR #26) is open and not auto-merged, because its "Deviations and question
 4. **Deductive variations and the budget.** A line cost must be zero or more, because `addBudgetLine` only appends non-negative lines. A deductive variation lowers the price but not the budget. Option: approve, or define how the budget is reduced.
 5. **At risk.** Counted for open variations only, for costs dated on or after `discovered_on`, `approved` and `posted`, on the cost codes of the lines. Option: approve, or state a different window.
 6. **Beyond the spec lists.** Event `variations.variation.changed` (an outbox entry per mutation, constitution 5.9), `DELETE` of a draft, and `POST /variations/:id/copy`. Option: approve and add them to the P1-10 text.
+
+### 2026-10-27: H-05 chart of accounts accepted provisionally, and made editable from the UI
+
+The owner accepted the draft chart of accounts (`docs/decisions/chart-of-accounts-draft.md`) as it stands, provisionally, so P0-03 is no longer blocked; the accountant has not reviewed it. The register now shows H-05 as `answered`. The owner wants to be able to change the chart later without a new build. Proposal:
+
+1. **P0-03** loads the draft as `chart_of_accounts.csv` seed data. No spec change; its BR-6 accepts the owner as approver.
+2. **P2-09** section 3 says `acc_accounts` is "read-only in the UI except activation". Change it so a user holding a new permission `accounting.account.manage` (owner and admin) can: add an account, rename it, change its parent, and activate or deactivate it. The `code` stays fixed once any transaction carries it as a tag (tags refer to codes), and `type` cannot change once the account is in use. An account is never deleted, only deactivated. Every change is audited and writes an outbox event, as for other settings. The seed CSV is loaded only when the table is empty, so later edits are never overwritten.
+3. This adds one permission, one small admin screen and a handful of rules to P2-09; it does not touch P0-03.
+
+Options for the human to decide: approve and update the P2-09 text, or keep the chart read-only and change it only through a new seed file.

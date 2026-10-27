@@ -1,6 +1,6 @@
 # Chart of accounts: DRAFT for the accountant to review
 
-**Status: draft. Not approved. Do not load into the system.** Written by the build agent as a starting point for H-05. The accountant should add, remove, rename and renumber freely, and sign off in the last section. Nothing here contains a tax rate or a balance.
+**Status: provisionally accepted by the owner on 2026-10-27, accountant review pending.** Written by the build agent as a starting point for H-05. The owner accepted it as it stands so the build can proceed; it may be changed later from the UI. The accountant should add, remove, rename and renumber freely, and sign off in the last section. Nothing here contains a tax rate or a balance.
 
 How to read it: codes are 4 digits, grouped by type (1 assets, 2 liabilities, 3 equity, 4 income, 5 direct project costs, 6 overhead). "Parent" shows the grouping. Project costs are also split by cost code (100 Materials, 200 Labour and so on, answered in H-25) inside the system, so this chart stays short.
 
@@ -84,5 +84,6 @@ How to read it: codes are 4 digits, grouped by type (1 assets, 2 liabilities, 3 
 | Approved by | Role | Date | Changes made |
 |---|---|---|---|
 | | accountant | | |
+| owner | owner | 2026-10-27 | none; accepted as drafted, provisionally |
 
 Once signed, send the final list to the build agent. It will be set as the answer to H-05 and loaded through P0-03.
