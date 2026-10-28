@@ -74,6 +74,29 @@ export const settingRegistry: SettingRegistry = {
     description: 'Whether work orders may carry cost entries (Phase 3)',
     default: false,
   },
+  // P1-12 BR-1: negative stock is never accepted in this version, so only `false` is valid.
+  'inventory.allow_negative_stock': {
+    type: 'boolean',
+    description: 'Whether stock may go negative (only false is accepted in this version)',
+    default: false,
+  },
+  // P1-12 BR-8: the cost code stock losses are posted to; empty until H-25 is settled.
+  'inventory.stock_loss_cost_code': {
+    type: 'string',
+    description: 'Cost code id that stock count losses are posted to (overhead)',
+    default: '',
+  },
+  'inventory.supervisor_can_issue': {
+    type: 'boolean',
+    description: 'Whether a supervisor may issue material on the stores of an assigned project',
+    default: false,
+  },
+  // P1-12 BR-7, H-21: salvaged material enters stock at zero value unless the owner chooses estimates.
+  'inventory.salvage_value_mode': {
+    type: 'string',
+    description: 'Value of salvaged material: zero or estimated (H-21)',
+    default: 'zero',
+  },
 };
 
 export function settingDefinition(

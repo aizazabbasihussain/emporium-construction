@@ -93,6 +93,7 @@ export interface Item extends Versioned {
   stockable: boolean;
   defaultTaxKind: DefaultTaxKind;
   reorderLevel: string | null;
+  defaultCostCodeId: string | null;
   active: boolean;
 }
 

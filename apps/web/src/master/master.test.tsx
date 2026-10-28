@@ -259,6 +259,7 @@ describe('items and units', () => {
     stockable: true,
     defaultTaxKind: 'goods',
     reorderLevel: null,
+    defaultCostCodeId: null,
     active: true,
     version: 2,
   };
@@ -298,6 +299,7 @@ describe('items and units', () => {
       unitCode: 'bag',
       itemKind: 'material',
       categoryId: null,
+      defaultCostCodeId: null,
       reorderLevel: null,
     });
   });

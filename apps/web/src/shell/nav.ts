@@ -4,6 +4,7 @@ import {
   estimationPermissions,
   identityPermissions,
   importerPermissions,
+  inventoryPermissions,
   masterdataPermissions,
   quotationsPermissions,
   notificationsPermissions,
@@ -98,6 +99,36 @@ export const navItems: readonly NavItem[] = [
     path: '/procurement/purchase-orders',
     label: 'nav.purchaseOrders',
     permission: procurementPermissions.poRead,
+  },
+  {
+    path: '/inventory/stock',
+    label: 'nav.inventoryStock',
+    permission: inventoryPermissions.stockRead,
+  },
+  {
+    path: '/inventory/issue',
+    label: 'nav.inventoryIssue',
+    permission: inventoryPermissions.stockRead,
+  },
+  {
+    path: '/inventory/transfers',
+    label: 'nav.inventoryTransfers',
+    permission: inventoryPermissions.stockRead,
+  },
+  {
+    path: '/inventory/counts',
+    label: 'nav.inventoryCounts',
+    permission: inventoryPermissions.stockRead,
+  },
+  {
+    path: '/inventory/client-material',
+    label: 'nav.inventoryClient',
+    permission: inventoryPermissions.stockRead,
+  },
+  {
+    path: '/inventory/ledger',
+    label: 'nav.inventoryLedger',
+    permission: inventoryPermissions.stockRead,
   },
   {
     path: '/valuation/settings',

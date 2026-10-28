@@ -296,6 +296,37 @@ describe('items (T-3, BR-4)', () => {
     expect(await eventCount(kit.db, 'master.item.changed')).toBeGreaterThan(0);
   });
 
+  it('keeps a live default cost code and refuses an unknown or inactive one (BR-4)', async () => {
+    const codes = await kit.masterData.costing.listCostCodes(kit.db);
+    const root = codes.find((c) => c.code === '100');
+    if (root === undefined) throw new Error('seed missing');
+    const row = await tx((t) =>
+      catalog().createItem(item({ code: 'DC-1', defaultCostCodeId: root.id }), kit.actor, t),
+    );
+    expect(row.defaultCostCodeId).toBe(root.id);
+    expect(
+      await codeOf(
+        tx((t) =>
+          catalog().createItem(item({ code: 'DC-2', defaultCostCodeId: uid(9005) }), kit.actor, t),
+        ),
+      ),
+    ).toBe('default_cost_code_unknown');
+    const dormant = await tx((t) =>
+      kit.masterData.costing.createCostCode(
+        { code: 'DC-OFF', name: 'Dormant', parentId: root.id, kind: 'material', active: false },
+        kit.actor,
+        t,
+      ),
+    );
+    expect(
+      await codeOf(
+        tx((t) =>
+          catalog().createItem(item({ code: 'DC-3', defaultCostCodeId: dormant.id }), kit.actor, t),
+        ),
+      ),
+    ).toBe('default_cost_code_unknown');
+  });
+
   it.each(['service', 'labour', 'equipment'])('rejects a stockable %s item', async (itemKind) => {
     expect(
       await codeOf(

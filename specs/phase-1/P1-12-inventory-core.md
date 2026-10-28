@@ -3,7 +3,7 @@ id: P1-12
 title: Inventory core
 phase: 1
 module: inventory
-status: not-started
+status: done
 depends_on: [P1-11, P1-09, P1-13]
 requires_inputs: [H-21]
 ---

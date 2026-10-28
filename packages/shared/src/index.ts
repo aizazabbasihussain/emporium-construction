@@ -171,3 +171,23 @@ export {
   type ValuationMethod,
   type ValuationPermission,
 } from './valuation.js';
+export {
+  countStatuses,
+  inventoryMovementTypes,
+  inventoryNotificationTemplates,
+  inventoryPermissionGrants,
+  inventoryPermissions,
+  inventorySettingKeys,
+  ownerships,
+  salvageValueModes,
+  stockAdjustmentDocType,
+  storeKinds,
+  transferStatuses,
+  type CountStatus,
+  type InventoryMovementType,
+  type InventoryPermission,
+  type Ownership,
+  type SalvageValueMode,
+  type StoreKind,
+  type TransferStatus,
+} from './inventory.js';

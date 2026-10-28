@@ -23,6 +23,12 @@ import { EstimateEditorPage } from './estimation/EstimateEditorPage';
 import { EstimatesPage } from './estimation/EstimatesPage';
 import { TemplatesPage } from './estimation/TemplatesPage';
 import { ProjectPage } from './projects/ProjectPage';
+import { ClientMaterialPage } from './inventory/ClientMaterialPage';
+import { CountsPage } from './inventory/CountsPage';
+import { IssuePage } from './inventory/IssuePage';
+import { LedgerPage } from './inventory/LedgerPage';
+import { StockPage } from './inventory/StockPage';
+import { TransfersPage } from './inventory/TransfersPage';
 import { GrnPage } from './procurement/GrnPage';
 import { PurchaseOrderPage, PurchaseOrdersPage } from './procurement/OrderPages';
 import { RequisitionPage, RequisitionsPage } from './procurement/RequisitionPages';
@@ -179,6 +185,18 @@ export function AppRoutes() {
             </RequirePermission>
           }
         />
+        <Route path="/inventory/stock" element={guarded('/inventory/stock', <StockPage />)} />
+        <Route path="/inventory/issue" element={guarded('/inventory/issue', <IssuePage />)} />
+        <Route
+          path="/inventory/transfers"
+          element={guarded('/inventory/transfers', <TransfersPage />)}
+        />
+        <Route path="/inventory/counts" element={guarded('/inventory/counts', <CountsPage />)} />
+        <Route
+          path="/inventory/client-material"
+          element={guarded('/inventory/client-material', <ClientMaterialPage />)}
+        />
+        <Route path="/inventory/ledger" element={guarded('/inventory/ledger', <LedgerPage />)} />
         <Route
           path="/valuation/settings"
           element={guarded('/valuation/settings', <ValuationSettingsPage />)}
