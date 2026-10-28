@@ -1,4 +1,8 @@
-import { procurementPermissions, variationsPermissions } from '@emporium/shared';
+import {
+  expensesPermissions,
+  procurementPermissions,
+  variationsPermissions,
+} from '@emporium/shared';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ConfigProvider } from 'antd';
 import { useEffect, useState, type ReactNode } from 'react';
@@ -15,7 +19,12 @@ import type { AuthClient } from './auth/client';
 import { i18n } from './i18n';
 import { AppLayout } from './shell/AppLayout';
 import { NotFoundPage } from './shell/ErrorPages';
-import { RequireAuth, RequirePermission } from './shell/guards';
+import { RequireAnyPermission, RequireAuth, RequirePermission } from './shell/guards';
+import { AdvancesPage } from './expenses/AdvancesPage';
+import { CategoriesPage } from './expenses/CategoriesPage';
+import { ClaimPage } from './expenses/ClaimPage';
+import { ClaimsPage } from './expenses/ClaimsPage';
+import { CustodiansPage } from './expenses/CustodiansPage';
 import { ApprovalRulesPage } from './approvals/ApprovalRulesPage';
 import { ApprovalsInboxPage } from './approvals/ApprovalsInboxPage';
 import { FollowUpsPage } from './crm/FollowUpsPage';
@@ -197,6 +206,40 @@ export function AppRoutes() {
           element={guarded('/inventory/client-material', <ClientMaterialPage />)}
         />
         <Route path="/inventory/ledger" element={guarded('/inventory/ledger', <LedgerPage />)} />
+        <Route
+          path="/expenses/claims"
+          element={guarded('/expenses/claims', <ClaimsPage view="mine" />)}
+        />
+        <Route
+          path="/expenses/claims/:id"
+          element={
+            <RequireAnyPermission
+              permissions={[expensesPermissions.claimReadOwn, expensesPermissions.claimReadAll]}
+            >
+              <ClaimPage />
+            </RequireAnyPermission>
+          }
+        />
+        <Route
+          path="/expenses/all-claims"
+          element={guarded('/expenses/all-claims', <ClaimsPage view="all" />)}
+        />
+        <Route
+          path="/expenses/queue"
+          element={guarded('/expenses/queue', <ClaimsPage view="queue" />)}
+        />
+        <Route
+          path="/expenses/advances"
+          element={guarded('/expenses/advances', <AdvancesPage />)}
+        />
+        <Route
+          path="/expenses/custodians"
+          element={guarded('/expenses/custodians', <CustodiansPage />)}
+        />
+        <Route
+          path="/expenses/categories"
+          element={guarded('/expenses/categories', <CategoriesPage />)}
+        />
         <Route
           path="/valuation/settings"
           element={guarded('/valuation/settings', <ValuationSettingsPage />)}

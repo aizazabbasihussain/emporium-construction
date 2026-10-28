@@ -22,6 +22,7 @@ try {
     variations,
     procurement,
     inventory,
+    expenses,
     approvals,
     files,
     localFileStore,
@@ -46,6 +47,7 @@ try {
     variations: { db, variations, platform },
     procurement: { db, procurement, platform },
     inventory: { db, inventory, platform },
+    expenses: { db, expenses, platform },
   });
   await app.listen({ port: config.port, host: '0.0.0.0' });
   startScheduler(runtime, logger);

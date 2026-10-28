@@ -86,6 +86,19 @@ export {
   type RequisitionStatus,
 } from './procurement.js';
 export {
+  advanceStatuses,
+  claimCostObjectTypes,
+  claimStatuses,
+  expenseClaimDocType,
+  expenseClaimEntityType,
+  expensesPermissionGrants,
+  expensesPermissions,
+  type AdvanceStatus,
+  type ClaimCostObjectType,
+  type ClaimStatus,
+  type ExpensesPermission,
+} from './expenses.js';
+export {
   variationDocType,
   variationEntityType,
   variationStatuses,

@@ -2,6 +2,7 @@ import {
   approvalsPermissions,
   crmPermissions,
   estimationPermissions,
+  expensesPermissions,
   filesPermissions,
   identityPermissions,
   importerPermissions,
@@ -34,6 +35,7 @@ export const allPermissions: string[] = [
   ...Object.values(variationsPermissions),
   ...Object.values(procurementPermissions),
   ...Object.values(inventoryPermissions),
+  ...Object.values(expensesPermissions),
 ];
 
 export const profileOf = (permissions: string[], overrides: Partial<Profile> = {}): Profile => ({

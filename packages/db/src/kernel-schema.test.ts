@@ -20,11 +20,13 @@ describe('platform kernel schema (P1-01)', () => {
     const series = await db.query<{ code: string; prefix: string; gapless: boolean }>(
       'select code, prefix, gapless from sys_number_series order by code',
     );
-    // The H-27 document series, the party series added by P1-05 and the lead series of P1-06, the estimate series of P1-07 and the transfer and count series of P1-12.
+    // The H-27 document series, the party series added by P1-05 and the lead series of P1-06, the estimate series of P1-07, the transfer and count series of P1-12 and the claim and advance series of P1-14.
     expect(series.map((s) => s.prefix).sort()).toEqual([
+      'ADV',
       'CL',
       'CNT',
       'EST',
+      'EXP',
       'INV',
       'LC',
       'LEAD',

@@ -2,6 +2,7 @@ import {
   approvalsPermissions,
   crmPermissions,
   estimationPermissions,
+  expensesPermissions,
   identityPermissions,
   importerPermissions,
   inventoryPermissions,
@@ -129,6 +130,36 @@ export const navItems: readonly NavItem[] = [
     path: '/inventory/ledger',
     label: 'nav.inventoryLedger',
     permission: inventoryPermissions.stockRead,
+  },
+  {
+    path: '/expenses/claims',
+    label: 'nav.expenseClaims',
+    permission: expensesPermissions.claimReadOwn,
+  },
+  {
+    path: '/expenses/all-claims',
+    label: 'nav.expenseAllClaims',
+    permission: expensesPermissions.claimReadAll,
+  },
+  {
+    path: '/expenses/queue',
+    label: 'nav.expenseQueue',
+    permission: expensesPermissions.claimPost,
+  },
+  {
+    path: '/expenses/advances',
+    label: 'nav.expenseAdvances',
+    permission: expensesPermissions.advanceIssue,
+  },
+  {
+    path: '/expenses/custodians',
+    label: 'nav.expenseCustodians',
+    permission: expensesPermissions.claimReadAll,
+  },
+  {
+    path: '/expenses/categories',
+    label: 'nav.expenseCategories',
+    permission: expensesPermissions.categoryManage,
   },
   {
     path: '/valuation/settings',
