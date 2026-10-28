@@ -135,3 +135,14 @@ The owner accepted the draft chart of accounts (`docs/decisions/chart-of-account
 3. This adds one permission, one small admin screen and a handful of rules to P2-09; it does not touch P0-03.
 
 Options for the human to decide: approve and update the P2-09 text, or keep the chart read-only and change it only through a new seed file.
+
+### 2026-10-28: detached, supervised autonomous loop
+
+Changes only `tools/agent/loop.mjs` and `specs/04-autonomous-run.md` (tooling; no product behaviour). Reason: the loop ran as a child of the starting process and was lost when that process died or ran out of memory.
+
+1. `--detach` starts the loop as a background supervisor that restarts it up to three times after a crash.
+2. Session output streams to a log file instead of an in-memory buffer; each session has a timeout (default 90 minutes) and is killed with its whole process tree.
+3. Sessions run with a 4 GB Node heap and `VITEST_MAX_WORKERS=2`.
+4. Uncommitted work left on a `spec/<ID>-*` branch by a dead session is resumed instead of stopping the loop.
+
+Human review needed: `tools/agent/` is a protected path and is not auto-merged.
