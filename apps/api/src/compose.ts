@@ -19,6 +19,7 @@ import { createEstimation, type Estimation } from './modules/estimation/index.js
 import { createMasterData, type MasterData } from './modules/masterdata/index.js';
 import { createProjects, type Projects } from './modules/projects/index.js';
 import { createQuotations, type Quotations } from './modules/quotations/index.js';
+import { createInventory, type Inventory } from './modules/inventory/index.js';
 import { createProcurement, type Procurement } from './modules/procurement/index.js';
 import { createVariations, type Variations } from './modules/variations/index.js';
 import { createValuation, type Valuation } from './modules/valuation/index.js';
@@ -32,6 +33,7 @@ import {
   masterdataPermissions,
   notificationsPermissions,
   platformPermissions,
+  inventoryPermissions,
   procurementPermissions,
   projectsPermissions,
   quotationsPermissions,
@@ -76,6 +78,7 @@ export interface Runtime {
   projects: Projects;
   variations: Variations;
   procurement: Procurement;
+  inventory: Inventory;
   approvals: Approvals;
   files: Files;
   /** Set when FILE_STORE_DRIVER=local: it serves its own signed download links. */
@@ -109,6 +112,7 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
   identity.registerPermissions('projects', Object.values(projectsPermissions));
   identity.registerPermissions('variations', Object.values(variationsPermissions));
   identity.registerPermissions('procurement', Object.values(procurementPermissions));
+  identity.registerPermissions('inventory', Object.values(inventoryPermissions));
   const importer = createImporter({ platform, clock, newId: () => uuidv7(clock.now()) });
   const masterData = createMasterData({
     platform,
@@ -210,6 +214,16 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     masterData,
     files,
   });
+  const inventory = createInventory({
+    platform,
+    clock,
+    newId: () => uuidv7(clock.now()),
+    valuation,
+    projects,
+    masterData,
+    approvals,
+    notifications,
+  });
   const procurement = createProcurement({
     platform,
     clock,
@@ -218,6 +232,12 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     approvals,
     masterData,
     files,
+    // BR-8: a receipt whose stock has left the store cannot be cancelled. Payables (P2-05) will
+    // answer the billed question; until then nothing is billed.
+    guards: {
+      isIssued: (db, grnId) => inventory.hasIssuesFromGrn(db, grnId),
+      isBilled: async () => false,
+    },
   });
   if (config.adminEmail !== undefined) {
     const email = config.adminEmail;
@@ -235,6 +255,7 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     projects,
     variations,
     procurement,
+    inventory,
     approvals,
     files,
     localFileStore: local,

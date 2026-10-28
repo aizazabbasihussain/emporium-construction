@@ -198,12 +198,12 @@ describe('importing the masters (AC-3, T-8)', () => {
 
   it('imports items with their category and unit, and stops on a bad reference', async () => {
     const header =
-      'code,name,category_code,unit,item_kind,stockable,default_tax_kind,reorder_level,active';
+      'code,name,category_code,unit,item_kind,stockable,default_tax_kind,reorder_level,default_cost_code,active';
     await commit(
       'items',
       header,
-      'IMP-1,Cement bag,C-ROOT,bag,material,yes,goods,50,yes',
-      'IMP-2,Site visit,,ls,service,,services,,',
+      'IMP-1,Cement bag,C-ROOT,bag,material,yes,goods,50,101,yes',
+      'IMP-2,Site visit,,ls,service,,services,,,',
     );
     const items = await kit.masterData.catalog.searchItems(kit.db, {
       q: 'IMP-',
@@ -216,13 +216,23 @@ describe('importing the masters (AC-3, T-8)', () => {
       ['IMP-1', true, '50.0000'],
       ['IMP-2', false, null],
     ]);
-    const missing = await dryRun('items', header, 'IMP-3,X,NO-SUCH,bag,material,,goods,,');
+    const cement = (await kit.masterData.costing.listCostCodes(kit.db)).find(
+      (c) => c.code === '101',
+    );
+    expect(items.items.map((i) => i.defaultCostCodeId)).toEqual([cement?.id, null]);
+    const noCode = await dryRun('items', header, 'IMP-5,X,,bag,material,,goods,,NO-SUCH,');
+    expect(
+      await codeOf(
+        kit.importer.service.commit(noCode.batchId, { force: false, permissions }, actor, kit.db),
+      ),
+    ).toBe('cost_code_unknown');
+    const missing = await dryRun('items', header, 'IMP-3,X,NO-SUCH,bag,material,,goods,,,');
     expect(
       await codeOf(
         kit.importer.service.commit(missing.batchId, { force: false, permissions }, actor, kit.db),
       ),
     ).toBe('category_unknown');
-    const unstockable = await dryRun('items', header, 'IMP-4,X,,ls,service,yes,services,,');
+    const unstockable = await dryRun('items', header, 'IMP-4,X,,ls,service,yes,services,,,');
     expect(
       await codeOf(
         kit.importer.service.commit(

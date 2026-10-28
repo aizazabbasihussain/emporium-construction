@@ -89,6 +89,7 @@ const itemBody = z.object({
     .string()
     .regex(/^\d{1,14}(\.\d{1,4})?$/)
     .nullish(),
+  defaultCostCodeId: z.uuid().nullish(),
   active: z.boolean().optional(),
 });
 

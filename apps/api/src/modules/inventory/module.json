@@ -1,0 +1,75 @@
+{
+  "name": "inventory",
+  "tablePrefix": "inv_",
+  "ownedTables": [
+    "inv_stores",
+    "inv_ledger",
+    "inv_balances",
+    "inv_issues",
+    "inv_transfers",
+    "inv_transfer_lines",
+    "inv_counts",
+    "inv_count_lines",
+    "inv_reorder_levels"
+  ],
+  "ownedViews": ["inv_v_stock_on_hand", "inv_v_client_material_balance"],
+  "exports": [
+    "createInventory",
+    "registerInventoryRoutes",
+    "getStockOnHand",
+    "issueToCostObject",
+    "returnToStore",
+    "receiveClientMaterial",
+    "hasIssuesFromGrn"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.events.subscribe",
+    "platform.idempotency.execute",
+    "platform.numbering.next",
+    "platform.settings.get",
+    "platform.backdating.check",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "masterdata.getItem",
+    "masterdata.getParty",
+    "valuation.recordReceipt",
+    "valuation.valueIssue",
+    "valuation.recordTransfer",
+    "valuation.recordReturn",
+    "valuation.getStockValue",
+    "projects.getProject",
+    "projects.postCost",
+    "projects.reverseCost",
+    "approvals.requestApproval",
+    "notifications.notifyRole",
+    "notifications.registerTemplate"
+  ],
+  "eventsIn": [
+    "goods.received",
+    "approval.approved",
+    "approval.rejected",
+    "approval.returned",
+    "approval.cancelled"
+  ],
+  "eventsOut": [
+    "stock.issued",
+    "stock.received",
+    "stock.adjusted",
+    "inventory.store.changed",
+    "inventory.transfer.changed",
+    "inventory.count.changed"
+  ],
+  "permissions": [
+    "inventory.stock.read",
+    "inventory.stock.issue",
+    "inventory.stock.return",
+    "inventory.stock.transfer",
+    "inventory.stock.count",
+    "inventory.adjustment.approve",
+    "inventory.store.manage"
+  ],
+  "notes": "Owns stores, the append-only stock ledger (inv_ledger, with a trigger that refuses update and delete), balances, transfers, counts and reorder levels. Company stock is valued by calling valuation inside the same transaction; client-owned stock carries no cost and never posts a cost entry. A transfer takes the stock out of the source when sent and valuation moves the cost (recordTransfer) when it is received, so in-transit stock is out of both stores. An issue posts one project cost entry at the valuation value; a return reverses that entry and re-posts the remainder. H-21 default used: salvage value zero (setting inventory.salvage_value_mode). Counts need the setting inventory.stock_loss_cost_code (H-25) before they can be submitted. The nullable mst_items.default_cost_code_id is added by the masterdata module (migration 0014), not by inventory."
+}

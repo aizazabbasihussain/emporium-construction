@@ -191,7 +191,7 @@ export async function isCategoryUsed(db: Db, id: string): Promise<boolean> {
 // Items ----------------------------------------------------------------------------------------
 
 const ITEM_COLUMNS = `id, code, name, category_id, unit_code, item_kind, stockable, default_tax_kind,
-  reorder_level::text as reorder_level, active, version`;
+  reorder_level::text as reorder_level, default_cost_code_id, active, version`;
 export interface ItemRow {
   id: string;
   code: string;
@@ -202,6 +202,7 @@ export interface ItemRow {
   stockable: boolean;
   default_tax_kind: string;
   reorder_level: string | null;
+  default_cost_code_id: string | null;
   active: boolean;
   version: number;
 }

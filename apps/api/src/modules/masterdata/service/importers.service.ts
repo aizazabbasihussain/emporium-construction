@@ -137,6 +137,7 @@ const itemSchema = z.object({
   stockable: z.boolean().nullable(),
   default_tax_kind: z.string(),
   reorder_level: optionalText,
+  default_cost_code: optionalText,
   active: z.boolean().nullable(),
 });
 const costCodeSchema = z.object({
@@ -276,6 +277,7 @@ export function registerMasterImporters(
       { name: 'stockable', type: 'boolean', required: false, example: 'yes' },
       choice('default_tax_kind', taxKinds, 'goods', true),
       { name: 'reorder_level', type: 'decimal', required: false, example: '100' },
+      text('default_cost_code', '101', false, 'Cost code the issues of this item are charged to'),
       { name: 'active', type: 'boolean', required: false, example: 'yes' },
     ],
     async apply(rows, ctx, tx) {
@@ -288,6 +290,14 @@ export function registerMasterImporters(
                 'category',
                 row.category_code,
               );
+        const costCode =
+          row.default_cost_code === null
+            ? null
+            : requireFound(
+                await findCostCodeByCode(tx, row.default_cost_code),
+                'cost_code',
+                row.default_cost_code,
+              );
         await catalog.createItem(
           {
             code: row.code,
@@ -298,6 +308,7 @@ export function registerMasterImporters(
             stockable: row.stockable ?? undefined,
             defaultTaxKind: row.default_tax_kind,
             reorderLevel: row.reorder_level,
+            defaultCostCodeId: costCode?.id ?? null,
             active: row.active ?? undefined,
           },
           actorOf(ctx),

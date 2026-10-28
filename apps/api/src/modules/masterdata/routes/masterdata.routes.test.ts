@@ -803,6 +803,32 @@ describe('item categories and items', () => {
     expect((await call({ method: 'GET', url: `/master/items/${row.id}` })).status).toBe(404);
   });
 
+  it('keeps the default cost code of an item and refuses an unknown one (P1-12)', async () => {
+    const codes = json<{ items: { id: string }[] }>(
+      await call({
+        method: 'GET',
+        url: '/master/cost-codes?sort=code&limit=200',
+        user: SUPERVISOR,
+      }),
+    );
+    const costCodeId = (codes.items[0] as { id: string }).id;
+    const created = await call({
+      method: 'POST',
+      url: '/master/items',
+      body: { ...item, code: 'RI-DC', defaultCostCodeId: costCodeId },
+      user: PROCUREMENT,
+    });
+    expect(created.status).toBe(201);
+    expect(json<{ defaultCostCodeId: string }>(created).defaultCostCodeId).toBe(costCodeId);
+    const bad = await call({
+      method: 'POST',
+      url: '/master/items',
+      body: { ...item, code: 'RI-DC2', defaultCostCodeId: '018f7a7a-0000-7000-8000-000000000999' },
+      user: PROCUREMENT,
+    });
+    expect(bad.status).toBe(400);
+  });
+
   it('rejects invalid items (400, 422), unknown items (404), conflicts (409) and missing permissions (403)', async () => {
     expect(
       (

@@ -65,6 +65,7 @@ import type {
   PageResult,
   UnitDto,
 } from '../types.js';
+import { findCostCode } from '../repo/costing.repo.js';
 import type { References } from './references.service.js';
 import { createRecorder, pageOf, requiredText, textOrNull } from './support.js';
 
@@ -108,6 +109,7 @@ export const toItemDto = (row: ItemRow): ItemDto => ({
   stockable: row.stockable,
   defaultTaxKind: row.default_tax_kind as DefaultTaxKind,
   reorderLevel: row.reorder_level,
+  defaultCostCodeId: row.default_cost_code_id,
   active: row.active,
   version: row.version,
 });
@@ -133,6 +135,7 @@ export interface ItemInput {
   stockable?: boolean | undefined;
   defaultTaxKind: string;
   reorderLevel?: string | null | undefined;
+  defaultCostCodeId?: string | null | undefined;
   active?: boolean | undefined;
 }
 
@@ -247,6 +250,16 @@ export function createCatalogService(deps: {
     if (categoryId !== null && (await findCategory(tx, categoryId)) === undefined) {
       throw new ValidationError('category_unknown', 'The item category does not exist');
     }
+    const defaultCostCodeId = input.defaultCostCodeId ?? null;
+    if (defaultCostCodeId !== null) {
+      const costCode = await findCostCode(tx, defaultCostCodeId);
+      if (costCode === undefined || !costCode.active) {
+        throw new ValidationError(
+          'default_cost_code_unknown',
+          'The default cost code does not exist or is not active',
+        );
+      }
+    }
     const reorder = textOrNull(input.reorderLevel);
     return {
       code,
@@ -257,6 +270,7 @@ export function createCatalogService(deps: {
       stockable,
       default_tax_kind: oneOf(taxKinds, input.defaultTaxKind, 'invalid_tax_kind'),
       reorder_level: reorder === null ? null : assertDecimal(reorder, 4, 'invalid_reorder_level'),
+      default_cost_code_id: defaultCostCodeId,
       active: input.active ?? true,
     };
   }

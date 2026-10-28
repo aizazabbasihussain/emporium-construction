@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { itemKinds, masterdataPermissions, taxKinds } from '@emporium/shared';
 import { useAuth } from '../auth/AuthProvider';
-import { masterApi, type Category, type Item, type Unit } from './api';
+import { masterApi, type Category, type CostCode, type Item, type Unit } from './api';
 import { CrudPage, type Field } from './CrudPage';
 import { options } from './rules';
 
@@ -17,6 +17,10 @@ export function ItemsPage() {
   const units = useQuery({
     queryKey: ['master-units', 'all'],
     queryFn: () => masterApi.listAll<Unit>('/master/units'),
+  });
+  const costCodes = useQuery({
+    queryKey: ['master-cost-codes', 'all'],
+    queryFn: () => masterApi.listAll<CostCode>('/master/cost-codes'),
   });
   const categoryName = (id: string | null) => categories.data?.find((c) => c.id === id)?.name ?? '';
   const categoryOptions = (categories.data ?? []).map((c) => ({
@@ -61,6 +65,15 @@ export function ItemsPage() {
       label: 'master.items.reorderLevel',
       rules: [{ pattern: /^\d{1,14}(\.\d{1,4})?$/, message: t('master.validation.decimal') }],
     },
+    {
+      name: 'defaultCostCodeId',
+      label: 'master.items.defaultCostCode',
+      type: 'select',
+      allowClear: true,
+      options: (costCodes.data ?? [])
+        .filter((c) => c.active)
+        .map((c) => ({ value: c.id, label: `${c.code} ${c.name}` })),
+    },
     { name: 'active', label: 'master.items.active', type: 'checkbox' },
   ];
 
@@ -91,6 +104,7 @@ export function ItemsPage() {
         toBody={(values) => ({
           ...values,
           categoryId: values.categoryId ?? null,
+          defaultCostCodeId: values.defaultCostCodeId ?? null,
           reorderLevel: values.reorderLevel === '' ? null : (values.reorderLevel ?? null),
         })}
         columns={[
