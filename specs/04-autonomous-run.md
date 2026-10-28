@@ -10,6 +10,12 @@ node tools/agent/loop.mjs --dry-run       # shows the next spec only
 node tools/agent/loop.mjs --max-specs 3   # at most three specs
 ```
 
+```
+node tools/agent/loop.mjs --detach        # background run that survives this terminal or Claude session
+```
+
+`--detach` starts a supervisor that restarts the loop up to three times after a crash. State is in `.agent-logs/loop-state.json`, the PID in `.agent-logs/loop.pid`. Each session streams its output to its own log file, is killed with its whole process tree after `--timeout-min` (default 90), and runs with `--max-old-space-size=4096` and `VITEST_MAX_WORKERS=2`. If a session dies and leaves uncommitted work on a `spec/<ID>-*` branch, the next iteration resumes that branch instead of stopping.
+
 Stop it by creating an empty file `.agent-stop` in the repo root. Session logs go to `.agent-logs/` (git-ignored).
 
 The loop picks the spec (`node specs/tools/next-spec.mjs`), starts `claude -p` with the prompt "read specs/04-autonomous-run.md and build spec <ID>", waits for it to finish, checks that the spec is `done` on `main`, and starts the next session. It stops on the first spec that does not end `done`.
