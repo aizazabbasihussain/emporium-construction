@@ -1,0 +1,54 @@
+{
+  "name": "expenses",
+  "tablePrefix": "exp_",
+  "ownedTables": [
+    "exp_custodians",
+    "exp_categories",
+    "exp_advances",
+    "exp_claims",
+    "exp_claim_lines"
+  ],
+  "exports": ["createExpenses", "registerExpensesRoutes", "getCustodianBalance"],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.events.subscribe",
+    "platform.idempotency.execute",
+    "platform.numbering.next",
+    "platform.backdating.check",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "identity.users.list",
+    "projects.getProject",
+    "projects.postCost",
+    "projects.transitionCost",
+    "projects.reverseCost",
+    "approvals.requestApproval",
+    "approvals.getApprovalState",
+    "approvals.cancelApproval",
+    "masterdata.getCostCode",
+    "files.list",
+    "files.registerFileAccess"
+  ],
+  "eventsIn": ["approval.approved", "approval.rejected", "approval.returned", "approval.cancelled"],
+  "eventsOut": [
+    "expense.approved",
+    "expense.posted",
+    "advance.issued",
+    "expenses.claim.changed",
+    "expenses.advance.changed",
+    "expenses.custodian.changed",
+    "expenses.category.changed"
+  ],
+  "permissions": [
+    "expenses.claim.create",
+    "expenses.claim.read_own",
+    "expenses.claim.read_all",
+    "expenses.claim.post",
+    "expenses.claim.reverse",
+    "expenses.advance.issue",
+    "expenses.category.manage"
+  ],
+  "notes": "Owns site expense claims, their lines, cash advances to custodians, custodians and expense categories. A claim goes through the approval engine (document type expense_claim, H-09). Approval books one approved cost entry per line in the project cost ledger (idempotency key exp:<line id>); the accountant's posting moves each entry to posted. A cancelled approved claim, or a reversed posted claim, reverses its entries; the ledger row id of the latest entry of each line is kept on the line. The custodian balance is advances issued (settled included) minus approved and posted claims of the custodian. Receipts are files of entity type exp_claim. It moves no cash: the cash book (P2-03) consumes advance.issued and expense.posted."
+}

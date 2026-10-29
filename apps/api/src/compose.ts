@@ -19,6 +19,7 @@ import { createEstimation, type Estimation } from './modules/estimation/index.js
 import { createMasterData, type MasterData } from './modules/masterdata/index.js';
 import { createProjects, type Projects } from './modules/projects/index.js';
 import { createQuotations, type Quotations } from './modules/quotations/index.js';
+import { createExpenses, type Expenses } from './modules/expenses/index.js';
 import { createInventory, type Inventory } from './modules/inventory/index.js';
 import { createProcurement, type Procurement } from './modules/procurement/index.js';
 import { createVariations, type Variations } from './modules/variations/index.js';
@@ -27,6 +28,7 @@ import {
   approvalsPermissions,
   crmPermissions,
   estimationPermissions,
+  expensesPermissions,
   filesPermissions,
   identityPermissions,
   importerPermissions,
@@ -79,6 +81,7 @@ export interface Runtime {
   variations: Variations;
   procurement: Procurement;
   inventory: Inventory;
+  expenses: Expenses;
   approvals: Approvals;
   files: Files;
   /** Set when FILE_STORE_DRIVER=local: it serves its own signed download links. */
@@ -113,6 +116,7 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
   identity.registerPermissions('variations', Object.values(variationsPermissions));
   identity.registerPermissions('procurement', Object.values(procurementPermissions));
   identity.registerPermissions('inventory', Object.values(inventoryPermissions));
+  identity.registerPermissions('expenses', Object.values(expensesPermissions));
   const importer = createImporter({ platform, clock, newId: () => uuidv7(clock.now()) });
   const masterData = createMasterData({
     platform,
@@ -239,6 +243,16 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
       isBilled: async () => false,
     },
   });
+  const expenses = createExpenses({
+    platform,
+    clock,
+    newId: () => uuidv7(clock.now()),
+    projects,
+    approvals,
+    masterData,
+    files,
+    identity,
+  });
   if (config.adminEmail !== undefined) {
     const email = config.adminEmail;
     await db.transaction((tx) => identity.users.ensureAdmin(email, tx));
@@ -256,6 +270,7 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     variations,
     procurement,
     inventory,
+    expenses,
     approvals,
     files,
     localFileStore: local,
