@@ -19,7 +19,10 @@
     "transitionCost",
     "getCostSummary",
     "addBudgetLine",
-    "getEstimateBudgetSource"
+    "getEstimateBudgetSource",
+    "getTask",
+    "updateTaskProgress",
+    "listSupervisedProjects"
   ],
   "consumes": [
     "platform.audit.record",

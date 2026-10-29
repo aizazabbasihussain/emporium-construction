@@ -18,6 +18,10 @@ export interface Projects {
   listProjectsForUser: ProjectService['listForUser'];
   addBudgetLine: ProjectService['addBudgetLine'];
   getEstimateBudgetSource: ProjectService['getEstimateBudgetSource'];
+  /** Task and supervisor interfaces for daily progress reports (spec P1-15 section 2). */
+  getTask: ProjectService['getTask'];
+  updateTaskProgress: ProjectService['updateTaskProgress'];
+  listSupervisedProjects: ProjectService['listSupervised'];
   postCost: CostingService['postCost'];
   reverseCost: CostingService['reverseCost'];
   transitionCost: CostingService['transitionCost'];
@@ -59,6 +63,10 @@ export function createProjects(deps: {
     addBudgetLine: (projectId, line, tx, actor) =>
       service.addBudgetLine(projectId, line, tx, actor),
     getEstimateBudgetSource: (db, id) => service.getEstimateBudgetSource(db, id),
+    getTask: (db, projectId, taskId) => service.getTask(db, projectId, taskId),
+    updateTaskProgress: (projectId, taskId, percent, actor, tx) =>
+      service.updateTaskProgress(projectId, taskId, percent, actor, tx),
+    listSupervisedProjects: (db, date) => service.listSupervised(db, date),
     postCost: (entry, tx) => costing.postCost(entry, tx),
     reverseCost: (entryId, reason, tx, by) => costing.reverseCost(entryId, reason, tx, by),
     transitionCost: (entryId, to, tx, by) => costing.transitionCost(entryId, to, tx, by),
@@ -75,5 +83,6 @@ export type {
   CostSummaryDto,
   ProjectDetailDto,
   ProjectDto,
+  SupervisedProjectDto,
   TaskDto,
 } from './types.js';

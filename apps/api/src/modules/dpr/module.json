@@ -1,0 +1,42 @@
+{
+  "name": "dpr",
+  "tablePrefix": "dpr_",
+  "ownedTables": ["dpr_reports", "dpr_task_updates", "dpr_material_notes", "dpr_missing_runs"],
+  "ownedViews": ["dpr_v_submission_status"],
+  "exports": [
+    "createDpr",
+    "registerDprRoutes",
+    "getDpr",
+    "listDprs",
+    "getMissingDprs",
+    "notifyMissingDprs"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.idempotency.execute",
+    "platform.backdating.check",
+    "platform.settings.get",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "projects.getProject",
+    "projects.getTask",
+    "projects.updateTaskProgress",
+    "projects.listSupervisedProjects",
+    "files.list",
+    "files.registerFileAccess",
+    "notifications.notify",
+    "notifications.notifyRole",
+    "notifications.registerTemplate"
+  ],
+  "eventsIn": [],
+  "eventsOut": ["dpr.submitted", "dpr.reviewed", "dpr.report.changed"],
+  "permissions": [
+    "dpr.report.create",
+    "dpr.report.update_own",
+    "dpr.report.read",
+    "dpr.report.review"
+  ],
+  "notes": "Owns daily progress reports, their task updates and material notes. A supervisor (scoped to the project) or an office role with dpr.report.create writes one report per project per date; the date follows the kernel backdating rule. Submitting needs 10 characters of work done and, while the setting dpr_photo_required is on, a photo (files of entity type dpr_report, at most 20). On submit the task percents move through projects.updateTaskProgress; lowering a percent needs a note. The project manager reviews or reopens a submitted report; a reviewed report is final. getMissingDprs lists active projects with a supervisor on the date and no submitted or reviewed report (read view dpr_v_submission_status); from 18:00 Asia/Karachi the scheduler tick tells each project manager once per day (dpr_missing_runs), except on days in the setting site_holidays. Manpower comes from the manual field until attendance (P1-17) exists to read counts from (see BACKLOG). It posts no costs and changes no attendance."
+}

@@ -8,11 +8,13 @@ export interface SchedulerState {
   lastPurgeAt: number;
 }
 
-type Jobs = Pick<Runtime, 'db' | 'platform' | 'notifications' | 'files' | 'quotations'>;
+type Jobs = Pick<Runtime, 'db' | 'platform' | 'notifications' | 'files' | 'quotations' | 'dpr'>;
 
 /**
- * One scheduler tick (spec P1-04 BR-8): deliver due outbox events, deliver due reminders and, once a
- * day, run the file and notification purges and expire quotations past their validity (P1-08 BR-5). A failing job is logged and does not stop the others.
+ * One scheduler tick (spec P1-04 BR-8): deliver due outbox events, deliver due reminders, tell the
+ * project managers about missing daily reports from 18:00 Asia/Karachi (P1-15 BR-6; it runs once a
+ * day by itself) and, once a day, run the file and notification purges and expire quotations past
+ * their validity (P1-08 BR-5). A failing job is logged and does not stop the others.
  */
 export async function runSchedulerTick(
   jobs: Jobs,
@@ -29,6 +31,7 @@ export async function runSchedulerTick(
   };
   await run('events', () => jobs.platform.events.dispatchDue(jobs.db));
   await run('reminders', () => jobs.notifications.tickReminders(jobs.db));
+  await run('dpr-missing', () => jobs.db.transaction((tx) => jobs.dpr.notifyMissingDprs(tx, now)));
   if (now.getTime() - state.lastPurgeAt >= PURGE_EVERY_MS) {
     state.lastPurgeAt = now.getTime();
     await run('files-purge', () => jobs.files.purgeExpired(jobs.db));

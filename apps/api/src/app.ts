@@ -25,6 +25,7 @@ import {
   type NotificationsRouteDeps,
 } from './modules/notifications/index.js';
 import { registerPlatformRoutes, type PlatformRouteDeps } from './modules/platform/index.js';
+import { registerDprRoutes, type DprRouteDeps } from './modules/dpr/index.js';
 import { registerExpensesRoutes, type ExpensesRouteDeps } from './modules/expenses/index.js';
 import { registerInventoryRoutes, type InventoryRouteDeps } from './modules/inventory/index.js';
 import {
@@ -70,6 +71,7 @@ export interface AppDeps {
   inventory?: InventoryRouteDeps;
   /** The expense endpoints; they rely on the authentication hook of `identity`. */
   expenses?: ExpensesRouteDeps;
+  dpr?: DprRouteDeps;
 }
 
 export async function buildApp({
@@ -92,6 +94,7 @@ export async function buildApp({
   procurement,
   inventory,
   expenses,
+  dpr,
 }: AppDeps): Promise<FastifyInstance> {
   const loggerInstance: FastifyBaseLogger = logger;
   const app = Fastify({
@@ -134,6 +137,7 @@ export async function buildApp({
   if (procurement) registerProcurementRoutes(app, procurement);
   if (inventory) registerInventoryRoutes(app, inventory);
   if (expenses) registerExpensesRoutes(app, expenses);
+  if (dpr) registerDprRoutes(app, dpr);
 
   return app;
 }

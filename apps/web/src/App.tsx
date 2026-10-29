@@ -1,4 +1,5 @@
 import {
+  dprPermissions,
   expensesPermissions,
   procurementPermissions,
   variationsPermissions,
@@ -20,6 +21,9 @@ import { i18n } from './i18n';
 import { AppLayout } from './shell/AppLayout';
 import { NotFoundPage } from './shell/ErrorPages';
 import { RequireAnyPermission, RequireAuth, RequirePermission } from './shell/guards';
+import { MissingReportsPage } from './dpr/MissingReportsPage';
+import { ReportPage } from './dpr/ReportPage';
+import { ReportsPage } from './dpr/ReportsPage';
 import { AdvancesPage } from './expenses/AdvancesPage';
 import { CategoriesPage } from './expenses/CategoriesPage';
 import { ClaimPage } from './expenses/ClaimPage';
@@ -240,6 +244,18 @@ export function AppRoutes() {
           path="/expenses/categories"
           element={guarded('/expenses/categories', <CategoriesPage />)}
         />
+        <Route path="/dpr/reports" element={guarded('/dpr/reports', <ReportsPage />)} />
+        <Route
+          path="/dpr/reports/:id"
+          element={
+            <RequireAnyPermission
+              permissions={[dprPermissions.reportRead, dprPermissions.reportCreate]}
+            >
+              <ReportPage />
+            </RequireAnyPermission>
+          }
+        />
+        <Route path="/dpr/missing" element={guarded('/dpr/missing', <MissingReportsPage />)} />
         <Route
           path="/valuation/settings"
           element={guarded('/valuation/settings', <ValuationSettingsPage />)}

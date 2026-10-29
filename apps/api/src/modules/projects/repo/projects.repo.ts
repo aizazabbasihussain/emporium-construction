@@ -202,7 +202,7 @@ export const updateTask = (
   id: string,
   version: number,
   values: Values,
-  by: string,
+  by: string | null,
   at: Date,
 ) => updateRow<TaskRow>(db, 'prj_tasks', TASK_COLUMNS, id, version, values, by, at);
 
@@ -228,6 +228,31 @@ export async function taskPercentsFor(
   }
   return byProject;
 }
+
+export interface SupervisedProjectRow {
+  id: string;
+  code: string;
+  name: string;
+  project_manager_id: string | null;
+  supervisor_ids: string[];
+}
+
+/**
+ * Active projects with a supervisor assigned on the date (an assignment ends the day its end date
+ * names, as `isAssignmentOpen` has it). Daily progress reports (P1-15 BR-6) use it.
+ */
+export const listSupervisedProjects = (db: Db, date: string) =>
+  db.query<SupervisedProjectRow>(
+    `select p.id, p.code, p.name, p.project_manager_id,
+            array_agg(distinct a.user_id::text order by a.user_id::text) as supervisor_ids
+       from prj_projects p
+       join prj_supervisor_assignments a on a.project_id = p.id
+      where p.deleted_at is null and p.status = 'active'
+        and a.from_date <= $1 and (a.to_date is null or a.to_date > $1)
+      group by p.id, p.code, p.name, p.project_manager_id
+      order by p.code`,
+    [date],
+  );
 
 /** The budget of a project added up per cost code (BR-8). */
 export const budgetByCode = (db: Db, projectId: string) =>

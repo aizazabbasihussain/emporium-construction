@@ -40,6 +40,7 @@ import {
   insertTask,
   listAssignments,
   listBudgetLines,
+  listSupervisedProjects,
   listTasks,
   removeBudgetLine,
   searchProjects,
@@ -60,6 +61,7 @@ import type {
   PageResult,
   ProjectDetailDto,
   ProjectDto,
+  SupervisedProjectDto,
   TaskDto,
 } from '../types.js';
 import { createRecorder, pageOf, requiredText, textOrNull, type Recorded } from './support.js';
@@ -181,6 +183,21 @@ export interface ProjectService {
     actor: Actor,
     tx: Db,
   ): Promise<ProjectDetailDto>;
+  /** Module interface `getTask` (used by daily reports): one task of a project, no caller scope. */
+  getTask(db: Db, projectId: string, taskId: string): Promise<TaskDto>;
+  /**
+   * Module interface `updateTaskProgress` (used by daily reports, P1-15 BR-4): sets the percent of a
+   * task; 100 marks it done, 0 to do and anything between doing.
+   */
+  updateTaskProgress(
+    projectId: string,
+    taskId: string,
+    percent: number,
+    actor: Recorded,
+    tx: Db,
+  ): Promise<TaskDto>;
+  /** Module interface `listSupervisedProjects`: active projects with a supervisor on the date. */
+  listSupervised(db: Db, date: string): Promise<SupervisedProjectDto[]>;
 }
 
 const SYSTEM: Recorded = { userId: null, requestId: null };
@@ -663,6 +680,45 @@ export function createProjectService(deps: {
       }
       await announce(tx, actor, project, 'supervisors', before, after);
       return detailOf(tx, project);
+    },
+
+    async getTask(db, projectId, taskId) {
+      const row = assertFound(await findTask(db, taskId), 'task');
+      assertKnown(row.project_id === projectId, 'task_not_found', 'Not found');
+      return taskOf(row);
+    },
+
+    async updateTaskProgress(projectId, taskId, percent, actor, tx) {
+      const project = assertFound(await findProject(tx, projectId, true), 'project');
+      const existing = assertFound(await findTask(tx, taskId, true), 'task');
+      assertKnown(existing.project_id === projectId, 'task_not_found', 'Not found');
+      const status: TaskStatus = percent === 100 ? 'done' : percent === 0 ? 'todo' : 'doing';
+      assertTaskProgress(status, percent);
+      if (existing.percent_complete === percent && existing.status === status) {
+        return taskOf(existing);
+      }
+      const row = assertUpdated(
+        await updateTask(
+          tx,
+          taskId,
+          existing.version,
+          { status, percent_complete: percent },
+          actor.userId,
+          clock.now(),
+        ),
+      );
+      await announce(tx, actor, project, 'task', taskOf(existing), taskOf(row));
+      return taskOf(row);
+    },
+
+    async listSupervised(db, date) {
+      return (await listSupervisedProjects(db, BusinessDate.parse(date).toString())).map((row) => ({
+        projectId: row.id,
+        code: row.code,
+        name: row.name,
+        projectManagerId: row.project_manager_id,
+        supervisorIds: row.supervisor_ids,
+      }));
     },
   };
 }
