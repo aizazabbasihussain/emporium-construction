@@ -21,6 +21,7 @@ import { createProjects, type Projects } from './modules/projects/index.js';
 import { createQuotations, type Quotations } from './modules/quotations/index.js';
 import { createDpr, type Dpr } from './modules/dpr/index.js';
 import { createWorkforce, type Workforce } from './modules/workforce/index.js';
+import { createAttendance, type Attendance } from './modules/attendance/index.js';
 import { createExpenses, type Expenses } from './modules/expenses/index.js';
 import { createInventory, type Inventory } from './modules/inventory/index.js';
 import { createProcurement, type Procurement } from './modules/procurement/index.js';
@@ -34,6 +35,7 @@ import {
   expensesPermissions,
   filesPermissions,
   workforcePermissions,
+  attendancePermissions,
   identityPermissions,
   importerPermissions,
   masterdataPermissions,
@@ -88,6 +90,7 @@ export interface Runtime {
   expenses: Expenses;
   dpr: Dpr;
   workforce: Workforce;
+  attendance: Attendance;
   approvals: Approvals;
   files: Files;
   /** Set when FILE_STORE_DRIVER=local: it serves its own signed download links. */
@@ -125,6 +128,7 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
   identity.registerPermissions('expenses', Object.values(expensesPermissions));
   identity.registerPermissions('dpr', Object.values(dprPermissions));
   identity.registerPermissions('workforce', Object.values(workforcePermissions));
+  identity.registerPermissions('attendance', Object.values(attendancePermissions));
   const importer = createImporter({ platform, clock, newId: () => uuidv7(clock.now()) });
   const masterData = createMasterData({
     platform,
@@ -269,16 +273,33 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     files,
     notifications,
   });
+  // Workforce asks attendance about unapproved sheets and attendance asks workforce for teams, so
+  // workforce receives a delegate that is filled in once attendance exists.
+  const lateAttendance: { current?: Attendance } = {};
   const workforce = createWorkforce({
     platform,
     clock,
     newId: () => uuidv7(clock.now()),
     identity,
     masterData,
-    // Attendance (P1-17) does not exist yet, so no sheet can be unapproved (see BACKLOG).
-    attendance: { listUnapprovedSheets: async () => [] },
+    attendance: {
+      listUnapprovedSheets: (tx, workerId, upTo) =>
+        (lateAttendance.current as Attendance).listUnapprovedSheets(tx, workerId, upTo),
+    },
     registerImporter: (definition) => importer.registerImporter(definition),
   });
+  const attendance = createAttendance({
+    platform,
+    clock,
+    newId: () => uuidv7(clock.now()),
+    projects,
+    approvals,
+    masterData,
+    workforce,
+    // Wage periods (P1-18) do not exist yet, so no period can be approved (see BACKLOG).
+    wages: { approvedPeriodOf: async () => null },
+  });
+  lateAttendance.current = attendance;
   if (config.adminEmail !== undefined) {
     const email = config.adminEmail;
     await db.transaction((tx) => identity.users.ensureAdmin(email, tx));
@@ -299,6 +320,7 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     expenses,
     dpr,
     workforce,
+    attendance,
     approvals,
     files,
     localFileStore: local,

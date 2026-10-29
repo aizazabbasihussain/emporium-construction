@@ -1,5 +1,6 @@
 import {
   approvalsPermissions,
+  attendancePermissions,
   crmPermissions,
   dprPermissions,
   estimationPermissions,
@@ -187,6 +188,21 @@ export const navItems: readonly NavItem[] = [
     path: '/workforce/board',
     label: 'nav.workforceBoard',
     permission: workforcePermissions.teamManage,
+  },
+  {
+    path: '/attendance/grid',
+    label: 'nav.attendanceGrid',
+    permission: attendancePermissions.sheetRead,
+  },
+  {
+    path: '/attendance/sheets',
+    label: 'nav.attendanceSheets',
+    permission: attendancePermissions.sheetRead,
+  },
+  {
+    path: '/attendance/missing',
+    label: 'nav.attendanceMissing',
+    permission: attendancePermissions.sheetRead,
   },
   {
     path: '/valuation/settings',

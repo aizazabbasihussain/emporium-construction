@@ -16,6 +16,9 @@ export interface Workforce {
   getWorkerRate: WorkersService['getWorkerRate'];
   getTeamMembers: TeamsService['getTeamMembers'];
   listTeamsForSupervisor: TeamsService['listTeamsForSupervisor'];
+  /** Query interfaces for attendance (spec P1-17 section 2): a team, and the teams a caller reaches. */
+  getTeam: TeamsService['get'];
+  listTeams: TeamsService['list'];
 }
 
 /**
@@ -38,6 +41,8 @@ export function createWorkforce(
     getWorkerRate: (db, workerId, date) => workers.getWorkerRate(db, workerId, date),
     getTeamMembers: (db, teamId, date) => teams.getTeamMembers(db, teamId, date),
     listTeamsForSupervisor: (db, userId) => teams.listTeamsForSupervisor(db, userId),
+    getTeam: (db, id, actor) => teams.get(db, id, actor),
+    listTeams: (db, actor) => teams.list(db, actor),
   };
 }
 

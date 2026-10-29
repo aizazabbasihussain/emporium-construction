@@ -67,6 +67,9 @@ import { navItems } from './shell/nav';
 import { ValuationReportPage } from './valuation/ReportPage';
 import { ValuationSettingsPage } from './valuation/SettingsPage';
 import { TransitionsPage } from './valuation/TransitionsPage';
+import { GridPage } from './attendance/GridPage';
+import { MissingPage } from './attendance/MissingPage';
+import { SheetsPage } from './attendance/SheetsPage';
 import { MyTeamsPage } from './workforce/MyTeamsPage';
 import { TeamBoardPage } from './workforce/TeamBoardPage';
 import { WorkerPage } from './workforce/WorkerPage';
@@ -270,6 +273,12 @@ export function AppRoutes() {
           element={guarded('/workforce/my-teams', <MyTeamsPage />)}
         />
         <Route path="/workforce/board" element={guarded('/workforce/board', <TeamBoardPage />)} />
+        <Route path="/attendance/grid" element={guarded('/attendance/grid', <GridPage />)} />
+        <Route path="/attendance/sheets" element={guarded('/attendance/sheets', <SheetsPage />)} />
+        <Route
+          path="/attendance/missing"
+          element={guarded('/attendance/missing', <MissingPage />)}
+        />
         <Route
           path="/valuation/settings"
           element={guarded('/valuation/settings', <ValuationSettingsPage />)}
