@@ -42,7 +42,7 @@ Handle small site spending: cash advances to custodians, expense claims with rec
 - Screens: claim form with line grid and receipt capture (mobile friendly), my claims, advances list, custodian balances, posting queue for accountant.
 
 ## 6. Permissions
-`expenses.claim.create|read-own` (supervisor, project_manager, storekeeper), `expenses.claim.read-all` (accountant, management), `expenses.claim.post|reverse` (accountant), `expenses.advance.issue` (accountant), `expenses.category.manage` (accountant).
+`expenses.claim.create|read_own` (supervisor, project_manager, storekeeper), `expenses.claim.read_all` (accountant, management), `expenses.claim.post|reverse` (accountant), `expenses.advance.issue` (accountant), `expenses.category.manage` (accountant).
 
 ## 7. Test requirements
 - T-1 Balance calculation across advances and claims in each status.
