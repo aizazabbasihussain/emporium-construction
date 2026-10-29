@@ -3,7 +3,7 @@ id: P1-16
 title: Workforce and teams
 phase: 1
 module: workforce
-status: not-started
+status: done
 depends_on: [P1-05, P1-04]
 requires_inputs: [H-12]
 ---

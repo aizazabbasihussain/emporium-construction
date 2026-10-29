@@ -103,6 +103,15 @@ export const settingRegistry: SettingRegistry = {
     description: 'Site holidays as comma-separated dates (yyyy-mm-dd); no missing-report alert',
     default: '',
   },
+  // P1-16 BR-3, H-11: the working days of a month a monthly salary is divided by. H-11 is still
+  // open and has no default, so 0 means "not decided"; the daily equivalent is refused until set.
+  'workforce.working_days_basis': {
+    type: 'integer',
+    description: 'Working days in a month that a monthly salary is divided by (H-11); 0 = not set',
+    default: 0,
+    min: 0,
+    max: 31,
+  },
   // P1-12 BR-7, H-21: salvaged material enters stock at zero value unless the owner chooses estimates.
   'inventory.salvage_value_mode': {
     type: 'string',

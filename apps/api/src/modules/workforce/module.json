@@ -1,0 +1,40 @@
+{
+  "name": "workforce",
+  "tablePrefix": "lab_",
+  "ownedTables": ["lab_trades", "lab_workers", "lab_pay_rates", "lab_teams", "lab_team_members"],
+  "ownedViews": [],
+  "exports": [
+    "createWorkforce",
+    "registerWorkforceRoutes",
+    "getWorker",
+    "getWorkerRate",
+    "getTeamMembers",
+    "listTeamsForSupervisor"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.idempotency.execute",
+    "platform.numbering.next",
+    "platform.settings.get",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "identity.users.list",
+    "identity.users.setScopes",
+    "masterdata.getParty",
+    "masterdata.registerReferenceCheck",
+    "importer.registerImporter",
+    "attendance.listUnapprovedSheets"
+  ],
+  "eventsIn": [],
+  "eventsOut": ["worker.changed", "team.membership.changed"],
+  "permissions": [
+    "workforce.worker.read",
+    "workforce.worker.manage",
+    "workforce.rate.read",
+    "workforce.rate.manage",
+    "workforce.team.manage"
+  ],
+  "notes": "Owns workers, trades, effective-dated pay rates, teams and team memberships. A worker has at most one pay rate and one team on any date; a new open rate or membership ends the previous open one the day before (domain rules in packages/domain/src/workforce). getWorkerRate returns the rate in force and, for a monthly salary, the daily equivalent from the setting workforce.working_days_basis (H-11, 0 until decided: the daily equivalent is refused). Leaving needs a leaving date and ends the open rate and membership on it; attendance sheets up to that date must be approved first (attendance.listUnapprovedSheets is an interface that P1-17 implements; until then composition passes a stub that reports none). Supervisors see only workers of their teams through team scopes that follow lab_teams, and never receive pay: rates have their own DTO and permissions. CNIC and bank details are masked to the last 4 characters in lists, in audit entries and for anyone without workforce.worker.manage. Importers: workers, worker_pay_rates, teams, team_members. It records no attendance and computes no wages."
+}

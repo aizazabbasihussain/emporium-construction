@@ -67,6 +67,10 @@ import { navItems } from './shell/nav';
 import { ValuationReportPage } from './valuation/ReportPage';
 import { ValuationSettingsPage } from './valuation/SettingsPage';
 import { TransitionsPage } from './valuation/TransitionsPage';
+import { MyTeamsPage } from './workforce/MyTeamsPage';
+import { TeamBoardPage } from './workforce/TeamBoardPage';
+import { WorkerPage } from './workforce/WorkerPage';
+import { WorkersPage } from './workforce/WorkersPage';
 
 /** Layout direction and the document language follow the active language (BR-11). */
 function DirectionProvider({ children }: { children: ReactNode }) {
@@ -256,6 +260,16 @@ export function AppRoutes() {
           }
         />
         <Route path="/dpr/missing" element={guarded('/dpr/missing', <MissingReportsPage />)} />
+        <Route path="/workforce/workers" element={guarded('/workforce/workers', <WorkersPage />)} />
+        <Route
+          path="/workforce/workers/:id"
+          element={guarded('/workforce/workers', <WorkerPage />)}
+        />
+        <Route
+          path="/workforce/my-teams"
+          element={guarded('/workforce/my-teams', <MyTeamsPage />)}
+        />
+        <Route path="/workforce/board" element={guarded('/workforce/board', <TeamBoardPage />)} />
         <Route
           path="/valuation/settings"
           element={guarded('/valuation/settings', <ValuationSettingsPage />)}

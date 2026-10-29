@@ -20,6 +20,7 @@ import { createMasterData, type MasterData } from './modules/masterdata/index.js
 import { createProjects, type Projects } from './modules/projects/index.js';
 import { createQuotations, type Quotations } from './modules/quotations/index.js';
 import { createDpr, type Dpr } from './modules/dpr/index.js';
+import { createWorkforce, type Workforce } from './modules/workforce/index.js';
 import { createExpenses, type Expenses } from './modules/expenses/index.js';
 import { createInventory, type Inventory } from './modules/inventory/index.js';
 import { createProcurement, type Procurement } from './modules/procurement/index.js';
@@ -32,6 +33,7 @@ import {
   estimationPermissions,
   expensesPermissions,
   filesPermissions,
+  workforcePermissions,
   identityPermissions,
   importerPermissions,
   masterdataPermissions,
@@ -85,6 +87,7 @@ export interface Runtime {
   inventory: Inventory;
   expenses: Expenses;
   dpr: Dpr;
+  workforce: Workforce;
   approvals: Approvals;
   files: Files;
   /** Set when FILE_STORE_DRIVER=local: it serves its own signed download links. */
@@ -121,6 +124,7 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
   identity.registerPermissions('inventory', Object.values(inventoryPermissions));
   identity.registerPermissions('expenses', Object.values(expensesPermissions));
   identity.registerPermissions('dpr', Object.values(dprPermissions));
+  identity.registerPermissions('workforce', Object.values(workforcePermissions));
   const importer = createImporter({ platform, clock, newId: () => uuidv7(clock.now()) });
   const masterData = createMasterData({
     platform,
@@ -265,6 +269,16 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     files,
     notifications,
   });
+  const workforce = createWorkforce({
+    platform,
+    clock,
+    newId: () => uuidv7(clock.now()),
+    identity,
+    masterData,
+    // Attendance (P1-17) does not exist yet, so no sheet can be unapproved (see BACKLOG).
+    attendance: { listUnapprovedSheets: async () => [] },
+    registerImporter: (definition) => importer.registerImporter(definition),
+  });
   if (config.adminEmail !== undefined) {
     const email = config.adminEmail;
     await db.transaction((tx) => identity.users.ensureAdmin(email, tx));
@@ -284,6 +298,7 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     inventory,
     expenses,
     dpr,
+    workforce,
     approvals,
     files,
     localFileStore: local,

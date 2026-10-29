@@ -111,6 +111,20 @@ export {
   type DprWeather,
 } from './dpr.js';
 export {
+  employmentTypes,
+  payBases,
+  teamSeries,
+  workerSeries,
+  workerStatuses,
+  workforcePermissionGrants,
+  workforcePermissions,
+  workforceSettingKeys,
+  type EmploymentType,
+  type PayBasis,
+  type WorkerStatus,
+  type WorkforcePermission,
+} from './workforce.js';
+export {
   variationDocType,
   variationEntityType,
   variationStatuses,
