@@ -65,4 +65,4 @@ Calculate each worker's monthly pay from approved attendance, overtime, allowanc
 - AC-4 Definition of Done satisfied.
 
 ## 9. Open inputs
-H-11: working-days basis, overtime multiplier, net rounding. Unanswered: stop.
+H-11: working-days basis, overtime multiplier, net rounding. Open; proceed with the register default (basis 26, overtime x1.5, net rounded to PKR 1) as editable settings and record it in the PR.

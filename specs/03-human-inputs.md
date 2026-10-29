@@ -16,7 +16,7 @@ Status: `open` or `answered`. "Default allowed": whether the agent may proceed w
 | H-08 | Tax rounding: per line or per document | Accountant | P2-01 | yes | per document | open |
 | H-09 | Approval matrix and amount limits (requisition, PO, expense, payment, quotation margin floor, write-offs) | Owner | P1-03 and all approvers | no | none | answered |
 | H-10 | Role holders: which people hold which roles | Owner | P1-02 | no | none | answered |
-| H-11 | Wage rules: working-days basis per month (26 or 30), overtime multiplier, rounding of net pay | Owner, accountant | P1-17, P1-18 | no | none | open |
+| H-11 | Wage rules: working-days basis per month (26 or 30), overtime multiplier, rounding of net pay | Owner, accountant | P1-17, P1-18 | yes | working-days basis 26, overtime multiplier 1.5, net pay rounded to nearest PKR 1; all editable settings, not constants | open |
 | H-12 | Worker pay basis and rates (daily rate or monthly salary) | Owner | P1-16 | yes | build with synthetic data; rates are per worker, effective-dated and entered by an admin from the screen, none in code | open |
 | H-13 | Opening data: cash, bank, receivables, payables, advances, PDCs, stock, open projects, workers, vendors, clients | Accountant, owner | P0-04, P2-10 | no | none | open |
 | H-14 | Samples of paper forms (quotation, site report, voucher, labour register, attendance sheet, invoice) | Owner | P0-02 | yes | specs' own fields | open |
