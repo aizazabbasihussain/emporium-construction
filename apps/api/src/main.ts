@@ -24,6 +24,7 @@ try {
     inventory,
     expenses,
     dpr,
+    workforce,
     approvals,
     files,
     localFileStore,
@@ -50,6 +51,7 @@ try {
     inventory: { db, inventory, platform },
     expenses: { db, expenses, platform },
     dpr: { db, dpr, platform },
+    workforce: { db, workforce, platform },
   });
   await app.listen({ port: config.port, host: '0.0.0.0' });
   startScheduler(runtime, logger);

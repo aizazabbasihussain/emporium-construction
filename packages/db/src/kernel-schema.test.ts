@@ -37,8 +37,10 @@ describe('platform kernel schema (P1-01)', () => {
       'RV',
       'SC',
       'STR',
+      'TM',
       'VAR',
       'VN',
+      'WK',
     ]);
     expect(series.find((s) => s.code === 'invoice')?.gapless).toBe(true);
     const [setting] = await db.query<{ value: number }>(

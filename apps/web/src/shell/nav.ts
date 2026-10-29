@@ -14,6 +14,7 @@ import {
   procurementPermissions,
   projectsPermissions,
   valuationPermissions,
+  workforcePermissions,
 } from '@emporium/shared';
 
 export interface NavItem {
@@ -171,6 +172,21 @@ export const navItems: readonly NavItem[] = [
     path: '/dpr/missing',
     label: 'nav.dprMissing',
     permission: dprPermissions.reportReview,
+  },
+  {
+    path: '/workforce/workers',
+    label: 'nav.workforceWorkers',
+    permission: workforcePermissions.workerRead,
+  },
+  {
+    path: '/workforce/my-teams',
+    label: 'nav.workforceMine',
+    permission: workforcePermissions.workerRead,
+  },
+  {
+    path: '/workforce/board',
+    label: 'nav.workforceBoard',
+    permission: workforcePermissions.teamManage,
   },
   {
     path: '/valuation/settings',
