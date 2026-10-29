@@ -63,4 +63,4 @@ Supervisors record daily attendance for their team, assigning each worker's day 
 - AC-4 Definition of Done satisfied.
 
 ## 9. Open inputs
-H-11: working-days basis and overtime multiplier. Unanswered: stop (affects money).
+H-11: working-days basis and overtime multiplier. Open; proceed with the register default (basis 26, overtime x1.5, net rounded to PKR 1) as editable settings and record it in the PR.
