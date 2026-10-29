@@ -21,6 +21,15 @@ export interface Actor {
   requestId: string | null;
 }
 
+/** An active project and who supervises it on a day (read by daily progress reports). */
+export interface SupervisedProjectDto {
+  projectId: string;
+  code: string;
+  name: string;
+  projectManagerId: string | null;
+  supervisorIds: string[];
+}
+
 export interface PageResult<T> {
   items: T[];
   total: number;

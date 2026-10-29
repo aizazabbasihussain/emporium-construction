@@ -91,6 +91,18 @@ export const settingRegistry: SettingRegistry = {
     description: 'Whether a supervisor may issue material on the stores of an assigned project',
     default: false,
   },
+  // P1-15 BR-3: a daily progress report needs a photo before it is submitted unless this is off.
+  dpr_photo_required: {
+    type: 'boolean',
+    description: 'Whether a daily progress report needs at least one photo to be submitted',
+    default: true,
+  },
+  // P1-15 BR-6: comma-separated dates (yyyy-mm-dd) on which no daily report is expected.
+  site_holidays: {
+    type: 'string',
+    description: 'Site holidays as comma-separated dates (yyyy-mm-dd); no missing-report alert',
+    default: '',
+  },
   // P1-12 BR-7, H-21: salvaged material enters stock at zero value unless the owner chooses estimates.
   'inventory.salvage_value_mode': {
     type: 'string',

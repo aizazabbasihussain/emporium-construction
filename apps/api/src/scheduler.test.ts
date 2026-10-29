@@ -15,6 +15,7 @@ const makeJobs = (overrides: { failing?: string } = {}) => {
     notifications: { tickReminders: job('reminders'), purgeOld: job('notifications-purge') },
     files: { purgeExpired: job('files-purge') },
     quotations: { expireDue: job('quotations-expire') },
+    dpr: { notifyMissingDprs: job('dpr-missing') },
   } as unknown as Parameters<typeof runSchedulerTick>[0];
   return { jobs, calls };
 };
@@ -34,6 +35,7 @@ describe('runSchedulerTick (BR-8)', () => {
     expect(calls).toEqual([
       'events',
       'reminders',
+      'dpr-missing',
       'files-purge',
       'notifications-purge',
       'quotations-expire',
@@ -41,13 +43,14 @@ describe('runSchedulerTick (BR-8)', () => {
 
     calls.length = 0;
     await runSchedulerTick(jobs, state, new Date(day + 60_000), logger().logger);
-    expect(calls).toEqual(['events', 'reminders']);
+    expect(calls).toEqual(['events', 'reminders', 'dpr-missing']);
 
     calls.length = 0;
     await runSchedulerTick(jobs, state, new Date(2 * day), logger().logger);
     expect(calls).toEqual([
       'events',
       'reminders',
+      'dpr-missing',
       'files-purge',
       'notifications-purge',
       'quotations-expire',
@@ -61,6 +64,7 @@ describe('runSchedulerTick (BR-8)', () => {
     expect(calls).toEqual([
       'events',
       'reminders',
+      'dpr-missing',
       'files-purge',
       'notifications-purge',
       'quotations-expire',

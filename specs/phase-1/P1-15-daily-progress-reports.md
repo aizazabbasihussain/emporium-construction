@@ -3,7 +3,7 @@ id: P1-15
 title: Daily progress reports (DPR)
 phase: 1
 module: dpr
-status: not-started
+status: done
 depends_on: [P1-09, P1-04]
 requires_inputs: []
 ---

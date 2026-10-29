@@ -99,6 +99,18 @@ export {
   type ExpensesPermission,
 } from './expenses.js';
 export {
+  dprNotificationTemplates,
+  dprPermissionGrants,
+  dprPermissions,
+  dprReportEntityType,
+  dprSettingKeys,
+  dprStatuses,
+  dprWeathers,
+  type DprPermission,
+  type DprStatus,
+  type DprWeather,
+} from './dpr.js';
+export {
   variationDocType,
   variationEntityType,
   variationStatuses,

@@ -19,6 +19,7 @@ import { createEstimation, type Estimation } from './modules/estimation/index.js
 import { createMasterData, type MasterData } from './modules/masterdata/index.js';
 import { createProjects, type Projects } from './modules/projects/index.js';
 import { createQuotations, type Quotations } from './modules/quotations/index.js';
+import { createDpr, type Dpr } from './modules/dpr/index.js';
 import { createExpenses, type Expenses } from './modules/expenses/index.js';
 import { createInventory, type Inventory } from './modules/inventory/index.js';
 import { createProcurement, type Procurement } from './modules/procurement/index.js';
@@ -27,6 +28,7 @@ import { createValuation, type Valuation } from './modules/valuation/index.js';
 import {
   approvalsPermissions,
   crmPermissions,
+  dprPermissions,
   estimationPermissions,
   expensesPermissions,
   filesPermissions,
@@ -82,6 +84,7 @@ export interface Runtime {
   procurement: Procurement;
   inventory: Inventory;
   expenses: Expenses;
+  dpr: Dpr;
   approvals: Approvals;
   files: Files;
   /** Set when FILE_STORE_DRIVER=local: it serves its own signed download links. */
@@ -117,6 +120,7 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
   identity.registerPermissions('procurement', Object.values(procurementPermissions));
   identity.registerPermissions('inventory', Object.values(inventoryPermissions));
   identity.registerPermissions('expenses', Object.values(expensesPermissions));
+  identity.registerPermissions('dpr', Object.values(dprPermissions));
   const importer = createImporter({ platform, clock, newId: () => uuidv7(clock.now()) });
   const masterData = createMasterData({
     platform,
@@ -253,6 +257,14 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     files,
     identity,
   });
+  const dpr = createDpr({
+    platform,
+    clock,
+    newId: () => uuidv7(clock.now()),
+    projects,
+    files,
+    notifications,
+  });
   if (config.adminEmail !== undefined) {
     const email = config.adminEmail;
     await db.transaction((tx) => identity.users.ensureAdmin(email, tx));
@@ -271,6 +283,7 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     procurement,
     inventory,
     expenses,
+    dpr,
     approvals,
     files,
     localFileStore: local,

@@ -1,6 +1,7 @@
 import {
   approvalsPermissions,
   crmPermissions,
+  dprPermissions,
   estimationPermissions,
   expensesPermissions,
   identityPermissions,
@@ -160,6 +161,16 @@ export const navItems: readonly NavItem[] = [
     path: '/expenses/categories',
     label: 'nav.expenseCategories',
     permission: expensesPermissions.categoryManage,
+  },
+  {
+    path: '/dpr/reports',
+    label: 'nav.dprReports',
+    permission: dprPermissions.reportRead,
+  },
+  {
+    path: '/dpr/missing',
+    label: 'nav.dprMissing',
+    permission: dprPermissions.reportReview,
   },
   {
     path: '/valuation/settings',
