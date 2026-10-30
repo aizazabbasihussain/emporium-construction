@@ -136,6 +136,34 @@ The owner accepted the draft chart of accounts (`docs/decisions/chart-of-account
 
 Options for the human to decide: approve and update the P2-09 text, or keep the chart read-only and change it only through a new seed file.
 
+### 2026-10-30: P1-19 needs query interfaces that four dependency modules do not provide
+
+Found while starting P1-19 (operational reports). The Boundary says the module consumes "only exported query functions and published `<prefix>_v_*` views", and must not read other modules' tables. Checked against `module.json` and `index.ts` of each dependency, three reports can be built as written and four cannot:
+
+| Report | Source available | Gap |
+|---|---|---|
+| BR-1 project cost | `projects.getCostSummary` (lines per cost code with budget, variance) | none |
+| BR-5 DPR compliance | `dpr.listDprs`, `dpr_v_submission_status` | none |
+| BR-7 client material | `inv_v_client_material_balance` | none |
+| BR-2 stock | `inv_v_stock_on_hand` (quantity only), `inventory.getStockOnHand` (one store and item per call) | no way to list stock with value for all stores and items; no below-reorder list (`inv_reorder_levels` has no view or export) |
+| BR-3 pending purchasing | `procurement.listOpenPoLines` | no export or view for open requisitions |
+| BR-4 labour | `attendance.getApprovedAttendance` (one worker), `getAttendanceHeadcount` (one project and one date) | no worker-days and labour cost per project per month; no headcount per day over a range |
+| BR-6 pipeline | `crm.service.pipeline` (counts, expected value, overdue count) | no conversion rate per period (won / (won + lost)); no list of overdue follow-ups |
+
+Building these inside `reports` would mean reading `inv_*`, `prc_*`, `att_*` or `crm_*` tables, which constitution 3 and 13 forbid. Adding the missing exports changes five modules that are already `done` (the P1-12 and P1-05 precedent above went through this register first). The agent stopped before writing code. P1-19 stays `not-started`.
+
+Options for the human to decide:
+1. **Add the missing interfaces, then build P1-19.** Approve these additions, each as an exported query (and a published view where the spec names views), with tests in the owning module:
+   - inventory: `listStockWithValue(filter)` and `listBelowReorder(filter)`, or views `inv_v_stock_value` and `inv_v_below_reorder`.
+   - procurement: `listOpenRequisitions(filter)`.
+   - attendance: `getLabourSummary(from, to, projectId?)` (worker-days and cost per project per month) and `getHeadcountSeries(projectId, from, to)`.
+   - crm: `getConversion(period)` and `listOverdueFollowUps(filter)`; `pipeline` exported on the `Crm` interface rather than reached through `service`.
+   Each module's spec Provides line is updated to match.
+2. **Split P1-19.** Build only BR-1, BR-5, BR-7 and the export format (BR-10, BR-11) now; move BR-2, BR-3, BR-4 and BR-6 to a follow-up spec that comes after the interfaces exist. AC-1 and the endpoint list change accordingly.
+3. **Allow `reports` to read the owning modules' tables through published views only**, and add the views listed in option 1 to those modules in one human-reviewed change.
+
+Smaller points the agent would settle in code unless told otherwise: the stock value of company-owned items comes from `valuation.getStockValue`, not from the reports module; "overdue" for a PO line is an expected date before today in Asia/Karachi.
+
 ### 2026-10-28: detached, supervised autonomous loop
 
 Changes only `tools/agent/loop.mjs` and `specs/04-autonomous-run.md` (tooling; no product behaviour). Reason: the loop ran as a child of the starting process and was lost when that process died or ran out of memory.
