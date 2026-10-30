@@ -15,7 +15,7 @@ Track enquiries from first contact to a won or lost job, with site visits and fo
 
 ## 2. Boundary
 - Owns: tables `crm_*`, module `crm`.
-- Provides: `getLead(id)`, event `crm.lead.won` (with party id and lead id), `createQuotationRequest` hook consumed by P1-08.
+- Provides: `getLead(id)`, event `crm.lead.won` (with party id and lead id), `createQuotationRequest` hook consumed by P1-08. Added 2026-10-30 by approved CHANGES entry (P1-19 interfaces), built in the P1-19 PR with tests in this module: `getConversion(period)` (won / (won + lost)), `listOverdueFollowUps(filter)`, and `pipeline` exported on the `Crm` interface.
 - Consumes: master data (parties, locations), files (photos), notifications (reminders), approvals not used.
 - Must not: create quotations, projects or invoices.
 - Out of scope: marketing campaigns, email integration, WhatsApp intake (Phase 7).
