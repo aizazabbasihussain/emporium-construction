@@ -345,6 +345,47 @@ export async function searchFollowUps(
   return { rows, total: Number(total[0]?.total ?? 0) };
 }
 
+/** P1-19 BR-6: the open follow-ups of live leads due before the date, oldest first. */
+export async function listOverdueFollowUpRows(
+  db: Db,
+  before: string,
+  assignedTo: string | null,
+): Promise<FollowUpRow[]> {
+  return db.query<FollowUpRow>(
+    `select ${FOLLOW_UP_SELECT} from crm_follow_ups f join crm_leads l on l.id = f.lead_id
+      where f.status = 'open' and f.deleted_at is null and l.deleted_at is null
+        and f.due_date < $1::date and ($2::uuid is null or f.assigned_to = $2)
+      order by f.due_date, f.id`,
+    [before, assignedTo],
+  );
+}
+
+/**
+ * P1-19 BR-6: leads won and lost per month (Asia/Karachi) between two dates. A lead counts in the
+ * month it was won or lost.
+ */
+export async function countClosedByMonth(
+  db: Db,
+  from: string,
+  to: string,
+): Promise<{ outcome: string; month: string; n: string }[]> {
+  return db.query(
+    `select 'won' as outcome, to_char(won_at at time zone 'Asia/Karachi', 'YYYY-MM') as month,
+            count(*)::text as n
+       from crm_leads
+      where deleted_at is null and won_at is not null
+        and (won_at at time zone 'Asia/Karachi')::date between $1::date and $2::date
+      group by 2
+     union all
+     select 'lost', to_char(lost_at at time zone 'Asia/Karachi', 'YYYY-MM'), count(*)::text
+       from crm_leads
+      where deleted_at is null and lost_at is not null
+        and (lost_at at time zone 'Asia/Karachi')::date between $1::date and $2::date
+      group by 2`,
+    [from, to],
+  );
+}
+
 /** Open follow-ups of the given leads, to flag overdue ones in lists (BR-5). */
 export async function openFollowUpsForLeads(
   db: Db,

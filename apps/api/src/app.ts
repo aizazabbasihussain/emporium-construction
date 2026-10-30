@@ -29,6 +29,7 @@ import { registerDprRoutes, type DprRouteDeps } from './modules/dpr/index.js';
 import { registerWorkforceRoutes, type WorkforceRouteDeps } from './modules/workforce/index.js';
 import { registerAttendanceRoutes, type AttendanceRouteDeps } from './modules/attendance/index.js';
 import { registerWagesRoutes, type WagesRouteDeps } from './modules/wages/index.js';
+import { registerReportsRoutes, type ReportsRouteDeps } from './modules/reports/index.js';
 import { registerExpensesRoutes, type ExpensesRouteDeps } from './modules/expenses/index.js';
 import { registerInventoryRoutes, type InventoryRouteDeps } from './modules/inventory/index.js';
 import {
@@ -78,6 +79,7 @@ export interface AppDeps {
   workforce?: WorkforceRouteDeps;
   attendance?: AttendanceRouteDeps;
   wages?: WagesRouteDeps;
+  reports?: ReportsRouteDeps;
 }
 
 export async function buildApp({
@@ -104,6 +106,7 @@ export async function buildApp({
   workforce,
   attendance,
   wages,
+  reports,
 }: AppDeps): Promise<FastifyInstance> {
   const loggerInstance: FastifyBaseLogger = logger;
   const app = Fastify({
@@ -150,6 +153,7 @@ export async function buildApp({
   if (workforce) registerWorkforceRoutes(app, workforce);
   if (attendance) registerAttendanceRoutes(app, attendance);
   if (wages) registerWagesRoutes(app, wages);
+  if (reports) registerReportsRoutes(app, reports);
 
   return app;
 }

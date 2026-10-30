@@ -14,6 +14,8 @@ export interface Procurement {
   getPurchaseOrder: ProcurementService['orders']['get'];
   listOpenPoLines: ProcurementService['orders']['listOpenLines'];
   getGrn: ProcurementService['receipts']['find'];
+  /** Query interface for the purchasing report (spec P1-19 BR-3). */
+  listOpenRequisitions: ProcurementService['requisitions']['listOpen'];
 }
 
 /**
@@ -45,6 +47,7 @@ export function createProcurement(
     getPurchaseOrder: (db, id) => service.orders.get(db, id),
     listOpenPoLines: (db, filter) => service.orders.listOpenLines(db, filter),
     getGrn: (db, id) => service.receipts.find(db, id),
+    listOpenRequisitions: (db, filter) => service.requisitions.listOpen(db, filter),
   };
 }
 
@@ -53,4 +56,11 @@ export {
   type ProcurementRouteDeps,
 } from './routes/procurement.routes.js';
 export type { GrnGuards } from './service/context.js';
-export type { GoodsReceivedPayload, GrnDto, OpenPoLineDto, PoDto, PrintModelDto } from './types.js';
+export type {
+  GoodsReceivedPayload,
+  GrnDto,
+  OpenPoLineDto,
+  OpenRequisitionDto,
+  PoDto,
+  PrintModelDto,
+} from './types.js';

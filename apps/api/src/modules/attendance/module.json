@@ -9,7 +9,9 @@
     "getApprovedAttendance",
     "getAttendanceHeadcount",
     "getUnapprovedSheets",
-    "listUnapprovedSheets"
+    "listUnapprovedSheets",
+    "getLabourSummary",
+    "getHeadcountSeries"
   ],
   "consumes": [
     "platform.audit.record",

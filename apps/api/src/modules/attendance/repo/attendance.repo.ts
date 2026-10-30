@@ -337,3 +337,56 @@ export const listSheetsInPeriod = (db: Db, from: string, to: string) =>
       order by sheet_date, team_id`,
     [from, to],
   );
+
+export interface LabourRow {
+  project_id: string;
+  month: string;
+  worker_days: string;
+  cost: string;
+}
+
+/**
+ * P1-19 BR-4: worker-days (a full day is 1, a half day 0.5, shared over the allocation fractions)
+ * and cost per project and month, from approved sheets. The cost is the allocation amounts, which
+ * carry the overtime of an entry unless that has its own project, plus that separate overtime.
+ */
+export const listLabourSummary = (db: Db, from: string, to: string, projectId: string | null) =>
+  db.query<LabourRow>(
+    `select project_id, month, sum(worker_days)::text as worker_days, sum(cost)::text as cost
+       from (
+         select a.cost_object_id as project_id, to_char(s.sheet_date, 'YYYY-MM') as month,
+                a.fraction * case e.status when 'present' then 1 when 'half_day' then 0.5 else 0 end
+                  as worker_days,
+                coalesce(a.amount, 0) as cost
+           from att_allocations a
+           join att_entries e on e.id = a.entry_id
+           join att_sheets s on s.id = e.sheet_id
+          where s.status = 'approved' and s.deleted_at is null and s.sheet_date between $1 and $2
+            and ($3::uuid is null or a.cost_object_id = $3)
+         union all
+         select e.overtime_project_id, to_char(s.sheet_date, 'YYYY-MM'), 0,
+                coalesce(e.overtime_value, 0)
+           from att_entries e join att_sheets s on s.id = e.sheet_id
+          where e.overtime_project_id is not null
+            and s.status = 'approved' and s.deleted_at is null and s.sheet_date between $1 and $2
+            and ($3::uuid is null or e.overtime_project_id = $3)
+       ) parts
+      group by project_id, month
+      order by month, project_id`,
+    [from, to, projectId],
+  );
+
+/** P1-19 BR-4: the workers on a project on each date of a period, from approved sheets. */
+export const listHeadcountSeries = (db: Db, projectId: string, from: string, to: string) =>
+  db.query<{ date: string; headcount: string }>(
+    `select to_char(s.sheet_date, 'YYYY-MM-DD') as date, count(distinct e.worker_id)::text as headcount
+       from att_allocations a
+       join att_entries e on e.id = a.entry_id
+       join att_sheets s on s.id = e.sheet_id
+      where a.cost_object_id = $1 and s.sheet_date between $2 and $3
+        and s.status = 'approved' and s.deleted_at is null
+        and e.status in ('present', 'half_day')
+      group by s.sheet_date
+      order by s.sheet_date`,
+    [projectId, from, to],
+  );

@@ -1,0 +1,42 @@
+{
+  "name": "reports",
+  "tablePrefix": "rpt_",
+  "ownedTables": ["rpt_saved_filters"],
+  "ownedViews": [],
+  "exports": ["createReports", "registerReportsRoutes"],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.idempotency.execute",
+    "platform.settings.get",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "projects.listProjectsForUser",
+    "projects.getCostSummary",
+    "procurement.listOpenPoLines",
+    "procurement.listOpenRequisitions",
+    "inventory.listStockWithValue",
+    "inventory.listBelowReorder",
+    "inv_v_client_material_balance",
+    "attendance.getLabourSummary",
+    "attendance.getHeadcountSeries",
+    "crm.pipeline",
+    "crm.getConversion",
+    "crm.listOverdueFollowUps",
+    "dpr.listDprs",
+    "masterdata.getCostCode",
+    "masterdata.getItem",
+    "masterdata.getParty"
+  ],
+  "eventsIn": [],
+  "eventsOut": ["reports.filter.changed"],
+  "permissions": [
+    "reports.project_cost.read",
+    "reports.stock.read",
+    "reports.purchasing.read",
+    "reports.labour.read",
+    "reports.dpr.read",
+    "reports.pipeline.read"
+  ],
+  "notes": "Owns saved filters only; every report is a query composition over the exported interfaces of other modules and the published view inv_v_client_material_balance (client material, BR-7), summed with Decimal arithmetic. Amounts are computed by the owning modules. The main list of a report is sorted and paged on the server, its totals cover the whole filtered set, and further tables (project totals, below-reorder items, open requisitions, headcount per day, conversion, overdue follow-ups) are returned and exported whole. Exports (CSV, XLSX) carry a header block and are refused above 50,000 rows. Permission codes use underscores (project_cost) because the code format of sys_role_permissions has no hyphen. The client material report follows reports.stock.read, which the spec does not name for it."
+}

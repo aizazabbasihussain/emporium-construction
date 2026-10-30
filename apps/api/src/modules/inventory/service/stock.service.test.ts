@@ -679,6 +679,101 @@ describe('queries and integrity (BR-12, AC-4)', () => {
   });
 });
 
+describe('listStockWithValue and listBelowReorder (P1-19 BR-2)', () => {
+  it('values company stock with the valuation engine and shows client stock by quantity', async () => {
+    const store = await kit.store();
+    const item = await kit.item();
+    await kit.receive(store, [{ itemId: item, quantity: '10', unitCost: '25' }]);
+    await tx((t) =>
+      kit.inventory.receiveClientMaterial(
+        {
+          storeId: store,
+          itemId: item,
+          ownerPartyId: kit.clientParty,
+          projectId,
+          quantity: '7',
+          businessDate: '2026-10-25',
+        },
+        kit.actor,
+        t,
+      ),
+    );
+    const rows = await kit.inventory.listStockWithValue(kit.db, { storeId: store });
+    expect(rows.every((r) => r.storeCode.startsWith('ST-') && r.storeName !== '')).toBe(true);
+    expect(rows).toMatchObject([
+      {
+        storeId: store,
+        itemId: item,
+        ownership: 'client',
+        ownerPartyId: kit.clientParty,
+        quantity: '7.0000',
+        value: null,
+      },
+      {
+        storeId: store,
+        itemId: item,
+        ownership: 'company',
+        ownerPartyId: null,
+        quantity: '10.0000',
+        value: '250.00',
+      },
+    ]);
+    expect(
+      await kit.inventory.listStockWithValue(kit.db, { storeId: store, ownership: 'company' }),
+    ).toHaveLength(1);
+    expect(await kit.inventory.listStockWithValue(kit.db, { itemId: item })).toHaveLength(2);
+    // A scope-limited caller sees the stores of their projects only.
+    expect(
+      await kit.inventory.listStockWithValue(kit.db, { itemId: item, projectIds: [projectId] }),
+    ).toEqual([]);
+    const site = await kit.store({ projectId, kind: 'site' });
+    await kit.receive(site, [{ itemId: item, quantity: '1', unitCost: '40' }]);
+    const scoped = await kit.inventory.listStockWithValue(kit.db, {
+      itemId: item,
+      projectIds: [projectId],
+    });
+    expect(scoped.map((r) => [r.storeId, r.value])).toEqual([[site, '40.00']]);
+    expect(await kit.inventory.listStockWithValue(kit.db)).not.toHaveLength(0);
+  });
+
+  it('lists company stock under its reorder level, with items that are out of stock', async () => {
+    const store = await kit.store();
+    const low = await kit.item();
+    const enough = await kit.item();
+    const none = await kit.item();
+    await kit.receive(store, [
+      { itemId: low, quantity: '3', unitCost: '10' },
+      { itemId: enough, quantity: '9', unitCost: '10' },
+    ]);
+    for (const [itemId, level] of [
+      [low, '5'],
+      [enough, '9'],
+      [none, '2'],
+    ] as const) {
+      await tx((t) =>
+        kit.inventory.service.stores.setReorderLevel(
+          { storeId: store, itemId, level },
+          kit.actor,
+          t,
+        ),
+      );
+    }
+    const rows = await kit.inventory.listBelowReorder(kit.db, { storeId: store });
+    expect(rows.every((r) => r.storeCode.startsWith('ST-') && r.storeName !== '')).toBe(true);
+    expect(rows).toMatchObject(
+      [
+        { storeId: store, itemId: low, level: '5.0000', quantity: '3.0000', shortfall: '2.0000' },
+        { storeId: store, itemId: none, level: '2.0000', quantity: '0.0000', shortfall: '2.0000' },
+      ].sort((a, b) => a.itemId.localeCompare(b.itemId)),
+    );
+    expect(await kit.inventory.listBelowReorder(kit.db, { itemId: enough })).toEqual([]);
+    expect(
+      await kit.inventory.listBelowReorder(kit.db, { storeId: store, projectIds: [projectId] }),
+    ).toEqual([]);
+    expect(await kit.inventory.listBelowReorder(kit.db)).not.toHaveLength(0);
+  });
+});
+
 describe('first in, first out (T-3)', () => {
   it('writes one ledger row per FIFO layer and one cost entry equal to their sum (T-3)', async () => {
     await kit.activatePolicy('fifo');

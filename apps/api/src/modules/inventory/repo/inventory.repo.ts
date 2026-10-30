@@ -164,6 +164,82 @@ export async function searchStock(
   return { rows, total: countOf(total) };
 }
 
+export interface StockFilter {
+  /** Limits the rows to the stores of these projects (a scope-limited caller). */
+  projectIds?: readonly string[] | undefined;
+  storeId?: string | undefined;
+  itemId?: string | undefined;
+  ownership?: string | undefined;
+}
+
+function stockClause(filter: StockFilter, column: (name: string) => string) {
+  const params: unknown[] = [];
+  const where = ['true'];
+  const add = (sql: string, value: unknown) => {
+    params.push(value);
+    where.push(sql.replace('?', `$${params.length}`));
+  };
+  if (filter.projectIds !== undefined) {
+    add(
+      `${column('store_id')} in (select id from inv_stores where project_id = any(?::uuid[]))`,
+      filter.projectIds,
+    );
+  }
+  if (filter.storeId !== undefined) add(`${column('store_id')} = ?`, filter.storeId);
+  if (filter.itemId !== undefined) add(`${column('item_id')} = ?`, filter.itemId);
+  if (filter.ownership !== undefined) add(`${column('ownership')} = ?`, filter.ownership);
+  return { where: where.join(' and '), params };
+}
+
+export interface NamedBalanceRow extends BalanceRow {
+  store_code: string;
+  store_name: string;
+}
+
+/** P1-19 BR-2: every balance that matches, with its store, without paging. */
+export function listBalances(db: Db, filter: StockFilter): Promise<NamedBalanceRow[]> {
+  const { where, params } = stockClause(filter, (name) => `b.${name}`);
+  return db.query<NamedBalanceRow>(
+    `select b.id, b.store_id, b.item_id, b.ownership, b.owner_party_id,
+            b.quantity::text as quantity, s.code as store_code, s.name as store_name
+       from inv_balances b join inv_stores s on s.id = b.store_id
+      where ${where}
+      order by s.code, b.item_id, b.ownership, b.owner_party_id, b.id`,
+    params,
+  );
+}
+
+export interface BelowReorderRow {
+  store_code: string;
+  store_name: string;
+  store_id: string;
+  item_id: string;
+  level: string;
+  quantity: string;
+}
+
+/**
+ * P1-19 BR-2: the company stock below its reorder level. An item with a level and no balance row
+ * has nothing in the store, so it counts as zero.
+ */
+export function listBelowReorderRows(db: Db, filter: StockFilter): Promise<BelowReorderRow[]> {
+  const { where, params } = stockClause(
+    { projectIds: filter.projectIds, storeId: filter.storeId, itemId: filter.itemId },
+    (name) => `l.${name}`,
+  );
+  return db.query<BelowReorderRow>(
+    `select l.store_id, s.code as store_code, s.name as store_name, l.item_id,
+            l.level::text as level, coalesce(b.quantity, 0)::text as quantity
+       from inv_reorder_levels l
+       join inv_stores s on s.id = l.store_id
+       left join inv_balances b on b.store_id = l.store_id and b.item_id = l.item_id
+                               and b.ownership = 'company'
+      where ${where} and coalesce(b.quantity, 0) < l.level
+      order by s.code, l.item_id`,
+    params,
+  );
+}
+
 /** What the balances of company stock add up to in one store and item. */
 export async function balanceOf(db: Db, key: BalanceKey): Promise<string> {
   const rows = await db.query<{ quantity: string }>(

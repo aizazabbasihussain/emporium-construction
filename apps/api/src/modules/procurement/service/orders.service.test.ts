@@ -561,6 +561,44 @@ describe('orders from selected quotes (BR-3)', () => {
   });
 });
 
+describe('listOpenRequisitions (P1-19 BR-3)', () => {
+  it('lists the requisitions that wait for approval or purchasing, and no others', async () => {
+    const project = await kit.project();
+    const draft = await kit.requisition({ projectId: project.id });
+    const waiting = await kit.requisition({ projectId: project.id });
+    await tx((db) => svc().requisitions.submit(waiting.id, waiting.version, kit.actor, db));
+    const approved = await kit.approvedRequisition({ projectId: project.id });
+    const ordered = await kit.approvedRequisition({ projectId: project.id });
+    const cancelled = await kit.approvedRequisition({ projectId: project.id });
+    await tx((db) =>
+      db.query("update prc_requisitions set status = 'ordered' where id = $1", [ordered]),
+    );
+    await tx((db) =>
+      db.query("update prc_requisitions set status = 'cancelled' where id = $1", [cancelled]),
+    );
+    const open = await kit.procurement.listOpenRequisitions(kit.db, { projectId: project.id });
+    expect(open.map((r) => [r.id, r.status, r.lineCount])).toEqual([
+      [waiting.id, 'pending_approval', 2],
+      [approved, 'approved', 2],
+    ]);
+    expect(open.map((r) => r.id)).not.toContain(draft.id);
+    expect(open[0]).toMatchObject({ projectId: project.id, storeId: null });
+
+    // Filters: by store, by the projects a scope-limited caller reaches, and all of them.
+    const store = await kit.approvedRequisition({});
+    expect(
+      (await kit.procurement.listOpenRequisitions(kit.db, { storeId: STORE })).map((r) => r.id),
+    ).toContain(store);
+    expect(await kit.procurement.listOpenRequisitions(kit.db, { projectIds: [MISSING] })).toEqual(
+      [],
+    );
+    expect(
+      (await kit.procurement.listOpenRequisitions(kit.db, { projectIds: [project.id] })).length,
+    ).toBe(2);
+    expect((await kit.procurement.listOpenRequisitions(kit.db)).length).toBeGreaterThan(2);
+  });
+});
+
 describe('open lines, print model, listing', () => {
   it('lists what is still to come and the print layout', async () => {
     const project = await kit.project();

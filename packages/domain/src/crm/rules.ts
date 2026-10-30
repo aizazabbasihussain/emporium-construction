@@ -143,6 +143,17 @@ export function summarizePipeline(
   });
 }
 
+/**
+ * P1-19 BR-6: the conversion rate of a period, won / (won + lost) as a percentage to two decimals,
+ * rounded half up. Leads still open are not part of it; null when nothing was won or lost.
+ */
+export function conversionRate(won: number, lost: number): string | null {
+  const closed = BigInt(won + lost);
+  if (closed === 0n) return null;
+  const hundredths = (BigInt(won) * 20000n + closed) / (closed * 2n);
+  return `${hundredths / 100n}.${(hundredths % 100n).toString().padStart(2, '0')}`;
+}
+
 function toCents(value: string | null): bigint {
   if (value === null) return 0n;
   const [whole = '0', fraction = ''] = value.split('.');

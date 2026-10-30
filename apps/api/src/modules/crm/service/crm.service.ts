@@ -4,6 +4,7 @@ import {
   assertLeadEditable,
   assertOnlyNotesChanged,
   assertVisitDate,
+  conversionRate,
   isOverdue,
   normalizeExpectedValue,
   planStageMove,
@@ -13,6 +14,7 @@ import {
   type StageKind,
 } from '@emporium/domain/crm';
 import { BusinessDate, type Clock } from '@emporium/domain/kernel';
+import { assertReportPeriod, monthsBetween } from '@emporium/domain/reports';
 import { normalizePhone } from '@emporium/domain/masterdata';
 import {
   leadSectors,
@@ -33,6 +35,7 @@ import {
 } from '../policy/crm.policy.js';
 import {
   cancelOpenFollowUps,
+  countClosedByMonth,
   findFollowUp,
   findLead,
   findStage,
@@ -43,6 +46,7 @@ import {
   insertVisit,
   leadsForPipeline,
   listHistory,
+  listOverdueFollowUpRows,
   listLossReasons,
   listSources,
   listStages,
@@ -67,6 +71,7 @@ import {
 } from '../repo/crm.repo.js';
 import type {
   Actor,
+  ConversionDto,
   Db,
   FollowUpDto,
   LeadDetailDto,
@@ -150,6 +155,13 @@ export interface CrmService {
     query: Omit<FollowUpSearch, 'status'> & { status?: string | undefined },
   ): Promise<PageResult<FollowUpDto>>;
   pipeline(db: Db): Promise<PipelineDto>;
+  /** P1-19 BR-6: conversion rate over a period and per month in it. */
+  getConversion(db: Db, period: { from: string; to: string }): Promise<ConversionDto>;
+  /** P1-19 BR-6: open follow-ups due before today (Asia/Karachi), oldest first. */
+  listOverdueFollowUps(
+    db: Db,
+    filter?: { assignedTo?: string | undefined },
+  ): Promise<FollowUpDto[]>;
   visitExists(db: Db, id: string): Promise<boolean>;
 }
 
@@ -694,6 +706,32 @@ export function createCrmService(deps: {
           isOverdue({ dueDate: f.due_date, status: f.status }, clock),
         ).length,
       };
+    },
+
+    async getConversion(db, period) {
+      assertReportPeriod(period.from, period.to);
+      const from = BusinessDate.parse(period.from).toString();
+      const to = BusinessDate.parse(period.to).toString();
+      const counts = await countClosedByMonth(db, from, to);
+      const countOf = (outcome: string, month: string) =>
+        Number(counts.find((c) => c.outcome === outcome && c.month === month)?.n ?? 0);
+      const months = monthsBetween(from, to).map((month) => {
+        const won = countOf('won', month);
+        const lost = countOf('lost', month);
+        return { month, won, lost, rate: conversionRate(won, lost) };
+      });
+      const won = months.reduce((sum, m) => sum + m.won, 0);
+      const lost = months.reduce((sum, m) => sum + m.lost, 0);
+      return { from, to, won, lost, rate: conversionRate(won, lost), months };
+    },
+
+    async listOverdueFollowUps(db, filter = {}) {
+      const rows = await listOverdueFollowUpRows(
+        db,
+        BusinessDate.today(clock).toString(),
+        filter.assignedTo ?? null,
+      );
+      return rows.map(toFollowUpDto);
     },
 
     visitExists: (db, id) => visitExists(db, id),

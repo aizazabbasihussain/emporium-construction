@@ -10,7 +10,14 @@
     "crm_follow_ups",
     "crm_stage_history"
   ],
-  "exports": ["createCrm", "registerCrmRoutes", "getLead"],
+  "exports": [
+    "createCrm",
+    "registerCrmRoutes",
+    "getLead",
+    "pipeline",
+    "getConversion",
+    "listOverdueFollowUps"
+  ],
   "consumes": [
     "platform.audit.record",
     "platform.events.publish",

@@ -56,6 +56,11 @@ export interface RequisitionHeaderDto {
   version: number;
 }
 
+/** P1-19 BR-3: a requisition that still waits for purchasing. */
+export interface OpenRequisitionDto extends RequisitionHeaderDto {
+  lineCount: number;
+}
+
 export interface RequisitionDto extends RequisitionHeaderDto {
   lines: RequisitionLineDto[];
   approval: ApprovalSummary;

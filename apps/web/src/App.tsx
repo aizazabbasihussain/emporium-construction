@@ -2,6 +2,7 @@ import {
   dprPermissions,
   expensesPermissions,
   procurementPermissions,
+  reportsPermissions,
   variationsPermissions,
 } from '@emporium/shared';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -64,6 +65,8 @@ import { NotificationsPage } from './notifications/NotificationsPage';
 import { HomePage } from './shell/HomePage';
 import { LoginPage } from './shell/LoginPage';
 import { navItems } from './shell/nav';
+import { ReportPage as OperationalReportPage } from './reports/ReportPage';
+import { ReportsHubPage } from './reports/ReportsHubPage';
 import { ValuationReportPage } from './valuation/ReportPage';
 import { ValuationSettingsPage } from './valuation/SettingsPage';
 import { TransitionsPage } from './valuation/TransitionsPage';
@@ -303,6 +306,15 @@ export function AppRoutes() {
           element={guarded('/valuation/transitions', <TransitionsPage />)}
         />
         <Route path="/crm/follow-ups" element={guarded('/crm/follow-ups', <FollowUpsPage />)} />
+        <Route
+          path="/reports"
+          element={
+            <RequireAnyPermission permissions={Object.values(reportsPermissions)}>
+              <ReportsHubPage />
+            </RequireAnyPermission>
+          }
+        />
+        <Route path="/reports/:code" element={<OperationalReportPage />} />
         <Route path="/imports" element={guarded('/imports', <ImportPage />)} />
         <Route path="/admin/settings" element={guarded('/admin/settings', <SettingsPage />)} />
         <Route path="*" element={<NotFoundPage />} />
