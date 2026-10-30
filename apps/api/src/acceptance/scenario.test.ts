@@ -1,6 +1,8 @@
 import { dprReportEntityType, variationEntityType } from '@emporium/shared';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createHarness, type Harness } from './harness.js';
+import { createTestDb } from '@emporium/db';
+import { dumpDatabase, fingerprint, restoreDatabase } from './backup.js';
 import { runIntegrityChecks } from './integrity.js';
 import { client, PNG_BASE64, val, type Client } from './scenario-kit.js';
 
@@ -613,5 +615,27 @@ describe('Gate A scenario', () => {
     expect(await runIntegrityChecks(h.db)).toEqual([]);
     const stock = await c.send('storekeeper', 'GET', '/inventory/integrity');
     expect(stock.status).toBe(200);
+  });
+
+  it('step 14: backup and restore rehearsal passes the integrity checks (BR-7)', async () => {
+    const dump = await dumpDatabase(h.db);
+    const fresh = await createTestDb();
+    await restoreDatabase(fresh, dump);
+    expect(await fingerprint(fresh)).toEqual(await fingerprint(h.db));
+    expect(await runIntegrityChecks(fresh)).toEqual([]);
+    // The restored database keeps working: a new ledger row gets the next sequence number.
+    const [before] = await fresh.query<{ top: string }>(
+      'select max(seq)::text as top from inv_ledger',
+    );
+    await fresh.query(
+      `insert into inv_ledger (id, store_id, item_id, ownership, movement_type, quantity, unit_cost, value,
+                               source_doc_type, source_doc_id, business_date, idempotency_key)
+       select gen_random_uuid(), store_id, item_id, 'company', 'adjustment_in', 1, 1, 1,
+              'count', gen_random_uuid(), '2026-10-26', 'restore-check' from inv_balances limit 1`,
+    );
+    const [after] = await fresh.query<{ top: string }>(
+      'select max(seq)::text as top from inv_ledger',
+    );
+    expect(Number(after?.top)).toBe(Number(before?.top) + 1);
   });
 });

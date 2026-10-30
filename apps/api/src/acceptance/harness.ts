@@ -18,7 +18,7 @@ export const uid = (n: number) => `018f9000-0000-7000-8000-${String(n).padStart(
 export const PILOT_USERS = [
   { key: 'admin', n: 1, role: 'admin' },
   { key: 'owner', n: 2, role: 'management' },
-  { key: 'owner2', n: 3, role: 'management' },
+  { key: 'pm2', n: 3, role: 'project_manager' },
   { key: 'pm', n: 4, role: 'project_manager' },
   { key: 'estimator', n: 5, role: 'estimator' },
   { key: 'procurement', n: 6, role: 'procurement' },
@@ -81,7 +81,13 @@ export function testConfig(): AppConfig {
 }
 
 export async function createHarness(
-  options: { db?: SqlDb; config?: Partial<AppConfig>; now?: Date } = {},
+  options: {
+    db?: SqlDb;
+    config?: Partial<AppConfig>;
+    now?: Date;
+    /** Which pilot users to create; the seed script needs only the few that load the data. */
+    users?: readonly PilotUserKey[];
+  } = {},
 ): Promise<Harness> {
   const db = options.db ?? (await createTestDb());
   const now = { current: options.now ?? new Date('2026-10-26T05:00:00Z') };
@@ -89,7 +95,9 @@ export async function createHarness(
   const runtime = await wireRuntime(db, async () => undefined, config, {
     now: () => new Date(now.current),
   });
-  for (const user of [...PILOT_USERS, NOBODY]) {
+  for (const user of [...PILOT_USERS, NOBODY].filter(
+    (candidate) => options.users === undefined || options.users.includes(candidate.key),
+  )) {
     await db.query(
       `insert into sys_users (id, auth_subject, email, full_name) values ($1, $2, $2, $3)
        on conflict do nothing`,

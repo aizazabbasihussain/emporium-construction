@@ -35,7 +35,11 @@ export function client(h: Harness) {
 
   /** Delivers due outbox events (the scheduler's job in production). */
   const deliver = async () => {
-    await h.runtime.platform.events.dispatchDue(h.db);
+    // A tick delivers at most 50 events; keep going until none is due.
+    for (;;) {
+      const summary = await h.runtime.platform.events.dispatchDue(h.db);
+      if (summary.dispatched + summary.retrying + summary.failed === 0) return;
+    }
   };
 
   /** Approves every pending approval of a user's inbox; returns how many were decided. */
