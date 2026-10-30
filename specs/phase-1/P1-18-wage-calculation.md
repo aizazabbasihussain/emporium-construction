@@ -3,7 +3,7 @@ id: P1-18
 title: Monthly wage calculation
 phase: 1
 module: wages
-status: not-started
+status: done
 depends_on: [P1-17]
 requires_inputs: [H-11]
 ---

@@ -15,6 +15,7 @@ import {
   procurementPermissions,
   projectsPermissions,
   valuationPermissions,
+  wagesPermissions,
   workforcePermissions,
 } from '@emporium/shared';
 
@@ -204,6 +205,8 @@ export const navItems: readonly NavItem[] = [
     label: 'nav.attendanceMissing',
     permission: attendancePermissions.sheetRead,
   },
+  { path: '/wages/periods', label: 'nav.wagesPeriods', permission: wagesPermissions.periodRead },
+  { path: '/wages/advances', label: 'nav.wagesAdvances', permission: wagesPermissions.periodRead },
   {
     path: '/valuation/settings',
     label: 'nav.valuationSettings',

@@ -1,0 +1,52 @@
+{
+  "name": "wages",
+  "tablePrefix": "wag_",
+  "ownedTables": [
+    "wag_periods",
+    "wag_lines",
+    "wag_adjustments",
+    "wag_advances",
+    "wag_advance_recoveries"
+  ],
+  "ownedViews": [],
+  "exports": [
+    "createWages",
+    "registerWagesRoutes",
+    "getApprovedWageSheet",
+    "getWorkerAdvanceBalance",
+    "approvedPeriodOf"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.events.subscribe",
+    "platform.idempotency.execute",
+    "platform.settings.get",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "approvals.requestApproval",
+    "approvals.getApprovalState",
+    "workforce.workers.list",
+    "workforce.getWorker",
+    "workforce.getWorkerRate",
+    "attendance.getApprovedAttendance",
+    "attendance.getUnapprovedSheets"
+  ],
+  "eventsIn": ["approval.approved", "approval.rejected", "approval.returned", "approval.cancelled"],
+  "eventsOut": [
+    "wages.period.approved",
+    "wages.period.reopened",
+    "wages.period.changed",
+    "wages.advance.changed"
+  ],
+  "permissions": [
+    "wages.period.read",
+    "wages.period.calculate",
+    "wages.period.submit",
+    "wages.period.reopen",
+    "wages.adjustment.manage",
+    "wages.advance.manage"
+  ],
+  "notes": "Owns the monthly wage periods (one per calendar month), their lines (one per worker with approved attendance in the month), the manual allowances and deductions and the simple advances with their planned recoveries. Calculation reads only approved attendance (attendance.getApprovedAttendance) and prices each day at the rate in effect that day (workforce.getWorkerRate): a daily-rate worker is paid per present day and half day (off days and paid leave only by the setting wages.pay_off_days_daily), a monthly-salary worker salary / the working-days basis (setting workforce.working_days_basis, H-11 default 26) per payable day, capped at the basis; overtime is hours x daily equivalent / 8 x the setting attendance.overtime_multiplier (H-11 default 1.5). Each component is rounded half-up to 2 decimals; net pay is rounded to the nearest rupee when wages.round_net_to_rupee is on (H-11 default) and the difference is kept in rounding_adjustment. Advance recovery is the least of the instalment, the open balance and the gross less deductions, so the recovery gives way first and the remainder carries to the next month; deductions beyond the gross are a shortfall the approver acknowledges and net pay never goes below zero. Recalculation is idempotent: it replaces calculated values, keeps manual adjustments and refuses an approved or submitted period. Submission is blocked while any attendance sheet of the month is not approved (attendance.getUnapprovedSheets); days with no sheet and shortfalls are warnings acknowledged on submit. Approval goes through the approval engine (document type wage_period, the management role approves, amount = total net pay); on approval the period locks, the planned recoveries are applied to the advance balances (closing an advance at zero) and wages.period.approved is emitted once. Reopening needs wages.period.reopen and a reason, reverses the recoveries and is refused once payment (P2-07, interface WagePayments.hasPaidLines, a stub that reports nothing paid until then) has paid a line. approvedPeriodOf(date) is the interface attendance uses to refuse unlocking approved attendance. The reconciliation compares the labour cost approved attendance allocated to projects (day value plus overtime) with the gross pay of the wage sheet by worker. It pays nobody, posts nothing to the cash book and does not change attendance."
+}
