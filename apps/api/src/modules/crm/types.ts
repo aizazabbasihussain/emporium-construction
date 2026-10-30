@@ -90,6 +90,17 @@ export interface LeadDetailDto {
   history: StageHistoryDto[];
 }
 
+/** P1-19 BR-6: leads won and lost in a period, and the conversion rate won / (won + lost). */
+export interface ConversionDto {
+  from: string;
+  to: string;
+  won: number;
+  lost: number;
+  /** A percentage with two decimals; null when nothing was won or lost. */
+  rate: string | null;
+  months: { month: string; won: number; lost: number; rate: string | null }[];
+}
+
 export interface PipelineDto {
   stages: {
     stageCode: string;

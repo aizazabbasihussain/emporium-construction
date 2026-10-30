@@ -71,6 +71,46 @@ export interface RequisitionLineRow {
 const REQ_LINE_COLUMNS = `id, line_no, item_id, description, quantity::text as quantity, unit_code,
   cost_code_id, estimated_rate::text as estimated_rate`;
 
+export interface OpenRequisitionRow extends RequisitionRow {
+  line_count: string;
+}
+
+/**
+ * P1-19 BR-3: requisitions that still wait for purchasing: sent for approval, approved, or only
+ * partly ordered. Draft, rejected, fully ordered and cancelled ones are not open.
+ */
+export function listOpenRequisitionRows(
+  db: Db,
+  filter: {
+    projectId?: string | undefined;
+    storeId?: string | undefined;
+    projectIds?: readonly string[] | undefined;
+  },
+): Promise<OpenRequisitionRow[]> {
+  const params: unknown[] = [];
+  const where = [
+    'r.deleted_at is null',
+    `r.status in ('pending_approval', 'approved', 'partly_ordered')`,
+  ];
+  const add = (sql: string, value: unknown) => {
+    params.push(value);
+    where.push(sql.replace('?', `$${params.length}`));
+  };
+  if (filter.projectId !== undefined) add('r.project_id = ?', filter.projectId);
+  if (filter.storeId !== undefined) add('r.store_id = ?', filter.storeId);
+  if (filter.projectIds !== undefined) add('r.project_id = any(?::uuid[])', filter.projectIds);
+  return db.query<OpenRequisitionRow>(
+    `select r.id, r.number, r.project_id, r.store_id, r.requested_by,
+            to_char(r.required_by, 'YYYY-MM-DD') as required_by, r.status, r.note, r.version,
+            (select count(*) from prc_requisition_lines l where l.requisition_id = r.id)::text
+              as line_count
+       from prc_requisitions r
+      where ${where.join(' and ')}
+      order by r.created_at, r.id`,
+    params,
+  );
+}
+
 export async function searchRequisitions(
   db: Db,
   search: RequisitionSearch,

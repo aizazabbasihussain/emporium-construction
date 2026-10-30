@@ -1,10 +1,13 @@
 import { workingDates } from '@emporium/domain/attendance';
 import { BusinessDate } from '@emporium/domain/kernel';
+import { assertReportPeriod, sumDecimals } from '@emporium/domain/reports';
 import { dprSettingKeys } from '@emporium/shared';
 import {
   countWorkersOnProject,
   listAllocationsOfEntries,
   listApprovedDays,
+  listHeadcountSeries,
+  listLabourSummary,
   listSheetsInPeriod,
   listUnapprovedSheetsOfWorker,
 } from '../repo/attendance.repo.js';
@@ -13,6 +16,8 @@ import type {
   ApprovedDayDto,
   Db,
   EntryStatus,
+  HeadcountDto,
+  LabourSummaryDto,
   MissingSheetDto,
   SheetStatus,
   UnapprovedSheetsDto,
@@ -120,6 +125,51 @@ export function createQueriesService(
     /** Module interface `getAttendanceHeadcount(projectId, date)` for daily reports. */
     async getAttendanceHeadcount(db: Db, projectId: string, date: string): Promise<number> {
       return countWorkersOnProject(db, projectId, BusinessDate.parse(date).toString());
+    },
+
+    /**
+     * Module interface `getLabourSummary(from, to, projectId?)` for the labour report (P1-19 BR-4):
+     * worker-days and cost per project and month, from approved sheets only.
+     */
+    async getLabourSummary(
+      db: Db,
+      from: string,
+      to: string,
+      projectId?: string,
+    ): Promise<LabourSummaryDto[]> {
+      assertReportPeriod(from, to);
+      const rows = await listLabourSummary(
+        db,
+        BusinessDate.parse(from).toString(),
+        BusinessDate.parse(to).toString(),
+        projectId ?? null,
+      );
+      return rows.map((row) => ({
+        projectId: row.project_id,
+        month: row.month,
+        workerDays: sumDecimals([row.worker_days], 4),
+        cost: sumDecimals([row.cost]),
+      }));
+    },
+
+    /**
+     * Module interface `getHeadcountSeries(projectId, from, to)` (P1-19 BR-4): the workers present
+     * or on a half day on each date of the period with approved attendance, dates without any left out.
+     */
+    async getHeadcountSeries(
+      db: Db,
+      projectId: string,
+      from: string,
+      to: string,
+    ): Promise<HeadcountDto[]> {
+      assertReportPeriod(from, to);
+      const rows = await listHeadcountSeries(
+        db,
+        projectId,
+        BusinessDate.parse(from).toString(),
+        BusinessDate.parse(to).toString(),
+      );
+      return rows.map((row) => ({ date: row.date, headcount: Number(row.headcount) }));
     },
 
     /** The interface workforce uses before it marks a worker as left (workforce BR-6). */

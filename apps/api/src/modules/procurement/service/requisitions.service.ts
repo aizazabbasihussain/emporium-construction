@@ -18,6 +18,7 @@ import {
 import {
   findRequisition,
   insertRequisition,
+  listOpenRequisitionRows,
   listRequisitionLines,
   orderedByLine,
   replaceRequisitionLines,
@@ -28,6 +29,7 @@ import {
 import type {
   Actor,
   Db,
+  OpenRequisitionDto,
   PageResult,
   RequisitionDto,
   RequisitionHeaderDto,
@@ -139,6 +141,24 @@ export function createRequisitionService(ctx: Context) {
         projectIds: scope.all ? undefined : scope.ids,
       });
       return pageOf(rows.map(requisitionHeaderOf), total, query);
+    },
+
+    /**
+     * Module interface `listOpenRequisitions(filter)` (P1-19 BR-3): the requisitions that wait for
+     * approval or purchasing, oldest first.
+     */
+    async listOpen(
+      db: Db,
+      filter: {
+        projectId?: string | undefined;
+        storeId?: string | undefined;
+        projectIds?: readonly string[] | undefined;
+      } = {},
+    ): Promise<OpenRequisitionDto[]> {
+      return (await listOpenRequisitionRows(db, filter)).map((row) => ({
+        ...requisitionHeaderOf(row),
+        lineCount: Number(row.line_count),
+      }));
     },
 
     async get(db: Db, id: string, actor: Actor): Promise<RequisitionDto> {

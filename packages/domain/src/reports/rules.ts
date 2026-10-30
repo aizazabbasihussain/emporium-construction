@@ -1,5 +1,6 @@
 import Decimal from 'decimal.js';
 import { ValidationError } from '../errors.js';
+import { BusinessDate } from '../kernel/business-date.js';
 
 // Pure rules of the operational reports (spec P1-19 section 4). The amounts are computed by the
 // owning modules (BR-9); this file only compares, groups and sums them with Decimal arithmetic.
@@ -183,4 +184,18 @@ export function monthsBetween(from: string, to: string): string[] {
     months.push(`${Math.floor(index / 12)}-${String((index % 12) + 1).padStart(2, '0')}`);
   }
   return months;
+}
+
+const MAX_REPORT_DAYS = 366;
+
+/** A report period: valid dates, not backwards, and at most a year (366 days) long. */
+export function assertReportPeriod(from: string, to: string, maxDays = MAX_REPORT_DAYS): void {
+  const start = BusinessDate.parse(from);
+  const end = BusinessDate.parse(to);
+  if (start.isAfter(end)) {
+    throw new ValidationError('period_invalid', 'The period ends before it starts');
+  }
+  if (end.daysSince(start) >= maxDays) {
+    throw new ValidationError('period_too_long', `The period is limited to ${maxDays} days`);
+  }
 }

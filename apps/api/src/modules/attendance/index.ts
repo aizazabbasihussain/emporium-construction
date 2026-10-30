@@ -16,6 +16,9 @@ export interface Attendance {
   getUnapprovedSheets: QueriesService['getUnapprovedSheets'];
   /** The check workforce makes before a worker is marked as left (P1-16 BR-6). */
   listUnapprovedSheets: QueriesService['listUnapprovedSheets'];
+  /** Query interfaces for the labour report (spec P1-19 BR-4). */
+  getLabourSummary: QueriesService['getLabourSummary'];
+  getHeadcountSeries: QueriesService['getHeadcountSeries'];
 }
 
 /**
@@ -35,6 +38,10 @@ export function createAttendance(deps: AttendanceDeps): Attendance {
       queries.getAttendanceHeadcount(db, projectId, date),
     getUnapprovedSheets: (db, period) => queries.getUnapprovedSheets(db, period),
     listUnapprovedSheets: (db, workerId, upTo) => queries.listUnapprovedSheets(db, workerId, upTo),
+    getLabourSummary: (db, from, to, projectId) =>
+      queries.getLabourSummary(db, from, to, projectId),
+    getHeadcountSeries: (db, projectId, from, to) =>
+      queries.getHeadcountSeries(db, projectId, from, to),
   };
 }
 
@@ -43,6 +50,8 @@ export type { WagePeriods } from './service/sheets.service.js';
 export type {
   ApprovedDayDto,
   GridDto,
+  HeadcountDto,
+  LabourSummaryDto,
   MissingSheetDto,
   SheetDto,
   SheetHeaderDto,

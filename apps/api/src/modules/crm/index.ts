@@ -12,6 +12,10 @@ export interface Crm {
   service: CrmService;
   /** Query interface for other modules (spec P1-06 section 2). */
   getLead: CrmService['getLead'];
+  /** Query interfaces for the pipeline report (spec P1-19 BR-6). */
+  pipeline: CrmService['pipeline'];
+  getConversion: CrmService['getConversion'];
+  listOverdueFollowUps: CrmService['listOverdueFollowUps'];
 }
 
 /**
@@ -37,11 +41,18 @@ export function createCrm(deps: {
       visitExists: await service.visitExists(db, entityId),
     }),
   );
-  return { service, getLead: (db, id) => service.getLead(db, id) };
+  return {
+    service,
+    getLead: (db, id) => service.getLead(db, id),
+    pipeline: (db) => service.pipeline(db),
+    getConversion: (db, period) => service.getConversion(db, period),
+    listOverdueFollowUps: (db, filter) => service.listOverdueFollowUps(db, filter),
+  };
 }
 
 export { registerCrmRoutes, type CrmRouteDeps } from './routes/crm.routes.js';
 export type {
+  ConversionDto,
   FollowUpDto,
   LeadDetailDto,
   LeadDto,

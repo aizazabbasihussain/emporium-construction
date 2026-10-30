@@ -20,7 +20,9 @@
     "issueToCostObject",
     "returnToStore",
     "receiveClientMaterial",
-    "hasIssuesFromGrn"
+    "hasIssuesFromGrn",
+    "listStockWithValue",
+    "listBelowReorder"
   ],
   "consumes": [
     "platform.audit.record",

@@ -151,6 +151,110 @@ describe('listUnapprovedSheets (used by workforce before a worker leaves)', () =
   });
 });
 
+describe('getLabourSummary and getHeadcountSeries (P1-19 BR-4)', () => {
+  const unknownProject = '00000000-0000-0000-0000-000000000000';
+
+  it('sums worker-days and cost per project and month from approved sheets only', async () => {
+    const setup = await kit.setup();
+    // Approved Friday: A is half a day with 2 hours overtime split 25 / 75, B is a full day.
+    await kit.approved(setup, FRIDAY, {
+      entries: [
+        {
+          workerId: setup.workerA.id,
+          status: 'half_day' as const,
+          overtimeHours: '2',
+          allocations: [
+            { projectId: setup.projectA, fraction: '0.25' },
+            { projectId: setup.projectB, fraction: '0.75' },
+          ],
+        },
+        present(setup.workerB.id, setup.projectA),
+      ],
+    });
+    // A draft sheet is not approved attendance.
+    await kit.save(setup, THURSDAY, kit.body(setup));
+
+    const all = await kit.attendance.getLabourSummary(kit.db, '2026-10-01', '2026-10-31');
+    expect(all).toContainEqual({
+      projectId: setup.projectA,
+      month: '2026-10',
+      workerDays: '1.1250',
+      cost: '1500.00',
+    });
+    expect(all).toContainEqual({
+      projectId: setup.projectB,
+      month: '2026-10',
+      workerDays: '0.3750',
+      cost: '375.00',
+    });
+    expect(
+      await kit.attendance.getLabourSummary(kit.db, '2026-10-01', '2026-10-31', setup.projectB),
+    ).toEqual([
+      { projectId: setup.projectB, month: '2026-10', workerDays: '0.3750', cost: '375.00' },
+    ]);
+    expect(
+      await kit.attendance.getLabourSummary(kit.db, '2026-09-01', '2026-09-30', setup.projectB),
+    ).toEqual([]);
+  });
+
+  it('counts overtime with its own project as cost there, with no worker-days', async () => {
+    const setup = await kit.setup();
+    await kit.approved(setup, FRIDAY, {
+      entries: [
+        {
+          workerId: setup.workerA.id,
+          status: 'present' as const,
+          overtimeHours: '2',
+          overtimeProjectId: setup.projectB,
+          allocations: [{ projectId: setup.projectA, fraction: '1' }],
+        },
+      ],
+    });
+    const rows = await kit.attendance.getLabourSummary(kit.db, FRIDAY, FRIDAY);
+    expect(rows.filter((r) => r.projectId === setup.projectA)).toEqual([
+      { projectId: setup.projectA, month: '2026-10', workerDays: '1.0000', cost: '1000.00' },
+    ]);
+    expect(rows.filter((r) => r.projectId === setup.projectB)).toEqual([
+      { projectId: setup.projectB, month: '2026-10', workerDays: '0.0000', cost: '375.00' },
+    ]);
+  });
+
+  it('refuses a bad or oversized period', async () => {
+    expect(await codeOf(kit.attendance.getLabourSummary(kit.db, 'x', FRIDAY))).toBe('invalid_date');
+    expect(await codeOf(kit.attendance.getLabourSummary(kit.db, FRIDAY, THURSDAY))).toBe(
+      'period_invalid',
+    );
+    expect(await codeOf(kit.attendance.getLabourSummary(kit.db, '2025-01-01', FRIDAY))).toBe(
+      'period_too_long',
+    );
+    expect(
+      await codeOf(kit.attendance.getHeadcountSeries(kit.db, unknownProject, FRIDAY, THURSDAY)),
+    ).toBe('period_invalid');
+  });
+
+  it('lists the headcount of each approved day, leaving out days without attendance', async () => {
+    const setup = await kit.setup();
+    const third = await kit.worker();
+    await kit.members(setup.teamId, [setup.workerA.id, setup.workerB.id, third.id]);
+    await kit.approved(setup, FRIDAY, {
+      entries: [
+        present(setup.workerA.id, setup.projectA),
+        present(setup.workerB.id, setup.projectA, { status: 'half_day' }),
+        { workerId: third.id, status: 'absent' as const },
+      ],
+    });
+    // Submitted but not approved: not part of the series.
+    const pending = await kit.save(setup, THURSDAY, kit.body(setup));
+    await kit.submit(pending.id);
+    expect(
+      await kit.attendance.getHeadcountSeries(kit.db, setup.projectA, THURSDAY, FRIDAY),
+    ).toEqual([{ date: FRIDAY, headcount: 2 }]);
+    expect(
+      await kit.attendance.getHeadcountSeries(kit.db, setup.projectB, THURSDAY, FRIDAY),
+    ).toEqual([]);
+  });
+});
+
 describe('missing and unapproved sheets (BR-9, T-6)', () => {
   it('reports weekdays without a sheet, skipping weekends, holidays and teams without members', async () => {
     const setup = await kit.setup();

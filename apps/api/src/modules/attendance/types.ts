@@ -102,6 +102,21 @@ export interface UnapprovedSheetsDto {
 }
 
 /** What `getApprovedAttendance` returns to wages: one item per worker and approved day. */
+/** P1-19 BR-4: worker-days and labour cost of one project in one month (approved attendance). */
+export interface LabourSummaryDto {
+  projectId: string;
+  /** `yyyy-mm`. */
+  month: string;
+  workerDays: string;
+  cost: string;
+}
+
+/** P1-19 BR-4: the workers on a project on one date. */
+export interface HeadcountDto {
+  date: string;
+  headcount: number;
+}
+
 export interface ApprovedDayDto {
   sheetId: string;
   teamId: string;

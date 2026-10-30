@@ -1,6 +1,7 @@
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 import {
+  assertReportPeriod,
   compareCells,
   compareOverspend,
   costStatus,
@@ -184,6 +185,19 @@ describe('overdue and compliance (BR-3, BR-5)', () => {
     });
     expect(dprCompliance([], ['2026-10-24']).percentSubmitted).toBeNull();
     expect(dprCompliance(['2026-10-19'], ['2026-10-19']).percentSubmitted).toBe('100.00');
+  });
+});
+
+describe('report period', () => {
+  it('accepts a year at most, in order, with real dates', () => {
+    expect(codeOf(() => assertReportPeriod('2026-01-01', '2026-12-31'))).toBe('no error');
+    expect(codeOf(() => assertReportPeriod('2026-10-25', '2026-10-25'))).toBe('no error');
+    expect(codeOf(() => assertReportPeriod('2026-10-25', '2026-10-24'))).toBe('period_invalid');
+    expect(codeOf(() => assertReportPeriod('2026-01-01', '2027-06-01'))).toBe('period_too_long');
+    expect(codeOf(() => assertReportPeriod('2026-01-01', '2026-02-20', 30))).toBe(
+      'period_too_long',
+    );
+    expect(codeOf(() => assertReportPeriod('x', '2026-02-20'))).toBe('invalid_date');
   });
 });
 

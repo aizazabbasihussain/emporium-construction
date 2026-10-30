@@ -45,6 +45,21 @@ export interface StockDto {
   quantity: string;
 }
 
+/** P1-19 BR-2: a balance with its value; the value of client-owned stock is null (not ours). */
+export interface StockValueRowDto extends StockDto {
+  value: string | null;
+}
+
+/** P1-19 BR-2: company stock below its reorder level. */
+export interface BelowReorderDto {
+  storeId: string;
+  itemId: string;
+  level: string;
+  quantity: string;
+  /** level - quantity */
+  shortfall: string;
+}
+
 export interface LedgerDto {
   id: string;
   seq: number;

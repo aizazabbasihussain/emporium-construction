@@ -15,6 +15,9 @@ export interface Inventory {
   returnToStore: InventoryService['stock']['returnToStore'];
   receiveClientMaterial: InventoryService['stock']['receiveClientMaterial'];
   hasIssuesFromGrn: InventoryService['stock']['hasIssuesFromGrn'];
+  /** Query interfaces for the stock reports (spec P1-19 BR-2, BR-7). */
+  listStockWithValue: InventoryService['stock']['listStockWithValue'];
+  listBelowReorder: InventoryService['stock']['listBelowReorder'];
 }
 
 /**
@@ -35,11 +38,16 @@ export function createInventory(deps: InventoryDeps): Inventory {
     returnToStore: (cmd, actor, tx) => service.stock.returnToStore(cmd, actor, tx),
     receiveClientMaterial: (cmd, actor, tx) => service.stock.receiveClientMaterial(cmd, actor, tx),
     hasIssuesFromGrn: (db, grnId) => service.stock.hasIssuesFromGrn(db, grnId),
+    listStockWithValue: (db, filter) => service.stock.listStockWithValue(db, filter),
+    listBelowReorder: (db, filter) => service.stock.listBelowReorder(db, filter),
   };
 }
 
 export { registerInventoryRoutes, type InventoryRouteDeps } from './routes/inventory.routes.js';
+export type { StockFilter } from './repo/inventory.repo.js';
 export type {
+  BelowReorderDto,
+  StockValueRowDto,
   ClientMaterialDto,
   CountDto,
   IntegrityReport,

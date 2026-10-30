@@ -164,6 +164,71 @@ export async function searchStock(
   return { rows, total: countOf(total) };
 }
 
+export interface StockFilter {
+  /** Limits the rows to the stores of these projects (a scope-limited caller). */
+  projectIds?: readonly string[] | undefined;
+  storeId?: string | undefined;
+  itemId?: string | undefined;
+  ownership?: string | undefined;
+}
+
+function stockClause(filter: StockFilter, column: (name: string) => string) {
+  const params: unknown[] = [];
+  const where = ['true'];
+  const add = (sql: string, value: unknown) => {
+    params.push(value);
+    where.push(sql.replace('?', `$${params.length}`));
+  };
+  if (filter.projectIds !== undefined) {
+    add(
+      `${column('store_id')} in (select id from inv_stores where project_id = any(?::uuid[]))`,
+      filter.projectIds,
+    );
+  }
+  if (filter.storeId !== undefined) add(`${column('store_id')} = ?`, filter.storeId);
+  if (filter.itemId !== undefined) add(`${column('item_id')} = ?`, filter.itemId);
+  if (filter.ownership !== undefined) add(`${column('ownership')} = ?`, filter.ownership);
+  return { where: where.join(' and '), params };
+}
+
+/** P1-19 BR-2: every balance that matches, without paging. */
+export function listBalances(db: Db, filter: StockFilter): Promise<BalanceRow[]> {
+  const { where, params } = stockClause(filter, (name) => name);
+  return db.query<BalanceRow>(
+    `select ${BALANCE_COLUMNS} from inv_balances where ${where}
+      order by store_id, item_id, ownership, owner_party_id, id`,
+    params,
+  );
+}
+
+export interface BelowReorderRow {
+  store_id: string;
+  item_id: string;
+  level: string;
+  quantity: string;
+}
+
+/**
+ * P1-19 BR-2: the company stock below its reorder level. An item with a level and no balance row
+ * has nothing in the store, so it counts as zero.
+ */
+export function listBelowReorderRows(db: Db, filter: StockFilter): Promise<BelowReorderRow[]> {
+  const { where, params } = stockClause(
+    { projectIds: filter.projectIds, storeId: filter.storeId, itemId: filter.itemId },
+    (name) => `l.${name}`,
+  );
+  return db.query<BelowReorderRow>(
+    `select l.store_id, l.item_id, l.level::text as level,
+            coalesce(b.quantity, 0)::text as quantity
+       from inv_reorder_levels l
+       left join inv_balances b on b.store_id = l.store_id and b.item_id = l.item_id
+                               and b.ownership = 'company'
+      where ${where} and coalesce(b.quantity, 0) < l.level
+      order by l.store_id, l.item_id`,
+    params,
+  );
+}
+
 /** What the balances of company stock add up to in one store and item. */
 export async function balanceOf(db: Db, key: BalanceKey): Promise<string> {
   const rows = await db.query<{ quantity: string }>(

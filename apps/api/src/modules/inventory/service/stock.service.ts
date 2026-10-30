@@ -28,6 +28,8 @@ import {
   hasOutflowSince,
   insertIssue,
   integrityRows,
+  listBalances,
+  listBelowReorderRows,
   listClientMaterial,
   listLedgerBySource,
   recordIssueReturn,
@@ -35,10 +37,12 @@ import {
   searchStock,
   type IssueRow,
   type LedgerRow,
+  type StockFilter,
   type StoreRow,
 } from '../repo/inventory.repo.js';
 import type {
   Actor,
+  BelowReorderDto,
   ClientMaterialDto,
   Db,
   IntegrityReport,
@@ -47,6 +51,7 @@ import type {
   PageResult,
   StockDto,
   StockEventPayload,
+  StockValueRowDto,
 } from '../types.js';
 import type { Context } from './context.js';
 import { ledgerDtoOf, pageOf } from './support.js';
@@ -637,6 +642,40 @@ export function createStockService(ctx: Context) {
         total,
         query,
       );
+    },
+
+    /**
+     * Module interface `listStockWithValue(filter)` (P1-19 BR-2): every balance, company-owned stock
+     * valued by the valuation engine and client-owned stock by quantity only.
+     */
+    async listStockWithValue(db: Db, filter: StockFilter = {}): Promise<StockValueRowDto[]> {
+      const rows = await listBalances(db, filter);
+      const result: StockValueRowDto[] = [];
+      for (const row of rows) {
+        result.push({
+          storeId: row.store_id,
+          itemId: row.item_id,
+          ownership: row.ownership as Ownership,
+          ownerPartyId: row.owner_party_id,
+          quantity: row.quantity,
+          value:
+            row.ownership === 'company'
+              ? (await valuation.getStockValue(db, row.store_id, row.item_id)).value
+              : null,
+        });
+      }
+      return result;
+    },
+
+    /** Module interface `listBelowReorder(filter)` (P1-19 BR-2): company stock below its level. */
+    async listBelowReorder(db: Db, filter: StockFilter = {}): Promise<BelowReorderDto[]> {
+      return (await listBelowReorderRows(db, filter)).map((row) => ({
+        storeId: row.store_id,
+        itemId: row.item_id,
+        level: row.level,
+        quantity: fmtQty(new D(row.quantity)),
+        shortfall: fmtQty(new D(row.level).minus(row.quantity)),
+      }));
     },
 
     async listLedger(db: Db, query: LedgerQuery, actor: Actor): Promise<PageResult<LedgerDto>> {

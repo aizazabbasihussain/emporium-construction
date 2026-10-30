@@ -20,7 +20,8 @@
     "registerProcurementRoutes",
     "getPurchaseOrder",
     "listOpenPoLines",
-    "getGrn"
+    "getGrn",
+    "listOpenRequisitions"
   ],
   "consumes": [
     "platform.audit.record",

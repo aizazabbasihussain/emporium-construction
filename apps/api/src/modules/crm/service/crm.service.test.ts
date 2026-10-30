@@ -527,6 +527,102 @@ describe('follow-ups (BR-4, BR-5; T-2, T-3; AC-3)', () => {
   });
 });
 
+describe('conversion and overdue follow-ups (P1-19 BR-6)', () => {
+  const at = (iso: string) => {
+    kit.now.current = new Date(iso);
+  };
+  const restore = () => at('2026-10-25T10:00:00Z');
+
+  it('counts leads won and lost per month in Karachi time and rates them', async () => {
+    const party = await createParty('Conversion Client', '03005550077');
+    try {
+      // Created in 2024 so no other test's lead falls into the period.
+      at('2024-03-10T08:00:00Z');
+      const winA = await newLead({ partyId: party.id });
+      const winB = await newLead({ partyId: party.id });
+      const lose = await newLead();
+      const stillOpen = await newLead();
+      await move(winA, 'won');
+      // 20:00 UTC on 31 March is 01:00 on 1 April in Karachi: it counts in April.
+      at('2024-03-31T20:00:00Z');
+      await move(winB, 'won');
+      at('2024-04-12T08:00:00Z');
+      await move(lose, 'lost', { lossReasonCode: 'price' });
+      expect(stillOpen.stageKind).toBe('open');
+
+      const result = await service().getConversion(kit.db, {
+        from: '2024-03-01',
+        to: '2024-05-31',
+      });
+      expect(result).toEqual({
+        from: '2024-03-01',
+        to: '2024-05-31',
+        won: 2,
+        lost: 1,
+        rate: '66.67',
+        months: [
+          { month: '2024-03', won: 1, lost: 0, rate: '100.00' },
+          { month: '2024-04', won: 1, lost: 1, rate: '50.00' },
+          { month: '2024-05', won: 0, lost: 0, rate: null },
+        ],
+      });
+      const narrow = await service().getConversion(kit.db, {
+        from: '2024-04-01',
+        to: '2024-04-30',
+      });
+      expect([narrow.won, narrow.lost, narrow.rate]).toEqual([1, 1, '50.00']);
+      const empty = await service().getConversion(kit.db, { from: '2023-01-01', to: '2023-01-31' });
+      expect([empty.won, empty.lost, empty.rate]).toEqual([0, 0, null]);
+    } finally {
+      restore();
+    }
+  });
+
+  it('refuses a bad or oversized period', async () => {
+    await expect(
+      service().getConversion(kit.db, { from: '2026-02-01', to: '2026-01-01' }),
+    ).rejects.toMatchObject({ code: 'period_invalid' });
+    await expect(
+      service().getConversion(kit.db, { from: '2020-01-01', to: '2026-01-01' }),
+    ).rejects.toMatchObject({ code: 'period_too_long' });
+    await expect(
+      service().getConversion(kit.db, { from: 'x', to: '2026-01-01' }),
+    ).rejects.toMatchObject({ code: 'invalid_date' });
+  });
+
+  it('lists the open follow-ups past their due date, oldest first, and no others', async () => {
+    const lead = await newLead();
+    const late = await tx((db) =>
+      service().addFollowUp(lead.id, { dueDate: '2026-10-20' }, actor(), db),
+    );
+    const later = await tx((db) =>
+      service().addFollowUp(lead.id, { dueDate: '2026-10-24' }, actor(), db),
+    );
+    const today = await tx((db) =>
+      service().addFollowUp(lead.id, { dueDate: '2026-10-25' }, actor(), db),
+    );
+    const done = await tx((db) =>
+      service().addFollowUp(lead.id, { dueDate: '2026-10-21' }, actor(), db),
+    );
+    await tx((db) => service().completeFollowUp(done.id, done.version, actor(), db));
+    const ids = (await service().listOverdueFollowUps(kit.db)).map((f) => f.id);
+    expect(ids).toContain(late.id);
+    expect(ids).toContain(later.id);
+    expect(ids).not.toContain(today.id);
+    expect(ids).not.toContain(done.id);
+    expect(ids.indexOf(late.id)).toBeLessThan(ids.indexOf(later.id));
+    const first = (await service().listOverdueFollowUps(kit.db)).find((f) => f.id === late.id);
+    expect(first).toMatchObject({ leadId: lead.id, dueDate: '2026-10-20', overdue: true });
+    const mine = await service().listOverdueFollowUps(kit.db, { assignedTo: late.assignedTo });
+    expect(mine.map((f) => f.id)).toContain(late.id);
+    expect(
+      await service().listOverdueFollowUps(kit.db, {
+        assignedTo: '018f0000-0000-7000-8000-000000000999',
+      }),
+    ).toEqual([]);
+  });
+});
+
 describe('lists and the pipeline (BR-5, T-5; AC-4)', () => {
   it('filters, sorts and pages the lead list', async () => {
     const lead = await newLead({
