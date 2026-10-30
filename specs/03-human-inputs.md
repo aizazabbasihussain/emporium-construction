@@ -7,8 +7,8 @@ Status: `open` or `answered`. "Default allowed": whether the agent may proceed w
 | ID | Decision | Owner | Needed by | Default allowed | Default | Status |
 |---|---|---|---|---|---|---|
 | H-01 | Tax registrations: FBR number(s); is PRA registration needed for Punjab work; registration numbers per authority | Accountant | P1-05, P2-01 | no | none | answered |
-| H-02 | Sales tax rules and rates by authority, service type and location (effective-dated) | Accountant | P2-01 | no | none | open |
-| H-03 | Withholding tax rules: tax withheld by clients; tax withheld from vendors and subcontractors; rates and bases | Accountant | P2-01 | no | none | open |
+| H-02 | Sales tax rules and rates by authority, service type and location (effective-dated) | Accountant | P2-01 | yes | FBR only; one sales tax rule of 8% on services, loaded as data (not seeded); rules effective-dated and editable | open |
+| H-03 | Withholding tax rules: tax withheld by clients; tax withheld from vendors and subcontractors; rates and bases | Accountant | P2-01 | yes | no withholding rules until an admin enters them; the engine and screens are fully configurable | open |
 | H-04 | Tax-invoice numbering: format, series per authority, must it be gapless | Accountant | P1-01, P2-02 | no | none | answered |
 | H-05 | Chart of accounts (codes, names, types) | Accountant | P0-03, P2-09 | no | none | answered |
 | H-06 | Fiscal year start month | Accountant | P2-09 | yes | July | open |
@@ -18,13 +18,13 @@ Status: `open` or `answered`. "Default allowed": whether the agent may proceed w
 | H-10 | Role holders: which people hold which roles | Owner | P1-02 | no | none | answered |
 | H-11 | Wage rules: working-days basis per month (26 or 30), overtime multiplier, rounding of net pay | Owner, accountant | P1-17, P1-18 | yes | working-days basis 26, overtime multiplier 1.5, net pay rounded to nearest PKR 1; all editable settings, not constants | open |
 | H-12 | Worker pay basis and rates (daily rate or monthly salary) | Owner | P1-16 | yes | build with synthetic data; rates are per worker, effective-dated and entered by an admin from the screen, none in code | open |
-| H-13 | Opening data: cash, bank, receivables, payables, advances, PDCs, stock, open projects, workers, vendors, clients | Accountant, owner | P0-04, P2-10 | no | none | open |
+| H-13 | Opening data: cash, bank, receivables, payables, advances, PDCs, stock, open projects, workers, vendors, clients | Accountant, owner | P0-04, P2-10 | yes | synthetic opening data via the import templates; real balances loaded later through the importer | open |
 | H-14 | Samples of paper forms (quotation, site report, voucher, labour register, attendance sheet, invoice) | Owner | P0-02 | yes | specs' own fields | open |
 | H-15 | Job templates and unit rates (boundary wall, room, slab, demolition, others) | Owner | P1-07 | yes | build the editor and evaluator; templates are data loaded by an admin, rates empty, overhead 10%, contingency 5%, margin 15% as editable settings | open |
 | H-16 | Lead sources, pipeline stages, loss reasons | Owner | P1-06 | yes | stages: New, Visited, Quoted, Negotiation, Won, Lost | open |
 | H-17 | Government contract terms: Pakistan-only storage wording, backups covered or not | Owner | Phase 4 | no | none | open |
 | H-18 | Hosting provider shortlist and quotes | Owner | Phase 4 | no | none | open |
-| H-19 | Independent reviewer for security and financial logic | Owner | P1-21, P2-10 | no | none | open |
+| H-19 | Independent reviewer for security and financial logic | Owner | P1-21, P2-10 | yes | build proceeds; reviewer is named before Gate A and Gate B sign-off | open |
 | H-20 | Maintenance billing model (per job, per visit, time and materials), SLA targets, rate cards, parts markup | Owner | P3-01, P3-04 | no | none | open |
 | H-21 | Salvaged material valuation: zero or estimated value | Accountant | P1-12 | yes | zero value | open |
 | H-22 | Purchase price variance handling (bill price differs from receipt price) | Accountant | P2-05 | yes | variance charged to project cost if issued, else to an overhead cost code | open |
@@ -51,3 +51,4 @@ Details behind each `answered` row. Dated 2026-10-24, given by the owner. Nothin
 - **H-05** Answered provisionally 2026-10-27. The owner accepted the draft in `docs/decisions/chart-of-accounts-draft.md` as it stands, to unblock the build; the accountant has not reviewed it yet. The owner may change it later, so the chart must be editable from the UI (see the proposal in `CHANGES.md`). When the accountant reviews it, any changes are made from the UI, not by a new build.
 - **H-12** Partly answered 2026-10-25. Permanent workers and supervisors are paid monthly; daily-wage and contractor workers daily. Contractor labour is paid as a total on the contractor bill and not tracked per worker. Rates must be configurable, not fixed. Worker records are entered by an admin from the screen. Defaults and open points are in `docs/decisions/h12-h15-owner-answers-and-defaults.md`. Status stays `open` until real rates are loaded.
 - **H-15** Partly answered 2026-10-25. Common jobs are demolition and restructuring (about 10 a year each); pricing is both lump sum and per unit; material prices come from the market. Template contents and the percentages were left to us; assumed values are in `docs/decisions/h12-h15-owner-answers-and-defaults.md`. Status stays `open` until the owner confirms real templates and rates.
+- **H-02, H-03, H-13, H-19** Partly answered 2026-10-30 by the owner. FBR only; the bill carries 8% tax. A withholding of 8% on the bill was also mentioned (to confirm what it is). Withholding we apply to vendors and subcontractors, opening data, the independent reviewer and the remaining Phase 2 inputs use defaults, to be revisited. Everything must stay configurable and extensible. Details and assumptions in `docs/decisions/phase2-owner-answers-and-defaults.md`. Statuses stay `open` until the accountant confirms.
