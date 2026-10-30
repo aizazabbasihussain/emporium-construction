@@ -124,6 +124,18 @@ export const settingRegistry: SettingRegistry = {
     description: 'Cost code that attendance labour cost is booked on unless a line names another',
     default: '200',
   },
+  // P1-18 BR-2: daily-rate workers are paid for off days and paid leave only when this is on.
+  'wages.pay_off_days_daily': {
+    type: 'boolean',
+    description: 'Whether daily-rate workers are paid for off days and paid leave',
+    default: false,
+  },
+  // P1-18 BR-7, H-11: net pay is rounded to the nearest rupee; the difference is kept on the line.
+  'wages.round_net_to_rupee': {
+    type: 'boolean',
+    description: 'Whether net pay is rounded to the nearest rupee (H-11)',
+    default: true,
+  },
   // P1-12 BR-7, H-21: salvaged material enters stock at zero value unless the owner chooses estimates.
   'inventory.salvage_value_mode': {
     type: 'string',

@@ -70,6 +70,10 @@ import { TransitionsPage } from './valuation/TransitionsPage';
 import { GridPage } from './attendance/GridPage';
 import { MissingPage } from './attendance/MissingPage';
 import { SheetsPage } from './attendance/SheetsPage';
+import { WageAdvancesPage } from './wages/AdvancesPage';
+import { WagePeriodsPage } from './wages/PeriodsPage';
+import { WageReconciliationPage } from './wages/ReconciliationPage';
+import { WageSheetPage } from './wages/SheetPage';
 import { MyTeamsPage } from './workforce/MyTeamsPage';
 import { TeamBoardPage } from './workforce/TeamBoardPage';
 import { WorkerPage } from './workforce/WorkerPage';
@@ -279,6 +283,13 @@ export function AppRoutes() {
           path="/attendance/missing"
           element={guarded('/attendance/missing', <MissingPage />)}
         />
+        <Route path="/wages/periods" element={guarded('/wages/periods', <WagePeriodsPage />)} />
+        <Route path="/wages/periods/:id" element={guarded('/wages/periods', <WageSheetPage />)} />
+        <Route
+          path="/wages/periods/:id/reconciliation"
+          element={guarded('/wages/periods', <WageReconciliationPage />)}
+        />
+        <Route path="/wages/advances" element={guarded('/wages/advances', <WageAdvancesPage />)} />
         <Route
           path="/valuation/settings"
           element={guarded('/valuation/settings', <ValuationSettingsPage />)}

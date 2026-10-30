@@ -241,3 +241,16 @@ export {
   type StoreKind,
   type TransferStatus,
 } from './inventory.js';
+export {
+  adjustmentKinds,
+  periodStatuses,
+  wageAdvanceStatuses,
+  wagePeriodDocType,
+  wagesPermissionGrants,
+  wagesPermissions,
+  wagesSettingKeys,
+  type AdjustmentKind,
+  type PeriodStatus,
+  type WageAdvanceStatus,
+  type WagesPermission,
+} from './wages.js';

@@ -26,6 +26,7 @@ try {
     dpr,
     workforce,
     attendance,
+    wages,
     approvals,
     files,
     localFileStore,
@@ -54,6 +55,7 @@ try {
     dpr: { db, dpr, platform },
     workforce: { db, workforce, platform },
     attendance: { db, attendance, platform },
+    wages: { db, wages, platform },
   });
   await app.listen({ port: config.port, host: '0.0.0.0' });
   startScheduler(runtime, logger);
