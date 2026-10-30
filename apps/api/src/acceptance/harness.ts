@@ -46,6 +46,8 @@ export interface Harness {
   app: FastifyInstance;
   now: { current: Date };
   userId(key: PilotUserKey): string;
+  /** A signed bearer token for a pilot user (for requests that are not JSON, such as uploads). */
+  tokenFor(user: PilotUserKey): Promise<string>;
   /** A request as the given user; `body` is sent as JSON. */
   call<T = Record<string, unknown>>(
     user: PilotUserKey | null,
@@ -128,6 +130,7 @@ export async function createHarness(
     runtime,
     app,
     now,
+    tokenFor,
     userId: (userKey) => uid([...PILOT_USERS, NOBODY].find((u) => u.key === userKey)?.n ?? 0),
     async call(user, method, url, body, headers = {}) {
       const response = await app.inject({
