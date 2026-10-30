@@ -23,6 +23,7 @@ export const filesApi = {
     entityId: string,
     file: File,
     caption: string,
+    idempotencyKey?: string,
   ): Promise<Attachment> => {
     const form = new FormData();
     form.append('entityType', entityType);
@@ -30,7 +31,7 @@ export const filesApi = {
     if (caption.trim() !== '') form.append('caption', caption.trim());
     if (file.lastModified > 0) form.append('takenAt', new Date(file.lastModified).toISOString());
     form.append('file', file, file.name);
-    return (await (await rawRequest('POST', '/files', form)).json()) as Attachment;
+    return (await (await rawRequest('POST', '/files', form, idempotencyKey)).json()) as Attachment;
   },
   url: (id: string) => request<{ url: string; expiresAt: string }>('GET', `/files/${id}/url`),
   remove: (id: string, version: number) =>

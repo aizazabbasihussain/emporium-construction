@@ -20,11 +20,19 @@ export function setTokenProvider(provider: TokenProvider): void {
 }
 
 /** Authenticated call that returns the raw response: file downloads and multipart uploads. */
-export async function rawRequest(method: string, path: string, body?: FormData): Promise<Response> {
+export async function rawRequest(
+  method: string,
+  path: string,
+  body?: FormData,
+  idempotencyKey?: string,
+): Promise<Response> {
   const token = await tokenProvider();
   const response = await fetch(`${baseUrl}${path}`, {
     method,
-    headers: token === null ? {} : { authorization: `Bearer ${token}` },
+    headers: {
+      ...(token === null ? {} : { authorization: `Bearer ${token}` }),
+      ...(idempotencyKey === undefined ? {} : { 'idempotency-key': idempotencyKey }),
+    },
     ...(body === undefined ? {} : { body }),
   });
   if (!response.ok) {
@@ -40,13 +48,22 @@ export async function rawRequest(method: string, path: string, body?: FormData):
   return response;
 }
 
-export async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+/**
+ * `idempotencyKey` is fixed by the offline queue so a retried request is recognized by the server;
+ * every other call gets a fresh key.
+ */
+export async function request<T>(
+  method: string,
+  path: string,
+  body?: unknown,
+  idempotencyKey: string = crypto.randomUUID(),
+): Promise<T> {
   const token = await tokenProvider();
   const response = await fetch(`${baseUrl}${path}`, {
     method,
     headers: {
       'content-type': 'application/json',
-      'idempotency-key': crypto.randomUUID(),
+      'idempotency-key': idempotencyKey,
       ...(token === null ? {} : { authorization: `Bearer ${token}` }),
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),

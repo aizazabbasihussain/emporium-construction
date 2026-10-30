@@ -20,6 +20,9 @@ import { AuthProvider, directionOf } from './auth/AuthProvider';
 import type { AuthClient } from './auth/client';
 import { i18n } from './i18n';
 import { AppLayout } from './shell/AppLayout';
+import type { OfflineDb } from './offline/db';
+import { OfflineProvider } from './offline/OfflineProvider';
+import { UnsentPage } from './offline/UnsentPage';
 import { NotFoundPage } from './shell/ErrorPages';
 import { RequireAnyPermission, RequireAuth, RequirePermission } from './shell/guards';
 import { MissingReportsPage } from './dpr/MissingReportsPage';
@@ -93,7 +96,16 @@ function DirectionProvider({ children }: { children: ReactNode }) {
   return <ConfigProvider direction={direction}>{children}</ConfigProvider>;
 }
 
-export function AppProviders({ auth, children }: { auth: AuthClient; children: ReactNode }) {
+export function AppProviders({
+  auth,
+  children,
+  openOfflineDb,
+}: {
+  auth: AuthClient;
+  children: ReactNode;
+  /** Tests pass a fake device database; the browser's IndexedDB is used otherwise. */
+  openOfflineDb?: () => Promise<OfflineDb>;
+}) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -107,7 +119,11 @@ export function AppProviders({ auth, children }: { auth: AuthClient; children: R
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={queryClient}>
         <DirectionProvider>
-          <AuthProvider client={auth}>{children}</AuthProvider>
+          <AuthProvider client={auth}>
+            <OfflineProvider {...(openOfflineDb ? { openDb: openOfflineDb } : {})}>
+              {children}
+            </OfflineProvider>
+          </AuthProvider>
         </DirectionProvider>
       </QueryClientProvider>
     </I18nextProvider>
@@ -139,6 +155,7 @@ export function AppRoutes() {
           path="/admin/number-series"
           element={guarded('/admin/number-series', <NumberSeriesPage />)}
         />
+        <Route path="/offline/unsent" element={<UnsentPage />} />
         <Route path="/approvals" element={guarded('/approvals', <ApprovalsInboxPage />)} />
         <Route
           path="/admin/approval-rules"

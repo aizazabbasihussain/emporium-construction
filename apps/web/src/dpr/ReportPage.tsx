@@ -3,6 +3,7 @@ import {
   dprReportEntityType,
   dprWeathers,
   formatDate,
+  submittedConflict,
 } from '@emporium/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Alert, Button, Descriptions, Input, Select, Space, Tag, Typography } from 'antd';
@@ -11,6 +12,10 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
 import { AttachmentUploader } from '../files/AttachmentUploader';
+import { DraftBanner } from '../offline/DraftBanner';
+import { useOffline, type SubmitResult } from '../offline/OfflineProvider';
+import { QueuedPhotos } from '../offline/QueuedPhotos';
+import { useDraft } from '../offline/useDraft';
 import { projectsApi } from '../projects/api';
 import { dprApi, type Report } from './api';
 import {
@@ -36,10 +41,20 @@ function ReportForm({ report }: { report: Report | undefined }) {
   const [reviewNote, setReviewNote] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const offline = useOffline();
+  // BR-2: the form is kept on the device as it is typed; only a user's own change starts saving.
+  const slot = useDraft<ReportDraft>('dpr', report === undefined ? 'new' : report.id);
+  const [touched, setTouched] = useState(false);
+  const [photoRound, setPhotoRound] = useState(0);
+  const saveSlot = slot.save;
 
   useEffect(() => {
     if (report !== undefined) setDraft(draftOf(report));
   }, [report]);
+
+  useEffect(() => {
+    if (touched) saveSlot(draft);
+  }, [draft, touched, saveSlot]);
 
   const projects = useQuery({
     queryKey: ['projects', 'all'],
@@ -56,23 +71,67 @@ function ReportForm({ report }: { report: Report | undefined }) {
   const editable = mine && (isNew || ['draft', 'reopened'].includes(report.status));
   const canReview = !isNew && report.status === 'submitted' && can(perm.reportReview);
 
-  const patch = (change: Partial<ReportDraft>) =>
+  const patch = (change: Partial<ReportDraft>) => {
+    setTouched(true);
     setDraft((current) => ({ ...current, ...change }));
+  };
+  // BR-8: the server's submitted report wins; a draft for that date cannot replace it.
+  const sameProject = useQuery({
+    queryKey: ['dpr-reports', 'project', draft.projectId],
+    queryFn: () => dprApi.reports({ projectId: draft.projectId }),
+    enabled: isNew && draft.projectId !== '' && offline.online,
+  });
+  const conflict = isNew && submittedConflict(draft.reportDate, sameProject.data?.items ?? []);
   const fail = (cause: unknown) => {
     setMessage(null);
     setError(errorText(cause));
   };
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['dpr-reports'] });
 
+  /** BR-3: a new report goes through the retry queue, so a lost connection never loses it. */
+  const afterQueued = async (result: SubmitResult) => {
+    if (result.status === 'sent') {
+      setError(null);
+      setMessage(t('dpr.saved'));
+      await slot.clear();
+      await refresh();
+      void navigate(`/dpr/reports/${result.item.resultId}`);
+    } else if (result.status === 'queued') {
+      setError(null);
+      setMessage(t('offline.savedWillSend'));
+      await slot.clear();
+      setDraft(emptyDraft(karachiToday()));
+      setTouched(false);
+      setPhotoRound((round) => round + 1);
+    } else {
+      // BR-4: the server refused it; the form comes back as typed, with the reason.
+      await offline.editAndResend(result.item);
+      setPhotoRound((round) => round + 1);
+      setMessage(null);
+      setError(result.item.lastError ?? t('common.saveError'));
+    }
+  };
+
   const save = useMutation({
-    mutationFn: () =>
-      report === undefined
-        ? dprApi.create(draft.projectId, draft.reportDate, bodyOf(draft))
-        : dprApi.update(report.id, report.version, bodyOf(draft)),
+    mutationFn: async (): Promise<Report | SubmitResult> => {
+      if (report !== undefined) return dprApi.update(report.id, report.version, bodyOf(draft));
+      if (!offline.available) {
+        return dprApi.create(draft.projectId, draft.reportDate, bodyOf(draft));
+      }
+      return offline.submit({
+        method: 'POST',
+        url: '/dpr/reports',
+        body: { projectId: draft.projectId, reportDate: draft.reportDate, ...bodyOf(draft) },
+        source: { formType: 'dpr', draftKey: slot.key, path: '/dpr/reports/new', payload: draft },
+      });
+    },
     onSuccess: async (next) => {
+      if ('status' in next && 'item' in next) return afterQueued(next);
       setError(null);
       setMessage(t('dpr.saved'));
       await refresh();
+      await slot.clear();
+      setTouched(false);
       if (report === undefined) void navigate(`/dpr/reports/${next.id}`);
       else queryClient.setQueryData(['dpr-reports', 'one', next.id], next);
     },
@@ -112,6 +171,24 @@ function ReportForm({ report }: { report: Report | undefined }) {
         {isNew ? t('dpr.new') : formatDate(report.reportDate)}{' '}
         {!isNew && <Tag>{t(`dpr.status.${report.status}`)}</Tag>}
       </Typography.Title>
+      {editable && (
+        <DraftBanner
+          draft={slot}
+          onRestore={(restored) => {
+            // A draft saved by an older version of the form still opens: missing fields are blank.
+            setDraft({ ...emptyDraft(karachiToday()), ...restored });
+            setTouched(true);
+          }}
+        />
+      )}
+      {conflict && (
+        <Alert
+          type="warning"
+          showIcon
+          message={t('offline.conflict')}
+          style={{ marginBottom: 12 }}
+        />
+      )}
       {error !== null && <Alert type="error" message={error} style={{ marginBottom: 12 }} />}
       {message !== null && <Alert type="success" message={message} style={{ marginBottom: 12 }} />}
       {!isNew && report.reviewNote !== null && (
@@ -358,7 +435,7 @@ function ReportForm({ report }: { report: Report | undefined }) {
           {editable && can(isNew ? perm.reportCreate : perm.reportUpdateOwn) && (
             <Button
               type="primary"
-              disabled={saveIssue !== null}
+              disabled={saveIssue !== null || conflict}
               loading={save.isPending}
               onClick={() => save.mutate()}
             >
@@ -424,7 +501,9 @@ function ReportForm({ report }: { report: Report | undefined }) {
         )}
 
         <Typography.Title level={5}>{t('dpr.photos.title')}</Typography.Title>
-        {isNew ? (
+        {isNew && offline.available ? (
+          <QueuedPhotos key={photoRound} draftKey={slot.key} />
+        ) : isNew ? (
           <Typography.Text type="secondary">{t('dpr.photos.hint')}</Typography.Text>
         ) : (
           <AttachmentUploader entityType={dprReportEntityType} entityId={report.id} />

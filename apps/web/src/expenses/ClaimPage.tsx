@@ -13,6 +13,9 @@ import { useAuth } from '../auth/AuthProvider';
 import { useLineReferences } from '../estimation/lists';
 import { AttachmentUploader } from '../files/AttachmentUploader';
 import { filesApi } from '../files/api';
+import { DraftBanner } from '../offline/DraftBanner';
+import { useOffline, type SubmitResult } from '../offline/OfflineProvider';
+import { useDraft } from '../offline/useDraft';
 import { projectsApi } from '../projects/api';
 import { expensesApi, type Claim } from './api';
 import {
@@ -24,6 +27,12 @@ import {
   type LineDraft,
 } from './ClaimLinesGrid';
 import { useErrorText } from './shared';
+
+/** The claim form as typed. */
+interface ClaimDraft {
+  note: string;
+  lines: LineDraft[];
+}
 
 function ReverseDialog({
   error,
@@ -84,6 +93,7 @@ function ClaimForm({ claim }: { claim: Claim | undefined }) {
   );
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [queued, setQueued] = useState(false);
   const [acknowledge, setAcknowledge] = useState(false);
   const [reversing, setReversing] = useState(false);
 
@@ -116,14 +126,69 @@ function ClaimForm({ claim }: { claim: Claim | undefined }) {
   const refresh = () => queryClient.invalidateQueries({ queryKey: ['expense-claims'] });
   const body = () => ({ note: note.trim(), lines: lines.map(lineOf) });
 
+  // BR-2: the claim is kept on the device as it is typed and offered back after a reload.
+  const offline = useOffline();
+  const slot = useDraft<ClaimDraft>('expense', claim === undefined ? 'new' : claim.id);
+  const saveSlot = slot.save;
+  const [touched, setTouched] = useState(false);
+  const editNote = (value: string) => {
+    setTouched(true);
+    setNote(value);
+  };
+  const editLines = (value: LineDraft[]) => {
+    setTouched(true);
+    setLines(value);
+  };
+  useEffect(() => {
+    if (touched) saveSlot({ note, lines });
+  }, [note, lines, touched, saveSlot]);
+
   const save = useMutation({
-    mutationFn: () =>
-      claim === undefined
-        ? expensesApi.createClaim(body())
-        : expensesApi.updateClaim(claim.id, claim.version, body()),
+    // BR-3: a new claim goes through the retry queue, so a lost connection never loses it.
+    mutationFn: async (): Promise<Claim | SubmitResult> => {
+      if (claim !== undefined) return expensesApi.updateClaim(claim.id, claim.version, body());
+      if (!offline.available) return expensesApi.createClaim(body());
+      return offline.submit({
+        method: 'POST',
+        url: '/expenses/claims',
+        body: body(),
+        source: {
+          formType: 'expense',
+          draftKey: slot.key,
+          path: '/expenses/claims/new',
+          payload: { note, lines },
+        },
+      });
+    },
     onSuccess: async (next) => {
+      if ('item' in next) {
+        if (next.status === 'queued') {
+          setError(null);
+          setSaved(false);
+          setQueued(true);
+          setNote('');
+          setLines([emptyLine(today)]);
+          setTouched(false);
+          await slot.clear();
+          return;
+        }
+        if (next.status === 'failed') {
+          await offline.editAndResend(next.item);
+          setSaved(false);
+          setError(next.item.lastError ?? t('common.saveError'));
+          return;
+        }
+        setError(null);
+        setSaved(true);
+        await refresh();
+        void navigate(`/expenses/claims/${next.item.resultId}`);
+        return;
+      }
       setError(null);
       setSaved(true);
+      setQueued(false);
+      setTouched(false);
+      await slot.clear();
       await refresh();
       if (claim === undefined) void navigate(`/expenses/claims/${next.id}`);
     },
@@ -167,6 +232,24 @@ function ClaimForm({ claim }: { claim: Claim | undefined }) {
         {claim?.number ?? t('expenses.claims.new')}{' '}
         {status !== undefined && <Tag>{t(`expenses.status.${status}`)}</Tag>}
       </Typography.Title>
+      {editable && (
+        <DraftBanner
+          draft={slot}
+          onRestore={(restored) => {
+            setNote(restored.note);
+            setLines(restored.lines);
+            setTouched(true);
+          }}
+        />
+      )}
+      {queued && (
+        <Alert
+          type="success"
+          showIcon
+          message={t('offline.savedWillSend')}
+          style={{ marginBottom: 12 }}
+        />
+      )}
       {error !== null && <Alert type="error" message={error} style={{ marginBottom: 12 }} />}
       {saved && <Alert type="success" message={t('common.saved')} style={{ marginBottom: 12 }} />}
       {claim !== undefined && (
@@ -201,7 +284,7 @@ function ClaimForm({ claim }: { claim: Claim | undefined }) {
           rows={2}
           disabled={!editable}
           value={note}
-          onChange={(event) => setNote(event.target.value)}
+          onChange={(event) => editNote(event.target.value)}
         />
         <ClaimLinesGrid
           lines={lines}
@@ -213,7 +296,7 @@ function ClaimForm({ claim }: { claim: Claim | undefined }) {
           }))}
           receiptOptions={receiptOptions}
           readOnly={!editable}
-          onChange={setLines}
+          onChange={editLines}
         />
         {problem !== null && editable && (
           <Alert type="warning" message={t(`expenses.lines.${problem}`)} />

@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { ApiError, setTokenProvider } from '../admin/api';
 import { identityApi, type Profile } from './api';
 import type { AuthClient } from './client';
+import { cacheProfile, cachedProfile, clearCachedProfile } from './profileCache';
 
 export type SignInResult = 'ok' | 'bad_credentials' | 'no_account' | 'error';
 
@@ -53,12 +54,14 @@ export function AuthProvider({ client, children }: { client: AuthClient; childre
   // BR-9: signing out drops the profile and every cached query.
   const signedOut = useCallback(() => {
     profileRef.current = null;
+    clearCachedProfile();
     queryClient.clear();
     setState({ status: 'signedOut', profile: null });
   }, [queryClient]);
 
   const adopt = useCallback((profile: Profile) => {
     profileRef.current = profile;
+    cacheProfile(profile);
     void i18nRef.current.changeLanguage(profile.locale);
     setState({ status: 'signedIn', profile });
   }, []);
@@ -73,7 +76,11 @@ export function AuthProvider({ client, children }: { client: AuthClient; childre
     void (async () => {
       let profile: Profile | null = null;
       if ((await client.getAccessToken()) !== null) {
-        profile = await identityApi.me().catch(() => null);
+        // An answer from the server (even a refusal) decides; only a missing connection falls back
+        // to the last known profile, so the shell opens offline.
+        profile = await identityApi
+          .me()
+          .catch((cause: unknown) => (cause instanceof ApiError ? null : cachedProfile()));
       }
       if (!active) return;
       if (profile === null) signedOut();

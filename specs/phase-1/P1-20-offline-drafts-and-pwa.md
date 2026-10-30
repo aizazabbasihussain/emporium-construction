@@ -3,7 +3,7 @@ id: P1-20
 title: Offline-tolerant drafts and PWA
 phase: 1
 module: pwa
-status: not-started
+status: done
 depends_on: [P1-15, P1-17, P1-14]
 requires_inputs: []
 ---
