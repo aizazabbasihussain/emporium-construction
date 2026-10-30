@@ -4,8 +4,10 @@ import { configure } from '@testing-library/react';
 // Ant Design renders slowly when the whole suite runs in parallel; allow for it.
 configure({ asyncUtilTimeout: 5000 });
 
+// Tests of the device storage layer run in plain Node (`@vitest-environment node`), which has no
+// window; everything below is for the jsdom tests only.
 // jsdom has no matchMedia; Ant Design's responsive components need it.
-if (!window.matchMedia) {
+if (typeof window !== 'undefined' && !window.matchMedia) {
   window.matchMedia = (query: string): MediaQueryList =>
     ({
       matches: false,

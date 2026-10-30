@@ -5,6 +5,9 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
+import { DraftBanner } from '../offline/DraftBanner';
+import { useOffline, type SubmitResult } from '../offline/OfflineProvider';
+import { useDraft } from '../offline/useDraft';
 import { projectsApi } from '../projects/api';
 import { attendanceApi, type Sheet } from './api';
 import {
@@ -39,6 +42,7 @@ export function GridPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [unlocking, setUnlocking] = useState(false);
   const [reason, setReason] = useState('');
+  const offline = useOffline();
 
   const teams = useQuery({ queryKey: ['attendance-teams'], queryFn: attendanceApi.teams });
   const projects = useQuery({
@@ -79,11 +83,48 @@ export function GridPage() {
     setError(errorText(cause));
   };
 
+  // BR-2: the grid is kept on the device as it is edited and offered back after a reload.
+  const slot = useDraft<RowDraft[]>('attendance', `${teamId}:${date}`);
+  const saveSlot = slot.save;
+  useEffect(() => {
+    if (dirty) saveSlot(rows);
+  }, [rows, dirty, saveSlot]);
+
   const save = useMutation({
-    mutationFn: () => attendanceApi.save(teamId, date, sheetBody(rows, sheet?.version)),
-    onSuccess: async () => {
+    // BR-3: the grid goes through the retry queue, so a lost connection never loses it.
+    mutationFn: async (): Promise<SubmitResult | null> => {
+      const body = sheetBody(rows, sheet?.version);
+      if (!offline.available) {
+        await attendanceApi.save(teamId, date, body);
+        return null;
+      }
+      return offline.submit({
+        method: 'PUT',
+        url: `/attendance/sheets/${teamId}/${date}`,
+        body,
+        source: {
+          formType: 'attendance',
+          draftKey: slot.key,
+          path: `/attendance/grid?team=${teamId}&date=${date}`,
+          payload: rows,
+        },
+      });
+    },
+    onSuccess: async (result) => {
+      if (result?.status === 'queued') {
+        setError(null);
+        setMessage(t('offline.savedWillSend'));
+        return;
+      }
+      if (result?.status === 'failed') {
+        await offline.editAndResend(result.item);
+        setMessage(null);
+        setError(result.item.lastError ?? t('common.saveError'));
+        return;
+      }
       setError(null);
       setMessage(t('attendance.grid.saved'));
+      await slot.clear();
       await refresh();
     },
     onError: fail,
@@ -173,6 +214,15 @@ export function GridPage() {
       </Space>
       {(teams.isError || grid.isError) && (
         <Alert type="error" message={t('common.loadError')} style={{ marginBottom: 12 }} />
+      )}
+      {!readOnly && (
+        <DraftBanner
+          draft={slot}
+          onRestore={(restored) => {
+            setRows(restored);
+            setDirty(true);
+          }}
+        />
       )}
       {error !== null && <Alert type="error" message={error} style={{ marginBottom: 12 }} />}
       {message !== null && <Alert type="success" message={message} style={{ marginBottom: 12 }} />}
