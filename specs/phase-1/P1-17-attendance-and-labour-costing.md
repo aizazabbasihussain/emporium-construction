@@ -15,7 +15,7 @@ Supervisors record daily attendance for their team, assigning each worker's day 
 
 ## 2. Boundary
 - Owns: tables `att_*`, `packages/domain/attendance`, module `attendance`.
-- Provides: `getApprovedAttendance(workerId, from, to)`, `getAttendanceHeadcount(projectId, date)`, `getUnapprovedSheets(period)`, events `attendance.approved`, `attendance.unlocked`.
+- Provides: `getApprovedAttendance(workerId, from, to)`, `getAttendanceHeadcount(projectId, date)`, `getUnapprovedSheets(period)`, events `attendance.approved`, `attendance.unlocked`. Added 2026-10-30 by approved CHANGES entry (P1-19 interfaces), built in the P1-19 PR with tests in this module: `getLabourSummary(from, to, projectId?)` (worker-days and cost per project per month) and `getHeadcountSeries(projectId, from, to)`.
 - Consumes: workforce (teams, members, rates), projects (`postCost`, status, scope), approvals, kernel.
 - Must not: compute payroll (P1-18) or edit worker records.
 - Out of scope: biometric devices, geofencing, leave balances, work-order allocation (enabled by P3-02), overtime approval workflows beyond the sheet approval.

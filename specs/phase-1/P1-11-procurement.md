@@ -15,7 +15,7 @@ Control buying: requisition, quote comparison, purchase order and goods receipt,
 
 ## 2. Boundary
 - Owns: tables `prc_*`, module `procurement`.
-- Provides: `getPurchaseOrder`, `listOpenPoLines`, events `po.approved`, `po.cancelled`, `goods.received` (payload: GRN id, lines with item, quantity, unit cost, destination type store|project, store id or project id, cost code, ownership company), query `getGrn(id)`.
+- Provides: `getPurchaseOrder`, `listOpenPoLines`, events `po.approved`, `po.cancelled`, `goods.received` (payload: GRN id, lines with item, quantity, unit cost, destination type store|project, store id or project id, cost code, ownership company), query `getGrn(id)`. Added 2026-10-30 by approved CHANGES entry (P1-19 interfaces), built in the P1-19 PR with tests in this module: `listOpenRequisitions(filter)`.
 - Consumes: master data, projects (`postCost`, project status), approvals, files, identity scope.
 - Must not: write stock (inventory reacts to `goods.received`) or bills and payments (P2-05).
 - Out of scope: vendor bills, three-way match, payment (P2-05), tax (P2-01), landed costs (BACKLOG), purchase returns to vendor (BACKLOG).

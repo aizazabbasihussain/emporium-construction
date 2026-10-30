@@ -138,6 +138,8 @@ Options for the human to decide: approve and update the P2-09 text, or keep the 
 
 ### 2026-10-30: P1-19 needs query interfaces that four dependency modules do not provide
 
+**Decision 2026-10-30: option 1 accepted by the owner.** The interfaces below are added to inventory, procurement, attendance and CRM in the P1-19 PR, with tests in the owning modules; the Provides lines of P1-06, P1-11, P1-12 and P1-17 and the Boundary of P1-19 are updated to match. Questions settled with it: company-owned stock value comes from `valuation.getStockValue`; a PO line is overdue when its expected date is before today in Asia/Karachi.
+
 Found while starting P1-19 (operational reports). The Boundary says the module consumes "only exported query functions and published `<prefix>_v_*` views", and must not read other modules' tables. Checked against `module.json` and `index.ts` of each dependency, three reports can be built as written and four cannot:
 
 | Report | Source available | Gap |

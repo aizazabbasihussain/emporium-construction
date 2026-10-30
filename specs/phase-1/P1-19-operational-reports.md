@@ -18,6 +18,7 @@ Give owners and managers the core Phase 1 views: where each project stands on co
 - Provides: report endpoints and export files.
 - Consumes: only exported query functions and published `<prefix>_v_*` views of other modules (listed in each module's `module.json`).
 - Must not: read other modules' tables directly or store copies of their data.
+- Cross-module additions (approved in CHANGES 2026-10-30, option 1): this spec's PR also adds the query interfaces listed in the Provides lines of P1-06, P1-11, P1-12 and P1-17, each with tests in the owning module and the owning `module.json` and `index.ts` updated. These are the only changes to those modules.
 - Out of scope: profitability and financial reports (P2-08), accountant exports (P2-09), dashboards (Phase 7).
 
 ## 3. Data model
