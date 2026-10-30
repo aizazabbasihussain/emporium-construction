@@ -254,3 +254,16 @@ export {
   type WageAdvanceStatus,
   type WagesPermission,
 } from './wages.js';
+export {
+  DEFAULT_PAGE_SIZE,
+  EXPORT_ROW_LIMIT,
+  MAX_PAGE_SIZE,
+  reportCodes,
+  reportFormats,
+  reportPermission,
+  reportsPermissionGrants,
+  reportsPermissions,
+  type ReportCode,
+  type ReportFormat,
+  type ReportsPermission,
+} from './reports.js';

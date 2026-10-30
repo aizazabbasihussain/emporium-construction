@@ -5,6 +5,7 @@ import {
   assertLeadEditable,
   assertOnlyNotesChanged,
   assertVisitDate,
+  conversionRate,
   isOverdue,
   normalizeExpectedValue,
   planStageMove,
@@ -186,6 +187,20 @@ describe('expected value', () => {
     expect(sumExpectedValue(['0.10', '0.20', null])).toBe('0.30');
     expect(sumExpectedValue(['100', '2.5'])).toBe('102.50');
     expect(sumExpectedValue(['1.005'])).toBe('1.00');
+  });
+});
+
+describe('conversion rate (P1-19 BR-6)', () => {
+  it('is won over won plus lost as a percentage with two decimals', () => {
+    expect(conversionRate(1, 2)).toBe('33.33');
+    expect(conversionRate(2, 1)).toBe('66.67');
+    expect(conversionRate(3, 0)).toBe('100.00');
+    expect(conversionRate(0, 4)).toBe('0.00');
+    expect(conversionRate(1, 7)).toBe('12.50');
+  });
+
+  it('is empty when nothing was closed', () => {
+    expect(conversionRate(0, 0)).toBeNull();
   });
 });
 
