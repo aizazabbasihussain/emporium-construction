@@ -10,6 +10,11 @@ const Dec = Decimal.clone({ precision: 40, rounding: Decimal.ROUND_HALF_UP });
 const money = (value: Decimal): string =>
   value.toDecimalPlaces(2, Decimal.ROUND_HALF_UP).toFixed(2);
 
+/** `part` over `whole` as a percentage to two decimals, half up; null when there is no whole. */
+export function ratioPercent(part: number, whole: number): string | null {
+  return whole === 0 ? null : money(new Dec(part).div(whole).times(100));
+}
+
 /** The sum of decimal strings, exact to the given number of decimals. Nulls count as nothing. */
 export function sumDecimals(values: readonly (string | null)[], places = 2): string {
   return values
@@ -167,8 +172,7 @@ export function dprCompliance(
     submittedDays,
     missingDays: missingDates.length,
     missingDates,
-    percentSubmitted:
-      expectedDays === 0 ? null : money(new Dec(submittedDays).div(expectedDays).times(100)),
+    percentSubmitted: ratioPercent(submittedDays, expectedDays),
   };
 }
 

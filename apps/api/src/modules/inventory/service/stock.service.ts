@@ -654,6 +654,8 @@ export function createStockService(ctx: Context) {
       for (const row of rows) {
         result.push({
           storeId: row.store_id,
+          storeCode: row.store_code,
+          storeName: row.store_name,
           itemId: row.item_id,
           ownership: row.ownership as Ownership,
           ownerPartyId: row.owner_party_id,
@@ -671,6 +673,8 @@ export function createStockService(ctx: Context) {
     async listBelowReorder(db: Db, filter: StockFilter = {}): Promise<BelowReorderDto[]> {
       return (await listBelowReorderRows(db, filter)).map((row) => ({
         storeId: row.store_id,
+        storeCode: row.store_code,
+        storeName: row.store_name,
         itemId: row.item_id,
         level: row.level,
         quantity: fmtQty(new D(row.quantity)),

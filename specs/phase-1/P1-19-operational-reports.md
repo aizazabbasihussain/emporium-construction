@@ -3,7 +3,7 @@ id: P1-19
 title: Operational reports
 phase: 1
 module: reports
-status: not-started
+status: done
 depends_on: [P1-09, P1-11, P1-12, P1-14, P1-15, P1-17, P1-06]
 requires_inputs: []
 ---

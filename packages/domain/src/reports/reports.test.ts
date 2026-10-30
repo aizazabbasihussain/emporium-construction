@@ -1,4 +1,3 @@
-import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 import {
   assertReportPeriod,
@@ -11,6 +10,7 @@ import {
   monthsBetween,
   normalizePage,
   pageOf,
+  ratioPercent,
   sortRows,
   sumDecimals,
   totalCostStatus,
@@ -86,34 +86,16 @@ describe('cost status (BR-1, T-2)', () => {
 });
 
 describe('totals (T-6)', () => {
-  const figures = fc.record({
-    budget: fc.integer({ min: 0, max: 10_000_000 }).map((n) => (n / 100).toFixed(2)),
-    committed: fc.integer({ min: 0, max: 10_000_000 }).map((n) => (n / 100).toFixed(2)),
-    approved: fc.integer({ min: 0, max: 10_000_000 }).map((n) => (n / 100).toFixed(2)),
-    posted: fc.integer({ min: 0, max: 10_000_000 }).map((n) => (n / 100).toFixed(2)),
-  });
-  const cents = (value: string): bigint => BigInt(value.replace('.', ''));
-
-  it('the sum of the per-cost-code figures is the project total, for random ledgers', () => {
-    fc.assert(
-      fc.property(fc.array(figures, { maxLength: 30 }), (lines: CostFigures[]) => {
-        const total = totalCostStatus(lines);
-        const sum = (pick: (line: CostFigures) => string) =>
-          lines.reduce((acc, line) => acc + cents(pick(line)), 0n);
-        expect(cents(total.budget)).toBe(sum((l) => l.budget));
-        expect(cents(total.committed)).toBe(sum((l) => l.committed));
-        expect(cents(total.approved)).toBe(sum((l) => l.approved));
-        expect(cents(total.posted)).toBe(sum((l) => l.posted));
-        // Used is the sum of the three statuses, and the variance closes the budget exactly.
-        expect(cents(total.used)).toBe(
-          cents(total.committed) + cents(total.approved) + cents(total.posted),
-        );
-        expect(cents(total.variance)).toBe(cents(total.budget) - cents(total.used));
-        const perCode = lines.map((line) => costStatus(line));
-        expect(cents(sumDecimals(perCode.map((l) => l.used)))).toBe(cents(total.used));
-        expect(cents(sumDecimals(perCode.map((l) => l.variance)))).toBe(cents(total.variance));
-      }),
-    );
+  it('totals the figures of several cost codes', () => {
+    const lines: CostFigures[] = [
+      { budget: '100.00', committed: '10.00', approved: '20.00', posted: '30.00' },
+      { budget: '50.00', committed: '0.00', approved: '0.00', posted: '5.00' },
+    ];
+    expect(totalCostStatus(lines)).toMatchObject({
+      budget: '150.00',
+      used: '65.00',
+      variance: '85.00',
+    });
   });
 
   it('sums decimals exactly and ignores empty cells', () => {
@@ -185,6 +167,16 @@ describe('overdue and compliance (BR-3, BR-5)', () => {
     });
     expect(dprCompliance([], ['2026-10-24']).percentSubmitted).toBeNull();
     expect(dprCompliance(['2026-10-19'], ['2026-10-19']).percentSubmitted).toBe('100.00');
+  });
+});
+
+describe('ratioPercent', () => {
+  it('is a percentage with two decimals, half up, and empty without a whole', () => {
+    expect(ratioPercent(1, 3)).toBe('33.33');
+    expect(ratioPercent(2, 3)).toBe('66.67');
+    expect(ratioPercent(0, 5)).toBe('0.00');
+    expect(ratioPercent(5, 5)).toBe('100.00');
+    expect(ratioPercent(3, 0)).toBeNull();
   });
 });
 

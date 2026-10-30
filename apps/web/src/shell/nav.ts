@@ -14,6 +14,7 @@ import {
   platformPermissions,
   procurementPermissions,
   projectsPermissions,
+  reportsPermissions,
   valuationPermissions,
   wagesPermissions,
   workforcePermissions,
@@ -25,6 +26,8 @@ export interface NavItem {
   label: string;
   /** Permission needed to see the item and open the page (BR-10); none means any signed-in user. */
   permission?: string;
+  /** Alternative to `permission`: the item shows when the user holds any one of these. */
+  anyPermission?: readonly string[];
 }
 
 /** Module specs append their pages here with the permission that opens them. */
@@ -222,6 +225,7 @@ export const navItems: readonly NavItem[] = [
     label: 'nav.valuationTransitions',
     permission: valuationPermissions.reportRead,
   },
+  { path: '/reports', label: 'nav.reports', anyPermission: Object.values(reportsPermissions) },
   {
     path: '/admin/settings',
     label: 'nav.settings',

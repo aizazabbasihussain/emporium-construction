@@ -12,7 +12,11 @@ export function AppLayout() {
   const location = useLocation();
 
   // BR-10: an item shows only when the user holds its permission.
-  const visible = navItems.filter((item) => item.permission === undefined || can(item.permission));
+  const visible = navItems.filter((item) =>
+    item.anyPermission !== undefined
+      ? item.anyPermission.some((permission) => can(permission))
+      : item.permission === undefined || can(item.permission),
+  );
   const selected = visible
     .filter(
       (item) =>

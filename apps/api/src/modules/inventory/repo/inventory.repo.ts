@@ -191,17 +191,27 @@ function stockClause(filter: StockFilter, column: (name: string) => string) {
   return { where: where.join(' and '), params };
 }
 
-/** P1-19 BR-2: every balance that matches, without paging. */
-export function listBalances(db: Db, filter: StockFilter): Promise<BalanceRow[]> {
-  const { where, params } = stockClause(filter, (name) => name);
-  return db.query<BalanceRow>(
-    `select ${BALANCE_COLUMNS} from inv_balances where ${where}
-      order by store_id, item_id, ownership, owner_party_id, id`,
+export interface NamedBalanceRow extends BalanceRow {
+  store_code: string;
+  store_name: string;
+}
+
+/** P1-19 BR-2: every balance that matches, with its store, without paging. */
+export function listBalances(db: Db, filter: StockFilter): Promise<NamedBalanceRow[]> {
+  const { where, params } = stockClause(filter, (name) => `b.${name}`);
+  return db.query<NamedBalanceRow>(
+    `select b.id, b.store_id, b.item_id, b.ownership, b.owner_party_id,
+            b.quantity::text as quantity, s.code as store_code, s.name as store_name
+       from inv_balances b join inv_stores s on s.id = b.store_id
+      where ${where}
+      order by s.code, b.item_id, b.ownership, b.owner_party_id, b.id`,
     params,
   );
 }
 
 export interface BelowReorderRow {
+  store_code: string;
+  store_name: string;
   store_id: string;
   item_id: string;
   level: string;
@@ -218,13 +228,14 @@ export function listBelowReorderRows(db: Db, filter: StockFilter): Promise<Below
     (name) => `l.${name}`,
   );
   return db.query<BelowReorderRow>(
-    `select l.store_id, l.item_id, l.level::text as level,
-            coalesce(b.quantity, 0)::text as quantity
+    `select l.store_id, s.code as store_code, s.name as store_name, l.item_id,
+            l.level::text as level, coalesce(b.quantity, 0)::text as quantity
        from inv_reorder_levels l
+       join inv_stores s on s.id = l.store_id
        left join inv_balances b on b.store_id = l.store_id and b.item_id = l.item_id
                                and b.ownership = 'company'
       where ${where} and coalesce(b.quantity, 0) < l.level
-      order by l.store_id, l.item_id`,
+      order by s.code, l.item_id`,
     params,
   );
 }

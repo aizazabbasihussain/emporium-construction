@@ -28,6 +28,7 @@ import { createInventory, type Inventory } from './modules/inventory/index.js';
 import { createProcurement, type Procurement } from './modules/procurement/index.js';
 import { createVariations, type Variations } from './modules/variations/index.js';
 import { createValuation, type Valuation } from './modules/valuation/index.js';
+import { createReports, type Reports } from './modules/reports/index.js';
 import {
   approvalsPermissions,
   crmPermissions,
@@ -46,6 +47,7 @@ import {
   procurementPermissions,
   projectsPermissions,
   quotationsPermissions,
+  reportsPermissions,
   valuationPermissions,
   variationsPermissions,
   wagesPermissions,
@@ -94,6 +96,7 @@ export interface Runtime {
   workforce: Workforce;
   attendance: Attendance;
   wages: Wages;
+  reports: Reports;
   approvals: Approvals;
   files: Files;
   /** Set when FILE_STORE_DRIVER=local: it serves its own signed download links. */
@@ -133,6 +136,7 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
   identity.registerPermissions('workforce', Object.values(workforcePermissions));
   identity.registerPermissions('attendance', Object.values(attendancePermissions));
   identity.registerPermissions('wages', Object.values(wagesPermissions));
+  identity.registerPermissions('reports', Object.values(reportsPermissions));
   const importer = createImporter({ platform, clock, newId: () => uuidv7(clock.now()) });
   const masterData = createMasterData({
     platform,
@@ -318,6 +322,18 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     payments: { hasPaidLines: async () => false },
   });
   lateWages.current = wages;
+  const reports = createReports({
+    platform,
+    clock,
+    newId: () => uuidv7(clock.now()),
+    projects,
+    procurement,
+    inventory,
+    attendance,
+    crm,
+    dpr,
+    masterData,
+  });
   if (config.adminEmail !== undefined) {
     const email = config.adminEmail;
     await db.transaction((tx) => identity.users.ensureAdmin(email, tx));
@@ -340,6 +356,7 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     workforce,
     attendance,
     wages,
+    reports,
     approvals,
     files,
     localFileStore: local,

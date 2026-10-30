@@ -699,7 +699,8 @@ describe('listStockWithValue and listBelowReorder (P1-19 BR-2)', () => {
       ),
     );
     const rows = await kit.inventory.listStockWithValue(kit.db, { storeId: store });
-    expect(rows).toEqual([
+    expect(rows.every((r) => r.storeCode.startsWith('ST-') && r.storeName !== '')).toBe(true);
+    expect(rows).toMatchObject([
       {
         storeId: store,
         itemId: item,
@@ -758,7 +759,8 @@ describe('listStockWithValue and listBelowReorder (P1-19 BR-2)', () => {
       );
     }
     const rows = await kit.inventory.listBelowReorder(kit.db, { storeId: store });
-    expect(rows).toEqual(
+    expect(rows.every((r) => r.storeCode.startsWith('ST-') && r.storeName !== '')).toBe(true);
+    expect(rows).toMatchObject(
       [
         { storeId: store, itemId: low, level: '5.0000', quantity: '3.0000', shortfall: '2.0000' },
         { storeId: store, itemId: none, level: '2.0000', quantity: '0.0000', shortfall: '2.0000' },
