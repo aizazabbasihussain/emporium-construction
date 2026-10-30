@@ -1,0 +1,46 @@
+{
+  "name": "attendance",
+  "tablePrefix": "att_",
+  "ownedTables": ["att_sheets", "att_entries", "att_allocations", "att_worker_days"],
+  "ownedViews": [],
+  "exports": [
+    "createAttendance",
+    "registerAttendanceRoutes",
+    "getApprovedAttendance",
+    "getAttendanceHeadcount",
+    "getUnapprovedSheets",
+    "listUnapprovedSheets"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.events.subscribe",
+    "platform.idempotency.execute",
+    "platform.backdating.check",
+    "platform.settings.get",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "projects.getProject",
+    "projects.postCost",
+    "projects.reverseCost",
+    "approvals.requestApproval",
+    "approvals.getApprovalState",
+    "masterdata.getCostCode",
+    "masterdata.costing.listCostCodes",
+    "workforce.getWorkerRate",
+    "workforce.getTeamMembers",
+    "workforce.getTeam",
+    "workforce.listTeams",
+    "wages.approvedPeriodOf"
+  ],
+  "eventsIn": ["approval.approved", "approval.rejected", "approval.returned", "approval.cancelled"],
+  "eventsOut": ["attendance.approved", "attendance.unlocked", "attendance.sheet.changed"],
+  "permissions": [
+    "attendance.sheet.create",
+    "attendance.sheet.update",
+    "attendance.sheet.read",
+    "attendance.sheet.unlock"
+  ],
+  "notes": "Owns daily attendance sheets (one per team and date), their entries (one per worker and day, with a status, overtime hours and the pay frozen at submission) and the allocations of a worked day across active projects (fractions add up to exactly 1). A supervisor works only on the teams in their scopes and never receives pay or cost amounts; office roles see everything. Entries are limited to members of the team on the date and a worker is on one sheet per date (att_worker_days). Submitting freezes each worker's daily-equivalent rate from workforce, prices present (1 day), half_day (0.5) and overtime (hours x daily rate / 8 x the setting attendance.overtime_multiplier, H-11 default 1.5), and asks the approval engine (document type attendance_sheet, project manager approves, amount = the sheet's labour cost). Approval books one approved cost entry per worker-day-project (idempotency key att:<entry>:<allocation>, a separate att:<entry>:ot line when overtime has its own project) on the labour cost code (setting labour_cost_code, default 200 Labour) of the project cost ledger; rounding is half-up per line and any lost or gained cent is moved to the line rounded furthest the other way so the lines always add up to the day value. Rejected sheets return to the supervisor with the approver's comment. Unlocking an approved sheet needs a reason, reverses its entries and gives its lines new ids; it is refused when the wage period of its date is approved (wages.approvedPeriodOf, an interface P1-18 implements; until then composition passes a stub that reports none). The headcount for a project and date counts workers present or on a half day on submitted and approved sheets. Missing sheets are weekdays (Monday to Friday, not in the setting site_holidays, not in the future) on which an active team with members has no sheet. It computes no payroll and edits no worker record."
+}

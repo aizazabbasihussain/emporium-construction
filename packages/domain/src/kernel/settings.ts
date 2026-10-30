@@ -103,14 +103,26 @@ export const settingRegistry: SettingRegistry = {
     description: 'Site holidays as comma-separated dates (yyyy-mm-dd); no missing-report alert',
     default: '',
   },
-  // P1-16 BR-3, H-11: the working days of a month a monthly salary is divided by. H-11 is still
-  // open and has no default, so 0 means "not decided"; the daily equivalent is refused until set.
+  // P1-16 BR-3, H-11: the working days of a month a monthly salary is divided by. The register
+  // allows the default of 26 until the owner decides; 0 still means "not set" and is refused.
   'workforce.working_days_basis': {
     type: 'integer',
     description: 'Working days in a month that a monthly salary is divided by (H-11); 0 = not set',
-    default: 0,
+    default: 26,
     min: 0,
     max: 31,
+  },
+  // P1-17 BR-5, H-11: overtime is paid at this multiple of the hourly equivalent (daily rate / 8).
+  'attendance.overtime_multiplier': {
+    type: 'string',
+    description: 'Overtime multiplier of the hourly rate (H-11)',
+    default: '1.5',
+  },
+  // P1-17 BR-3, H-25: the cost code (by code) that attendance cost is booked on by default.
+  labour_cost_code: {
+    type: 'string',
+    description: 'Cost code that attendance labour cost is booked on unless a line names another',
+    default: '200',
   },
   // P1-12 BR-7, H-21: salvaged material enters stock at zero value unless the owner chooses estimates.
   'inventory.salvage_value_mode': {

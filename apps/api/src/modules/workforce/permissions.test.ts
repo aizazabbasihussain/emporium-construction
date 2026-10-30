@@ -45,7 +45,9 @@ describe('workforce permissions (spec section 6)', () => {
     expect(tables.every((t) => t.relrowsecurity)).toBe(true);
   });
 
-  it('knows the working-days setting, not decided until the owner answers H-11', async () => {
-    expect((await kit.platform.settings.get(kit.db, 'workforce.working_days_basis')).value).toBe(0);
+  it('knows the working-days setting, 26 until the owner answers H-11', async () => {
+    expect((await kit.platform.settings.get(kit.db, 'workforce.working_days_basis')).value).toBe(
+      26,
+    );
   });
 });

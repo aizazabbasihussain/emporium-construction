@@ -3,7 +3,7 @@ id: P1-17
 title: Attendance and labour costing
 phase: 1
 module: attendance
-status: not-started
+status: done
 depends_on: [P1-16, P1-09, P1-03]
 requires_inputs: [H-11]
 ---

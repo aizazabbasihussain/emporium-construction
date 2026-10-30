@@ -518,6 +518,11 @@ describe('pay rates (BR-2, BR-3, BR-7, T-2)', () => {
       amount: '30000',
       effectiveFrom: '2026-01-01',
     });
+    // The register default is 26 (H-11); 0 means "not set" and is refused.
+    expect(
+      (await kit.workforce.getWorkerRate(kit.db, worker.id, '2026-02-01')).dailyEquivalent,
+    ).toBe('1153.8462');
+    await kit.setSetting('workforce.working_days_basis', 0);
     expect(await codeOf(kit.workforce.getWorkerRate(kit.db, worker.id, '2026-02-01'))).toBe(
       'working_days_basis_not_set',
     );
