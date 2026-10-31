@@ -1,6 +1,11 @@
 import { connect } from '@emporium/db';
 import { createPlatform, uuidv7 } from './modules/platform/index.js';
-import { createIdentity, createJwtVerifier, type Identity } from './modules/identity/index.js';
+import {
+  createIdentity,
+  createJwtVerifier,
+  currentUser,
+  type Identity,
+} from './modules/identity/index.js';
 import { createApprovals, type Approvals } from './modules/approvals/index.js';
 import {
   createFileStore,
@@ -109,7 +114,16 @@ export interface Runtime {
 /** Wires the modules for the running process; each module registers the permissions it owns. */
 export async function createRuntime(config: AppConfig): Promise<Runtime> {
   const { db, close } = connect(config.databaseUrl);
-  const clock = { now: () => new Date() };
+  return wireRuntime(db, close, config);
+}
+
+/** The wiring behind `createRuntime`, for any database (the acceptance suite passes PGlite). */
+export async function wireRuntime(
+  db: Db,
+  close: () => Promise<void>,
+  config: AppConfig,
+  clock: { now: () => Date } = { now: () => new Date() },
+): Promise<Runtime> {
   const platform = createPlatform({ clock });
   const identity = createIdentity({
     platform,
@@ -363,5 +377,33 @@ export async function createRuntime(config: AppConfig): Promise<Runtime> {
     notifications,
     platform,
     close,
+  };
+}
+
+/** The route dependencies of every module for a wired runtime (shared by `main.ts` and the acceptance suite). */
+export function routeDeps(runtime: Runtime) {
+  const { db, platform } = runtime;
+  return {
+    identity: { db, identity: runtime.identity },
+    platform: { db, platform, resolvePrincipal: currentUser },
+    importer: { db, importer: runtime.importer },
+    approvals: { db, approvals: runtime.approvals, platform },
+    files: { db, files: runtime.files, platform, local: runtime.localFileStore },
+    notifications: { db, notifications: runtime.notifications, platform },
+    masterData: { db, masterData: runtime.masterData, platform },
+    crm: { db, crm: runtime.crm, platform },
+    valuation: { db, valuation: runtime.valuation, platform },
+    estimation: { db, estimation: runtime.estimation, platform },
+    quotations: { db, quotations: runtime.quotations, platform },
+    projects: { db, projects: runtime.projects, platform },
+    variations: { db, variations: runtime.variations, platform },
+    procurement: { db, procurement: runtime.procurement, platform },
+    inventory: { db, inventory: runtime.inventory, platform },
+    expenses: { db, expenses: runtime.expenses, platform },
+    dpr: { db, dpr: runtime.dpr, platform },
+    workforce: { db, workforce: runtime.workforce, platform },
+    attendance: { db, attendance: runtime.attendance, platform },
+    wages: { db, wages: runtime.wages, platform },
+    reports: { db, reports: runtime.reports.service, platform },
   };
 }

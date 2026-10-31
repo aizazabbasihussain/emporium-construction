@@ -21,7 +21,10 @@
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm test:tools && pnpm boundaries && pnpm spec:check && pnpm docs:check && pnpm build",
     "module:new": "node tools/module-new.mjs",
     "docs:check": "node tools/docs-check/run.ts",
-    "decisions:check": "tsx packages/db/src/decisions-check/run.ts"
+    "decisions:check": "tsx packages/db/src/decisions-check/run.ts",
+    "seed:synthetic": "pnpm --filter @emporium/api exec tsx --env-file=../../.env src/acceptance/seed-cli.ts",
+    "e2e": "vitest run --project @emporium/api apps/api/src/acceptance/scenario.test.ts && pnpm --filter @emporium/web e2e",
+    "gate:a": "node tools/gate-a/run.ts"
   },
   "lint-staged": {
     "*.{ts,tsx,mjs,cjs,js}": [

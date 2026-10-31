@@ -1,5 +1,5 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": { "types": ["node"], "allowImportingTsExtensions": true },
-  "include": ["__tests__", "docs-check", "vitest.config.ts"]
+  "include": ["__tests__", "docs-check", "gate-a", "vitest.config.ts"]
 }

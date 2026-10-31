@@ -166,6 +166,10 @@ Options for the human to decide:
 
 Smaller points the agent would settle in code unless told otherwise: the stock value of company-owned items comes from `valuation.getStockValue`, not from the reports module; "overdue" for a PO line is an expected date before today in Asia/Karachi.
 
+### 2026-10-31: P1-21 BR-5 wage calculation limit relaxed from 3 to 5 seconds
+
+Decision by the owner, 2026-10-31. The 50-worker wage calculation took about 2.5 s alone but 3.5 to 4.5 s when the whole suite shares the machine (CI run on PR #46 failed at 3.48 s best of three). The limit is now 5 seconds. Only the number changed: `apps/api/src/acceptance/perf.test.ts` and BR-5 in the P1-21 spec. Profiling the wage calculation for a real speed-up is a separate item (BACKLOG).
+
 ### 2026-10-28: detached, supervised autonomous loop
 
 Changes only `tools/agent/loop.mjs` and `specs/04-autonomous-run.md` (tooling; no product behaviour). Reason: the loop ran as a child of the starting process and was lost when that process died or ran out of memory.

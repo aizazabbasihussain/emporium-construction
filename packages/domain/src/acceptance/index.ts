@@ -1,0 +1,15 @@
+export {
+  SYNTHETIC_COUNTS,
+  generateSyntheticCompany,
+  looksLikeRealPersonalData,
+  type SyntheticCategory,
+  type SyntheticCompany,
+  type SyntheticCostCode,
+  type SyntheticItem,
+  type SyntheticOptions,
+  type SyntheticParty,
+  type SyntheticProject,
+  type SyntheticTeam,
+  type SyntheticUser,
+  type SyntheticWorker,
+} from './synthetic.js';

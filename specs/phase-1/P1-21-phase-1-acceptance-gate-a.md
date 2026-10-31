@@ -3,7 +3,7 @@ id: P1-21
 title: Phase 1 acceptance (Gate A, operational pilot)
 phase: 1
 module: acceptance
-status: not-started
+status: done
 depends_on: [P1-10, P1-13, P1-18, P1-19, P1-20]
 requires_inputs: [H-19]
 ---
@@ -28,7 +28,7 @@ None. Test fixtures and documents only.
 - BR-2 The Gate A end-to-end scenario runs through the real API: lead, site visit, estimate from a template, quotation with margin approval, acceptance, project creation, requisition, RFQ, PO approval, partial GRN into a store, issue to project (weighted average and then again after switching to FIFO), client-supplied material receipt and use, variation approved, expense claim approved and posted, supervisor DPR with photos, attendance sheets for a week approved, monthly wage sheet approved, project cost report.
 - BR-3 Expected figures for every step are asserted to the paisa against a hand-calculated worksheet stored in `docs/pilot/gate-a-expected.md`.
 - BR-4 Security checks: every table has RLS deny-all; every route requires authentication; a permission matrix test iterates all routes and roles and compares to the expected matrix file; supervisors cannot read other projects, rates or costs; government project creation fails when the flag is off.
-- BR-5 Performance sanity on synthetic data (6 projects, 50 workers, 3 months): list endpoints respond under 500 ms at the 95th percentile on the test database; wage calculation for 50 workers completes under 3 seconds; ledger and stock queries use indexes (query plans asserted for the five heaviest queries).
+- BR-5 Performance sanity on synthetic data (6 projects, 50 workers, 3 months): list endpoints respond under 500 ms at the 95th percentile on the test database; wage calculation for 50 workers completes under 5 seconds (relaxed from 3 by the owner, 2026-10-31, see CHANGES); ledger and stock queries use indexes (query plans asserted for the five heaviest queries).
 - BR-6 Integrity checks after the scenario: inventory balances equal ledger sums; valuation conservation holds; project cost summary equals the sum of source entries; no orphan outbox events; no failed events.
 - BR-7 Backup and restore rehearsal of the pilot database: dump, restore into a fresh database, rerun integrity checks.
 - BR-8 Independent review: a named reviewer (H-19) receives a review pack (architecture summary, permission matrix, RLS report, ledger and valuation tests list) and records findings in `docs/pilot/review-gate-a.md`; critical findings must be fixed before pilot with private-client data.
