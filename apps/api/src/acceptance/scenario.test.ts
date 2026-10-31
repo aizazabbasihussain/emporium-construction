@@ -3,6 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createHarness, type Harness } from './harness.js';
 import { createTestDb } from '@emporium/db';
 import { dumpDatabase, fingerprint, restoreDatabase } from './backup.js';
+import { expected } from './expected.js';
 import { runIntegrityChecks } from './integrity.js';
 import { client, PNG_BASE64, val, type Client } from './scenario-kit.js';
 
@@ -118,10 +119,10 @@ describe('Gate A scenario', () => {
     s.estimateId = val(estimate.body, 'id');
     // BR-3: cost 250,000.00 + 180,000.00 = 430,000.00; overhead 10% 43,000.00; contingency 5% 21,500.00.
     const summary = await c.send('pm', 'GET', `/estimation/estimates/${s.estimateId}/summary`);
-    expect(val(summary.body, 'totals.companyCost')).toBe('430000.00');
-    expect(val(summary.body, 'totals.overheadAmount')).toBe('43000.00');
-    expect(val(summary.body, 'totals.contingencyAmount')).toBe('21500.00');
-    expect(val(summary.body, 'totals.totalCost')).toBe('494500.00');
+    expect(val(summary.body, 'totals.companyCost')).toBe(expected('estimate.companyCost'));
+    expect(val(summary.body, 'totals.overheadAmount')).toBe(expected('estimate.overhead'));
+    expect(val(summary.body, 'totals.contingencyAmount')).toBe(expected('estimate.contingency'));
+    expect(val(summary.body, 'totals.totalCost')).toBe(expected('estimate.totalCost'));
   });
 
   it('step 3: quotation with margin approval, acceptance and project creation', async () => {
@@ -152,9 +153,10 @@ describe('Gate A scenario', () => {
     });
     await c.deliver();
     expect(val(accepted.body, 'status')).toBe('accepted');
+    expect(val(accepted.body, 'price')).toBe(expected('quotation.price'));
     // BR-3: 30% of 618,125.00 is 185,437.50 and the balance is 432,687.50.
-    expect(val(accepted.body, 'stages.0.amount')).toBe('185437.50');
-    expect(val(accepted.body, 'stages.1.amount')).toBe('432687.50');
+    expect(val(accepted.body, 'stages.0.amount')).toBe(expected('quotation.stage1'));
+    expect(val(accepted.body, 'stages.1.amount')).toBe(expected('quotation.stage2'));
     const projects = await c.send<{ items: { id: string; name: string }[] }>(
       'pm',
       'GET',
@@ -163,7 +165,7 @@ describe('Gate A scenario', () => {
     expect(projects.body.items).toHaveLength(1);
     s.projectId = val(projects.body, 'items.0.id');
     const project = await c.send('pm', 'GET', `/projects/${s.projectId}`);
-    expect(val(project.body, 'originalContractValue')).toBe('618125.00');
+    expect(val(project.body, 'originalContractValue')).toBe(expected('project.contractValue'));
     expect(val(project.body, 'status')).toBe('planning');
     const purl = `/projects/${s.projectId}`;
     await c.send('pm', 'PATCH', purl, {
@@ -226,7 +228,7 @@ describe('Gate A scenario', () => {
     s.poId = val(po.body, 'id');
     s.poLineId = val(po.body, 'lines.0.id');
     // BR-3: 200 bags at 1,240.00 is 248,000.00.
-    expect(val(po.body, 'total')).toBe('248000.00');
+    expect(val(po.body, 'total')).toBe(expected('po1.total'));
     const purlPo = `/procurement/purchase-orders/${s.poId}`;
     await c.send('procurement', 'POST', `${purlPo}/submit`, {
       version: await c.versionOf('procurement', purlPo),
@@ -243,7 +245,7 @@ describe('Gate A scenario', () => {
     await c.deliver();
     s.grnId = val(grn.body, 'id');
     const stock = await c.send('storekeeper', 'GET', '/inventory/stock');
-    expect(val(stock.body, 'items.0.quantity')).toBe('120.0000');
+    expect(val(stock.body, 'items.0.quantity')).toBe(expected('stock.afterGrn1'));
   });
 
   it('step 5: issue to project with weighted average, then FIFO after a policy switch', async () => {
@@ -256,7 +258,7 @@ describe('Gate A scenario', () => {
       costCodeId: s.code100,
       businessDate: '2026-10-26',
     });
-    expect(val(issue.body, 'value')).toBe('62000.00');
+    expect(val(issue.body, 'value')).toBe(expected('issue1.value'));
 
     // The accountant switches the company to FIFO; the owner approves; the transition runs.
     await c.send('accountant', 'POST', '/valuation/policies', {
@@ -267,9 +269,9 @@ describe('Gate A scenario', () => {
     await c.approveInbox('owner');
     const transition = await c.send('accountant', 'POST', '/valuation/transitions/run', {});
     // The 70 bags left (120 - 50) carry over at 70 x 1,240.00 = 86,800.00.
-    expect(val(transition.body, 'items.0.quantity')).toBe('70.0000');
-    expect(val(transition.body, 'items.0.valueBefore')).toBe('86800.00');
-    expect(val(transition.body, 'items.0.valueAfter')).toBe('86800.00');
+    expect(val(transition.body, 'items.0.quantity')).toBe(expected('transition.quantity'));
+    expect(val(transition.body, 'items.0.valueBefore')).toBe(expected('transition.valueBefore'));
+    expect(val(transition.body, 'items.0.valueAfter')).toBe(expected('transition.valueAfter'));
 
     // A second order at 1,300.00: 100 bags, 130,000.00.
     const po2 = await c.send('procurement', 'POST', '/procurement/purchase-orders', {
@@ -278,7 +280,7 @@ describe('Gate A scenario', () => {
       orderDate: '2026-10-26',
       lines: [{ itemId: s.cementId, quantity: '100', rate: '1300', costCodeId: s.code100 }],
     });
-    expect(val(po2.body, 'total')).toBe('130000.00');
+    expect(val(po2.body, 'total')).toBe(expected('po2.total'));
     const po2url = `/procurement/purchase-orders/${val(po2.body, 'id')}`;
     await c.send('procurement', 'POST', `${po2url}/submit`, {
       version: await c.versionOf('procurement', po2url),
@@ -301,9 +303,9 @@ describe('Gate A scenario', () => {
       costCodeId: s.code100,
       businessDate: '2026-10-26',
     });
-    expect(val(fifo.body, 'value')).toBe('112800.00');
+    expect(val(fifo.body, 'value')).toBe(expected('issue2.value'));
     const stock = await c.send('storekeeper', 'GET', '/inventory/stock');
-    expect(val(stock.body, 'items.0.quantity')).toBe('80.0000');
+    expect(val(stock.body, 'items.0.quantity')).toBe(expected('stock.afterIssue2'));
   });
 
   it('step 6: client-supplied material is received and used without cost', async () => {
@@ -335,9 +337,9 @@ describe('Gate A scenario', () => {
     });
     expect(used.body.value ?? null).toBeNull();
     const balance = await c.send('storekeeper', 'GET', `/inventory/client-material/${s.projectId}`);
-    expect(val(balance.body, '0.received')).toBe('40.0000');
-    expect(val(balance.body, '0.used')).toBe('25.0000');
-    expect(val(balance.body, '0.balance')).toBe('15.0000');
+    expect(val(balance.body, '0.received')).toBe(expected('client.received'));
+    expect(val(balance.body, '0.used')).toBe(expected('client.used'));
+    expect(val(balance.body, '0.balance')).toBe(expected('client.balance'));
   });
 
   it('step 7: variation approved by the client', async () => {
@@ -372,8 +374,8 @@ describe('Gate A scenario', () => {
     await c.deliver();
     // BR-3: 618,125.00 + 52,000.00 = 670,125.00.
     const contract = await c.send('pm', 'GET', `/projects/${s.projectId}/contract-value`);
-    expect(val(contract.body, 'approvedPriceImpact')).toBe('52000.00');
-    expect(val(contract.body, 'currentContractValue')).toBe('670125.00');
+    expect(val(contract.body, 'approvedPriceImpact')).toBe(expected('variation.priceImpact'));
+    expect(val(contract.body, 'currentContractValue')).toBe(expected('contract.current'));
   });
 
   it('step 8: site expense claim approved and posted', async () => {
@@ -422,7 +424,9 @@ describe('Gate A scenario', () => {
     // BR-3: site expenses 2,000.00 + 1,500.50 = 3,500.50 posted.
     const summary = await c.send('pm', 'GET', `/projects/${s.projectId}/summary`);
     const lines = val<{ costCodeId: string; posted: string }[]>(summary.body, 'lines');
-    expect(lines.find((line) => line.costCodeId === s.code500)?.posted).toBe('3500.50');
+    expect(lines.find((line) => line.costCodeId === s.code500)?.posted).toBe(
+      expected('expense.total'),
+    );
   });
 
   it('step 9: supervisor daily progress report with photos', async () => {
@@ -543,13 +547,13 @@ describe('Gate A scenario', () => {
     const lines = await c.send('accountant', 'GET', `/wages/periods/${s.periodId}/lines`);
     // BR-3: mason 6 x 1,500.00 + 2 h overtime at 1,500 / 8 x 1.5 = 281.25 -> 9,562.50, net 9,563.00;
     // helper 5 x 1,000.00; foreman 39,000 / 26 = 1,500.00 x 5.5 days = 8,250.00.
-    expect(val(lines.body, 'lines.0.basicPay')).toBe('9000.00');
-    expect(val(lines.body, 'lines.0.overtimePay')).toBe('562.50');
-    expect(val(lines.body, 'lines.0.netPay')).toBe('9563.00');
-    expect(val(lines.body, 'lines.1.netPay')).toBe('5000.00');
-    expect(val(lines.body, 'lines.2.netPay')).toBe('8250.00');
-    expect(val(lines.body, 'totals.grossPay')).toBe('22812.50');
-    expect(val(lines.body, 'totals.netPay')).toBe('22813.00');
+    expect(val(lines.body, 'lines.0.basicPay')).toBe(expected('wage.mason.basic'));
+    expect(val(lines.body, 'lines.0.overtimePay')).toBe(expected('wage.mason.overtime'));
+    expect(val(lines.body, 'lines.0.netPay')).toBe(expected('wage.mason.net'));
+    expect(val(lines.body, 'lines.1.netPay')).toBe(expected('wage.helper.net'));
+    expect(val(lines.body, 'lines.2.netPay')).toBe(expected('wage.foreman.net'));
+    expect(val(lines.body, 'totals.grossPay')).toBe(expected('wage.gross'));
+    expect(val(lines.body, 'totals.netPay')).toBe(expected('wage.net'));
     const purl = `/wages/periods/${s.periodId}`;
     await c.send('accountant', 'POST', `${purl}/submit`, {
       version: await c.versionOf('accountant', purl),
@@ -565,15 +569,15 @@ describe('Gate A scenario', () => {
     const report = await c.send('pm', 'GET', `/reports/project-cost?projectId=${s.projectId}`);
     // BR-3: budget 250,000.00 + (180,000.00 + 40,000.00 variation cost) = 470,000.00; posted stock
     // 62,000.00 + 112,800.00 = 174,800.00 and expenses 3,500.50; approved labour 22,812.50.
-    expect(val(summary.body, 'budget')).toBe('470000.00');
-    expect(val(summary.body, 'totals.posted')).toBe('178300.50');
-    expect(val(summary.body, 'totals.approved')).toBe('22812.50');
-    expect(val(report.body, 'totals.budget')).toBe('470000.00');
-    expect(val(report.body, 'totals.posted')).toBe('178300.50');
-    expect(val(report.body, 'totals.approved')).toBe('22812.50');
-    expect(val(report.body, 'totals.used')).toBe('201113.00');
-    expect(val(report.body, 'totals.variance')).toBe('268887.00');
-    expect(val(report.body, 'totals.percentUsed')).toBe('42.79');
+    expect(val(summary.body, 'budget')).toBe(expected('cost.budget'));
+    expect(val(summary.body, 'totals.posted')).toBe(expected('cost.posted'));
+    expect(val(summary.body, 'totals.approved')).toBe(expected('cost.approved'));
+    expect(val(report.body, 'totals.budget')).toBe(expected('cost.budget'));
+    expect(val(report.body, 'totals.posted')).toBe(expected('cost.posted'));
+    expect(val(report.body, 'totals.approved')).toBe(expected('cost.approved'));
+    expect(val(report.body, 'totals.used')).toBe(expected('cost.used'));
+    expect(val(report.body, 'totals.variance')).toBe(expected('cost.variance'));
+    expect(val(report.body, 'totals.percentUsed')).toBe(expected('cost.percentUsed'));
   });
 
   it('step 12b: supervisors see only their own projects and no rates or costs (BR-4)', async () => {

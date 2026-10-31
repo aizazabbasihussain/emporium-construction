@@ -3,7 +3,7 @@ id: P1-21
 title: Phase 1 acceptance (Gate A, operational pilot)
 phase: 1
 module: acceptance
-status: not-started
+status: done
 depends_on: [P1-10, P1-13, P1-18, P1-19, P1-20]
 requires_inputs: [H-19]
 ---
