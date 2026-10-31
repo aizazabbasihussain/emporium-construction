@@ -28,6 +28,11 @@ import { createDpr, type Dpr } from './modules/dpr/index.js';
 import { createWorkforce, type Workforce } from './modules/workforce/index.js';
 import { createAttendance, type Attendance } from './modules/attendance/index.js';
 import { createWages, type Wages } from './modules/wages/index.js';
+import {
+  createWorkerPortal,
+  ensureWorkerRole,
+  type WorkerPortal,
+} from './modules/workerportal/index.js';
 import { createExpenses, type Expenses } from './modules/expenses/index.js';
 import { createInventory, type Inventory } from './modules/inventory/index.js';
 import { createProcurement, type Procurement } from './modules/procurement/index.js';
@@ -56,6 +61,7 @@ import {
   valuationPermissions,
   variationsPermissions,
   wagesPermissions,
+  workerportalPermissions,
 } from '@emporium/shared';
 import { randomUUID } from 'node:crypto';
 import { createRemoteJWKSet } from 'jose';
@@ -101,6 +107,7 @@ export interface Runtime {
   workforce: Workforce;
   attendance: Attendance;
   wages: Wages;
+  workerPortal: WorkerPortal;
   reports: Reports;
   approvals: Approvals;
   files: Files;
@@ -151,6 +158,8 @@ export async function wireRuntime(
   identity.registerPermissions('attendance', Object.values(attendancePermissions));
   identity.registerPermissions('wages', Object.values(wagesPermissions));
   identity.registerPermissions('reports', Object.values(reportsPermissions));
+  identity.registerPermissions('workerportal', Object.values(workerportalPermissions));
+  await ensureWorkerRole(identity, db);
   const importer = createImporter({ platform, clock, newId: () => uuidv7(clock.now()) });
   const masterData = createMasterData({
     platform,
@@ -336,6 +345,14 @@ export async function wireRuntime(
     payments: { hasPaidLines: async () => false },
   });
   lateWages.current = wages;
+  const workerPortal = createWorkerPortal({
+    platform,
+    clock,
+    identity,
+    workforce,
+    attendance,
+    wages,
+  });
   const reports = createReports({
     platform,
     clock,
@@ -370,6 +387,7 @@ export async function wireRuntime(
     workforce,
     attendance,
     wages,
+    workerPortal,
     reports,
     approvals,
     files,
@@ -404,6 +422,7 @@ export function routeDeps(runtime: Runtime) {
     workforce: { db, workforce: runtime.workforce, platform },
     attendance: { db, attendance: runtime.attendance, platform },
     wages: { db, wages: runtime.wages, platform },
+    workerPortal: { db, workerPortal: runtime.workerPortal, platform },
     reports: { db, reports: runtime.reports.service, platform },
   };
 }

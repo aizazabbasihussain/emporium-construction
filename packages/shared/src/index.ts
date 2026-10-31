@@ -255,6 +255,12 @@ export {
   type WagesPermission,
 } from './wages.js';
 export {
+  WORKER_ROLE,
+  workerportalPermissionGrants,
+  workerportalPermissions,
+  type WorkerportalPermission,
+} from './workerportal.js';
+export {
   DEFAULT_PAGE_SIZE,
   EXPORT_ROW_LIMIT,
   MAX_PAGE_SIZE,

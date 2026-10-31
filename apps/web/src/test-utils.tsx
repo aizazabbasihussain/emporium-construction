@@ -19,6 +19,7 @@ import {
   valuationPermissions,
   variationsPermissions,
   wagesPermissions,
+  workerportalPermissions,
   workforcePermissions,
 } from '@emporium/shared';
 import type { AuthClient } from './auth/client';
@@ -45,6 +46,7 @@ export const allPermissions: string[] = [
   ...Object.values(workforcePermissions),
   ...Object.values(attendancePermissions),
   ...Object.values(wagesPermissions),
+  ...Object.values(workerportalPermissions),
   ...Object.values(reportsPermissions),
 ];
 

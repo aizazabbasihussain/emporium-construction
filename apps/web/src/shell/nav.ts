@@ -17,6 +17,7 @@ import {
   reportsPermissions,
   valuationPermissions,
   wagesPermissions,
+  workerportalPermissions,
   workforcePermissions,
 } from '@emporium/shared';
 
@@ -210,6 +211,21 @@ export const navItems: readonly NavItem[] = [
   },
   { path: '/wages/periods', label: 'nav.wagesPeriods', permission: wagesPermissions.periodRead },
   { path: '/wages/advances', label: 'nav.wagesAdvances', permission: wagesPermissions.periodRead },
+  {
+    path: '/me/worker/attendance',
+    label: 'nav.workerAttendance',
+    permission: workerportalPermissions.selfRead,
+  },
+  {
+    path: '/me/worker/advances',
+    label: 'nav.workerAdvances',
+    permission: workerportalPermissions.selfRead,
+  },
+  {
+    path: '/me/worker/wages',
+    label: 'nav.workerWages',
+    permission: workerportalPermissions.selfRead,
+  },
   {
     path: '/valuation/settings',
     label: 'nav.valuationSettings',
