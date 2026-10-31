@@ -3,7 +3,7 @@ id: P1-22
 title: Worker self-service login
 phase: 1
 module: workerportal
-status: not-started
+status: done
 depends_on: [P1-02, P1-16, P1-17, P1-18]
 requires_inputs: []
 ---

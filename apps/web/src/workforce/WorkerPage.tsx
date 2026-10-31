@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
+import { WorkerAccountControl } from '../workerportal/AccountControl';
 import { workforceApi, type Rate } from './api';
 import {
   emptyRate,
@@ -190,6 +191,8 @@ export function WorkerPage() {
           </Button>
         </Space>
       )}
+
+      <WorkerAccountControl workerId={id} />
     </div>
   );
 }

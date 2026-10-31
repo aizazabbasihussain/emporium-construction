@@ -16,6 +16,9 @@
   "PATCH /admin/users/:id": ["admin"],
   "PUT /admin/users/:id/roles": ["admin"],
   "PUT /admin/users/:id/scopes": ["admin"],
+  "DELETE /admin/workers/:id/account": ["admin"],
+  "GET /admin/workers/:id/account": ["admin"],
+  "PUT /admin/workers/:id/account": ["admin"],
   "GET /approvals/inbox": ["admin", "owner", "pm", "procurement", "accountant"],
   "POST /approvals/requests": ["admin", "owner"],
   "GET /approvals/requests/:id": [
@@ -445,6 +448,9 @@
     "coordinator",
     "nobody"
   ],
+  "GET /me/worker/advances": [],
+  "GET /me/worker/attendance": [],
+  "GET /me/worker/wages": [],
   "GET /notifications": [
     "admin",
     "owner",

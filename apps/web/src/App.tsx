@@ -80,6 +80,9 @@ import { WageAdvancesPage } from './wages/AdvancesPage';
 import { WagePeriodsPage } from './wages/PeriodsPage';
 import { WageReconciliationPage } from './wages/ReconciliationPage';
 import { WageSheetPage } from './wages/SheetPage';
+import { WorkerAdvancesPage } from './workerportal/AdvancesPage';
+import { WorkerAttendancePage } from './workerportal/AttendancePage';
+import { WorkerWagesPage } from './workerportal/WagesPage';
 import { MyTeamsPage } from './workforce/MyTeamsPage';
 import { TeamBoardPage } from './workforce/TeamBoardPage';
 import { WorkerPage } from './workforce/WorkerPage';
@@ -310,6 +313,15 @@ export function AppRoutes() {
           element={guarded('/wages/periods', <WageReconciliationPage />)}
         />
         <Route path="/wages/advances" element={guarded('/wages/advances', <WageAdvancesPage />)} />
+        <Route
+          path="/me/worker/attendance"
+          element={guarded('/me/worker/attendance', <WorkerAttendancePage />)}
+        />
+        <Route
+          path="/me/worker/advances"
+          element={guarded('/me/worker/advances', <WorkerAdvancesPage />)}
+        />
+        <Route path="/me/worker/wages" element={guarded('/me/worker/wages', <WorkerWagesPage />)} />
         <Route
           path="/valuation/settings"
           element={guarded('/valuation/settings', <ValuationSettingsPage />)}

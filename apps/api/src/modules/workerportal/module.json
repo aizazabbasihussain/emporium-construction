@@ -1,0 +1,27 @@
+{
+  "name": "workerportal",
+  "tablePrefix": "wkp_",
+  "ownedTables": ["wkp_worker_accounts"],
+  "ownedViews": [],
+  "exports": ["createWorkerPortal", "ensureWorkerRole", "registerWorkerPortalRoutes"],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.idempotency.execute",
+    "identity.requirePermission",
+    "identity.requireAdminRole",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "identity.users.list",
+    "identity.registerRole",
+    "identity.roles.setPermissions",
+    "workforce.getWorker",
+    "attendance.getApprovedAttendance",
+    "wages.getApprovedWageSheet",
+    "wages.getWorkerAdvanceBalance"
+  ],
+  "eventsIn": [],
+  "eventsOut": ["workerportal.account.changed"],
+  "permissions": ["workerportal.self.read", "workerportal.account.manage"],
+  "notes": "Lets a labourer log in on a phone and read only their own records. An admin links one login (a user holding the worker role) to one worker record; every /me/worker query takes the worker from that link, never from the request, and answers 403 to a login with no link or whose worker has left (access ends at the end of the left date). The worker sees their approved attendance by month (date, status, overtime hours; no money, project or team), their open advance balance with the advance recoveries of the last twelve approved wage sheets, and their own line of a wage sheet only while that sheet is approved. Nothing is written by the worker and no rate of any worker is shown. Linking a login that holds other roles besides worker needs the admin's confirmation; every link change is audited and emitted as workerportal.account.changed."
+}

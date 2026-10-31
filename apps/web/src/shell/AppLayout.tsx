@@ -9,8 +9,15 @@ import { InstallPrompt } from '../offline/InstallPrompt';
 import { useOffline } from '../offline/OfflineProvider';
 import { SyncStatusBar } from '../offline/SyncStatusBar';
 import { navItems } from './nav';
+import { isWorkerOnly, WorkerLayout } from './WorkerLayout';
 
+/** A login that holds only the worker role gets the worker shell (P1-22 BR-5). */
 export function AppLayout() {
+  const { profile } = useAuth();
+  return isWorkerOnly(profile?.roles) ? <WorkerLayout /> : <OfficeLayout />;
+}
+
+function OfficeLayout() {
   const { t, i18n } = useTranslation();
   const { profile, can, signOut, setLanguage } = useAuth();
   const location = useLocation();
