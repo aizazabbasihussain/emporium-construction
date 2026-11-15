@@ -22,28 +22,28 @@ Specs: 41 (not-started: 15, in-progress: 0, in-review: 0, done: 26, blocked: 0)
 | P1-08 | Quotations (lump sum) | done | P1-07, P1-03, P1-06 | no | - |
 | P1-09 | Projects and cost ledger | done | P1-08 | no | - |
 | P1-10 | Project variations | done | P1-09, P1-03, P1-04 | no | - |
-| P1-11 | Procurement | done | P1-09, P1-03, P1-05, P1-04 | no | H-23 |
+| P1-11 | Procurement | done | P1-09, P1-03, P1-05, P1-04 | no | - |
 | P1-12 | Inventory core | done | P1-11, P1-09, P1-13 | no | H-21 |
 | P1-13 | Stock valuation engine (configurable) | done | P1-05 | no | H-07 |
 | P1-14 | Site expenses and petty cash | done | P1-09, P1-03, P1-04 | no | - |
 | P1-15 | Daily progress reports (DPR) | done | P1-09, P1-04 | no | - |
 | P1-16 | Workforce and teams | done | P1-05, P1-04 | no | H-12 |
-| P1-17 | Attendance and labour costing | done | P1-16, P1-09, P1-03 | no | H-11 |
-| P1-18 | Monthly wage calculation | done | P1-17 | no | H-11 |
+| P1-17 | Attendance and labour costing | done | P1-16, P1-09, P1-03 | no | - |
+| P1-18 | Monthly wage calculation | done | P1-17 | no | - |
 | P1-19 | Operational reports | done | P1-09, P1-11, P1-12, P1-14, P1-15, P1-17, P1-06 | no | - |
 | P1-20 | Offline-tolerant drafts and PWA | done | P1-15, P1-17, P1-14 | no | - |
 | P1-21 | Phase 1 acceptance (Gate A, operational pilot) | done | P1-10, P1-13, P1-18, P1-19, P1-20 | no | H-19 |
 | P1-22 | Worker self-service login | done | P1-02, P1-16, P1-17, P1-18 | no | - |
-| P2-01 | Tax engine | not-started | P1-05 | yes | H-02, H-03, H-08 |
-| P2-02 | Stage billing, advances and credit notes | not-started | P2-01, P1-08, P1-09, P1-10, P1-03 | no | H-28 |
+| P2-01 | Tax engine | not-started | P1-05 | yes | - |
+| P2-02 | Stage billing, advances and credit notes | not-started | P2-01, P1-08, P1-09, P1-10, P1-03 | no | - |
 | P2-03 | Cash and bank book | not-started | P1-05, P1-14 | yes | H-13 |
-| P2-04 | Receivables, receipts and PDC register | not-started | P2-02, P2-03, P2-01 | no | H-03, H-30 |
-| P2-05 | Payables, vendor bills and payments | not-started | P2-01, P2-03, P1-11, P1-12, P1-09 | no | H-03, H-22, H-23 |
-| P2-06 | Subcontractor orders and payments | not-started | P2-05, P1-09, P1-03 | no | H-03 |
-| P2-07 | Payroll finalization, payment and payslips | not-started | P1-18, P2-03, P1-09 | no | H-29 |
+| P2-04 | Receivables, receipts and PDC register | not-started | P2-02, P2-03, P2-01 | no | - |
+| P2-05 | Payables, vendor bills and payments | not-started | P2-01, P2-03, P1-11, P1-12, P1-09 | no | - |
+| P2-06 | Subcontractor orders and payments | not-started | P2-05, P1-09, P1-03 | no | - |
+| P2-07 | Payroll finalization, payment and payslips | not-started | P1-18, P2-03, P1-09 | no | - |
 | P2-08 | Project profitability and contract tracking | not-started | P2-04, P2-05, P2-06, P2-07, P1-09 | no | - |
-| P2-09 | Accountant exports and account tags | not-started | P2-04, P2-05, P2-07, P2-03, P1-13, P2-01 | no | H-06 |
-| P2-10 | Phase 2 acceptance (Gate B, financial go-live) | not-started | P2-08, P2-09, P1-21 | no | H-13, H-19, H-02, H-03 |
+| P2-09 | Accountant exports and account tags | not-started | P2-04, P2-05, P2-07, P2-03, P1-13, P2-01 | no | - |
+| P2-10 | Phase 2 acceptance (Gate B, financial go-live) | not-started | P2-08, P2-09, P1-21 | no | H-13, H-19 |
 | P3-01 | Service requests and warranty | not-started | P1-09, P1-05, P1-04 | yes | H-20 |
 | P3-02 | Work orders and labour on jobs | not-started | P3-01, P1-17, P1-09, P1-03 | no | H-20 |
 | P3-03 | Parts and materials on jobs | not-started | P3-02, P1-12 | no | - |
