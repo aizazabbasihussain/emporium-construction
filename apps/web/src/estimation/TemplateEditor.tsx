@@ -4,6 +4,7 @@ import { Alert, Button, Checkbox, Input, Modal, Select, Space, Table } from 'ant
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ApiError } from '../admin/api';
+import { fieldErrorsOf, fieldProps } from '../errors/fieldErrors';
 import { estimationApi, type Template, type TemplateLine, type TemplateParameter } from './api';
 import { FormulaPreview } from './FormulaPreview';
 import { useLineReferences } from './lists';
@@ -59,6 +60,8 @@ export function TemplateEditor({ open, template, onClose }: TemplateEditorProps)
       ),
   });
 
+  const fieldErrors = fieldErrorsOf(save.error);
+
   const changeLine = (index: number, patch: Partial<TemplateLine>) =>
     setLines(lines.map((line, i) => (i === index ? { ...line, ...patch } : line)));
   const changeParameter = (index: number, patch: Partial<TemplateParameter>) =>
@@ -81,18 +84,21 @@ export function TemplateEditor({ open, template, onClose }: TemplateEditorProps)
         <Space wrap>
           <Input
             aria-label={t('estimation.template.code')}
+            {...fieldProps(fieldErrors, 'code')}
             placeholder={t('estimation.template.code')}
             value={code}
             onChange={(event) => setCode(event.target.value)}
           />
           <Input
             aria-label={t('estimation.template.name')}
+            {...fieldProps(fieldErrors, 'name')}
             placeholder={t('estimation.template.name')}
             value={name}
             onChange={(event) => setName(event.target.value)}
           />
           <Select
             aria-label={t('estimation.workType.label')}
+            {...fieldProps(fieldErrors, 'workType')}
             style={{ width: 200 }}
             value={workType}
             onChange={setWorkType}
@@ -118,6 +124,7 @@ export function TemplateEditor({ open, template, onClose }: TemplateEditorProps)
               render: (_, p, index) => (
                 <Input
                   aria-label={t('estimation.template.paramKey')}
+                  {...fieldProps(fieldErrors, 'parameters', index, 'key')}
                   value={p.key}
                   onChange={(event) => changeParameter(index, { key: event.target.value })}
                 />
@@ -128,6 +135,7 @@ export function TemplateEditor({ open, template, onClose }: TemplateEditorProps)
               render: (_, p, index) => (
                 <Input
                   aria-label={t('estimation.template.paramLabel')}
+                  {...fieldProps(fieldErrors, 'parameters', index, 'label')}
                   value={p.label}
                   onChange={(event) => changeParameter(index, { label: event.target.value })}
                 />
@@ -138,6 +146,7 @@ export function TemplateEditor({ open, template, onClose }: TemplateEditorProps)
               render: (_, p, index) => (
                 <Input
                   aria-label={t('estimation.template.paramUnit')}
+                  {...fieldProps(fieldErrors, 'parameters', index, 'unit')}
                   value={p.unit}
                   onChange={(event) => changeParameter(index, { unit: event.target.value })}
                 />
@@ -172,6 +181,7 @@ export function TemplateEditor({ open, template, onClose }: TemplateEditorProps)
               render: (_, line, index) => (
                 <Input
                   aria-label={t('estimation.line.description')}
+                  {...fieldProps(fieldErrors, 'lines', index, 'description')}
                   value={line.description}
                   onChange={(event) => changeLine(index, { description: event.target.value })}
                 />
@@ -182,6 +192,7 @@ export function TemplateEditor({ open, template, onClose }: TemplateEditorProps)
               render: (_, line, index) => (
                 <Select
                   aria-label={t('estimation.line.kind')}
+                  {...fieldProps(fieldErrors, 'lines', index, 'lineKind')}
                   style={{ width: 150 }}
                   value={line.lineKind}
                   onChange={(value) => changeLine(index, { lineKind: value })}
@@ -197,6 +208,7 @@ export function TemplateEditor({ open, template, onClose }: TemplateEditorProps)
               render: (_, line, index) => (
                 <Select
                   aria-label={t('estimation.line.costCode')}
+                  {...fieldProps(fieldErrors, 'lines', index, 'costCodeId')}
                   style={{ width: 180 }}
                   value={line.costCodeId || undefined}
                   onChange={(value) => changeLine(index, { costCodeId: value })}
@@ -209,6 +221,7 @@ export function TemplateEditor({ open, template, onClose }: TemplateEditorProps)
               render: (_, line, index) => (
                 <Select
                   aria-label={t('estimation.line.unit')}
+                  {...fieldProps(fieldErrors, 'lines', index, 'unitCode')}
                   style={{ width: 90 }}
                   value={line.unitCode}
                   onChange={(value) => changeLine(index, { unitCode: value })}
@@ -221,6 +234,7 @@ export function TemplateEditor({ open, template, onClose }: TemplateEditorProps)
               render: (_, line, index) => (
                 <Input
                   aria-label={t('estimation.line.formula')}
+                  {...fieldProps(fieldErrors, 'lines', index, 'qtyFormula')}
                   value={line.qtyFormula}
                   onChange={(event) => changeLine(index, { qtyFormula: event.target.value })}
                 />
@@ -231,6 +245,7 @@ export function TemplateEditor({ open, template, onClose }: TemplateEditorProps)
               render: (_, line, index) => (
                 <Input
                   aria-label={t('estimation.line.defaultRate')}
+                  {...fieldProps(fieldErrors, 'lines', index, 'defaultRate')}
                   style={{ width: 110 }}
                   value={line.defaultRate ?? ''}
                   onChange={(event) =>
@@ -246,6 +261,7 @@ export function TemplateEditor({ open, template, onClose }: TemplateEditorProps)
               render: (_, line, index) => (
                 <Select
                   aria-label={t('estimation.line.suppliedBy')}
+                  {...fieldProps(fieldErrors, 'lines', index, 'suppliedBy')}
                   style={{ width: 110 }}
                   value={line.suppliedBy}
                   onChange={(value) => changeLine(index, { suppliedBy: value })}

@@ -16,6 +16,7 @@ import {
 import type { ColumnsType } from 'antd/es/table';
 import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useServerFieldErrors } from '../errors/fieldErrors';
 import { ApiError } from '../admin/api';
 import { masterApi, type DuplicateInfo, type ListParams, type Versioned } from './api';
 
@@ -133,6 +134,7 @@ export function CrudPage<T extends Versioned>(props: CrudProps<T>) {
     },
     onError: (cause) => setError(failure(cause)),
   });
+  useServerFieldErrors(form, save.error);
 
   const remove = useMutation({
     mutationFn: (row: T) => masterApi.remove(props.path, props.idOf(row), row.version),

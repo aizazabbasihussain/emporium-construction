@@ -5,12 +5,13 @@ import {
   reportsPermissions,
   variationsPermissions,
 } from '@emporium/shared';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MutationCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ConfigProvider } from 'antd';
 import { useEffect, useState, type ReactNode } from 'react';
 import { I18nextProvider, useTranslation } from 'react-i18next';
 import { Route, Routes } from 'react-router-dom';
 import { ApiError } from './admin/api';
+import { notifyError } from './errors/notify';
 import { AuditPage } from './admin/AuditPage';
 import { NumberSeriesPage } from './admin/NumberSeriesPage';
 import { RolesPage } from './admin/RolesPage';
@@ -112,6 +113,12 @@ export function AppProviders({
   const [queryClient] = useState(
     () =>
       new QueryClient({
+        // Every failed save gets the red pop-up; a mutation can opt out with `meta: { silent: true }`.
+        mutationCache: new MutationCache({
+          onError: (error, _variables, _context, mutation) => {
+            if (mutation.meta?.silent !== true) notifyError(error);
+          },
+        }),
         // Retry network failures only; an HTTP error answer will not change on retry.
         defaultOptions: {
           queries: { retry: (count, error) => !(error instanceof ApiError) && count < 2 },

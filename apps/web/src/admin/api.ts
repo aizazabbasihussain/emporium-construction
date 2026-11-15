@@ -1,3 +1,5 @@
+import { summarizeIssues, type ApiIssue } from '../errors/issues';
+
 const baseUrl = (import.meta.env.VITE_API_URL as string | undefined) ?? '';
 
 export class ApiError extends Error {
@@ -5,10 +7,30 @@ export class ApiError extends Error {
     readonly status: number,
     readonly code: string,
     message: string,
+    /** Failed field checks when the answer is `validation_failed`. */
+    readonly details: ApiIssue[] = [],
+    readonly requestId?: string,
   ) {
     super(message);
     this.name = 'ApiError';
   }
+}
+
+interface ErrorBody {
+  error?: { code?: string; message?: string; requestId?: string; details?: unknown };
+}
+
+/** Builds the error for a failed answer; field problems replace the bare "Request validation failed". */
+function apiErrorOf(status: number, data: ErrorBody): ApiError {
+  const code = data.error?.code ?? 'request_failed';
+  const details = Array.isArray(data.error?.details) ? (data.error.details as ApiIssue[]) : [];
+  const fieldIssues =
+    code === 'validation_failed' ? details.filter((i) => Array.isArray(i.path)) : [];
+  const message =
+    fieldIssues.length > 0
+      ? summarizeIssues(fieldIssues)
+      : (data.error?.message ?? 'Request failed');
+  return new ApiError(status, code, message, fieldIssues, data.error?.requestId);
 }
 
 type TokenProvider = () => Promise<string | null>;
@@ -36,14 +58,8 @@ export async function rawRequest(
     ...(body === undefined ? {} : { body }),
   });
   if (!response.ok) {
-    const data = (await response.json().catch(() => ({}))) as {
-      error?: { code?: string; message?: string };
-    };
-    throw new ApiError(
-      response.status,
-      data.error?.code ?? 'request_failed',
-      data.error?.message ?? 'Request failed',
-    );
+    const data = (await response.json().catch(() => ({}))) as ErrorBody;
+    throw apiErrorOf(response.status, data);
   }
   return response;
 }
@@ -62,22 +78,14 @@ export async function request<T>(
   const response = await fetch(`${baseUrl}${path}`, {
     method,
     headers: {
-      'content-type': 'application/json',
+      ...(body === undefined ? {} : { 'content-type': 'application/json' }),
       'idempotency-key': idempotencyKey,
       ...(token === null ? {} : { authorization: `Bearer ${token}` }),
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
-  const data = (await response.json().catch(() => ({}))) as {
-    error?: { code?: string; message?: string };
-  };
-  if (!response.ok) {
-    throw new ApiError(
-      response.status,
-      data.error?.code ?? 'request_failed',
-      data.error?.message ?? 'Request failed',
-    );
-  }
+  const data = (await response.json().catch(() => ({}))) as ErrorBody;
+  if (!response.ok) throw apiErrorOf(response.status, data);
   return data as T;
 }
 

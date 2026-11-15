@@ -4,6 +4,7 @@ import { Alert, Input, Modal, Select, Space } from 'antd';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ApiError } from '../admin/api';
+import { fieldErrorsOf, fieldProps } from '../errors/fieldErrors';
 import { masterApi, type Party } from '../master/api';
 import { projectsApi, type ProjectDetail } from './api';
 
@@ -47,6 +48,8 @@ export function NewProjectDialog({ open, onClose, onCreated }: NewProjectDialogP
       ),
   });
 
+  const fieldErrors = fieldErrorsOf(create.error);
+
   return (
     <Modal
       open={open}
@@ -68,12 +71,14 @@ export function NewProjectDialog({ open, onClose, onCreated }: NewProjectDialogP
       <Space direction="vertical" style={{ width: '100%' }}>
         <Input
           aria-label={t('projects.field.name')}
+          {...fieldProps(fieldErrors, 'name')}
           placeholder={t('projects.field.name')}
           value={name}
           onChange={(event) => setName(event.target.value)}
         />
         <Select
           aria-label={t('projects.field.client')}
+          {...fieldProps(fieldErrors, 'partyId')}
           placeholder={t('projects.field.client')}
           style={{ width: '100%' }}
           value={partyId}
@@ -85,6 +90,7 @@ export function NewProjectDialog({ open, onClose, onCreated }: NewProjectDialogP
         />
         <Select
           aria-label={t('projects.field.sector')}
+          {...fieldProps(fieldErrors, 'sector')}
           style={{ width: '100%' }}
           value={sector}
           onChange={setSector}
@@ -95,6 +101,7 @@ export function NewProjectDialog({ open, onClose, onCreated }: NewProjectDialogP
         />
         <Input
           aria-label={t('projects.field.contractValue')}
+          {...fieldProps(fieldErrors, 'originalContractValue')}
           placeholder={t('projects.field.contractValue')}
           inputMode="decimal"
           value={value}
