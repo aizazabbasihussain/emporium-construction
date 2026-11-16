@@ -125,7 +125,16 @@ beforeEach(() => {
     }
     if (url.startsWith('/estimation/estimates')) {
       return {
-        body: page([{ id: 'e1', number: 'EST-0001', revision: 1, title: 'Wall estimate' }]),
+        body: page([
+          {
+            id: 'e1',
+            number: 'EST-0001',
+            revision: 1,
+            title: 'Wall estimate',
+            partyId: 'p1',
+            proposedPrice: '1000',
+          },
+        ]),
       };
     }
     if (url.startsWith('/files')) return { body: page([]) };
@@ -246,7 +255,16 @@ describe('quotations list', () => {
       if (init.method === 'POST') return { status: 201, body: quotation() };
       if (url.startsWith('/estimation/estimates')) {
         return {
-          body: page([{ id: 'e1', number: 'EST-0001', revision: 1, title: 'Wall estimate' }]),
+          body: page([
+            {
+              id: 'e1',
+              number: 'EST-0001',
+              revision: 1,
+              title: 'Wall estimate',
+              partyId: 'p1',
+              proposedPrice: '1000',
+            },
+          ]),
         };
       }
       return { body: quotation() };
@@ -262,6 +280,8 @@ describe('quotations list', () => {
         url: '/quotations',
         body: {
           estimateId: 'e1',
+          partyId: 'p1',
+          price: '1000',
           stages: [{ name: 'Full payment', basis: 'percent', percent: '100', conditionText: null }],
         },
       }),
@@ -276,7 +296,18 @@ describe('quotations list', () => {
       init.method === 'POST'
         ? { status: 422, body: { error: { code: 'estimate_not_locked', message: 'x' } } }
         : url.startsWith('/estimation/estimates')
-          ? { body: page([{ id: 'e1', number: 'EST-0001', revision: 1, title: 'Wall estimate' }]) }
+          ? {
+              body: page([
+                {
+                  id: 'e1',
+                  number: 'EST-0001',
+                  revision: 1,
+                  title: 'Wall estimate',
+                  partyId: 'p1',
+                  proposedPrice: '1000',
+                },
+              ]),
+            }
           : { body: page([]) };
     await userEvent.click(screen.getByRole('button', { name: 'New quotation' }));
     await userEvent.click(screen.getByLabelText('Locked estimate'));

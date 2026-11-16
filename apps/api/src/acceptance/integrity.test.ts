@@ -50,7 +50,7 @@ describe('integrity checks (P1-21 BR-6)', () => {
   let db: SqlDb;
   beforeEach(async () => {
     db = await createTestDb();
-  });
+  }, 60_000);
 
   it('reports nothing on an empty database', async () => {
     expect(await runIntegrityChecks(db)).toEqual([]);

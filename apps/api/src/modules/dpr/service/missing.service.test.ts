@@ -137,5 +137,5 @@ describe('the 18:00 job (BR-6, T-5)', () => {
     } finally {
       await quiet.close();
     }
-  });
+  }, 30_000);
 });

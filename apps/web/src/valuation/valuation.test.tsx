@@ -314,7 +314,8 @@ describe('valuation transitions', () => {
         : original(url, init);
     open('/valuation/transitions');
     await userEvent.click(await screen.findByRole('button', { name: 'Run transitions now' }));
-    expect(await screen.findByText('Request failed')).toBeInTheDocument();
+    // The text shows inline and as the error pop-up title.
+    expect((await screen.findAllByText('Request failed')).length).toBeGreaterThan(0);
   });
 
   it('hides the run button from those who may only read the log', async () => {

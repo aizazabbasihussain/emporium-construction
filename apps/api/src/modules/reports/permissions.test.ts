@@ -11,15 +11,20 @@ beforeAll(async () => {
 afterAll(() => kit.close());
 
 describe('reports permissions (spec section 6)', () => {
+  // Migration 0023 gives admin every permission, so admin is left out of both sides of the comparison.
   it('grants in the migration match the shared grant table', async () => {
     for (const permission of Object.values(reportsPermissions)) {
       const rows = await kit.db.query<{ role_code: string }>(
         'select role_code from sys_role_permissions where permission_code = $1',
         [permission],
       );
-      expect(rows.map((r) => r.role_code).sort(), permission).toEqual(
-        [...reportsPermissionGrants[permission]].sort(),
-      );
+      expect(
+        rows
+          .map((r) => r.role_code)
+          .filter((code) => code !== 'admin')
+          .sort(),
+        permission,
+      ).toEqual([...reportsPermissionGrants[permission]].filter((code) => code !== 'admin').sort());
     }
   });
 

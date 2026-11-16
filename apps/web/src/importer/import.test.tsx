@@ -201,7 +201,8 @@ describe('import page', () => {
     expect(await screen.findByText('This file was already imported.')).toBeInTheDocument();
     code = 'something_else';
     await userEvent.click(screen.getByRole('button', { name: 'Run dry run' }));
-    expect(await screen.findByText('Server words')).toBeInTheDocument();
+    // The message shows inline and in the error pop-up.
+    expect((await screen.findAllByText('Server words')).length).toBeGreaterThan(0);
   });
 
   it('shows the commit failure message', async () => {
