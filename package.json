@@ -24,7 +24,8 @@
     "decisions:check": "tsx packages/db/src/decisions-check/run.ts",
     "seed:synthetic": "pnpm --filter @emporium/api exec tsx --env-file=../../.env src/acceptance/seed-cli.ts",
     "e2e": "vitest run --project @emporium/api apps/api/src/acceptance/scenario.test.ts && pnpm --filter @emporium/web e2e",
-    "gate:a": "node tools/gate-a/run.ts"
+    "gate:a": "node tools/gate-a/run.ts",
+    "seed:team-setup": "pnpm --filter @emporium/api exec tsx --env-file=../../.env src/seed-team-setup.ts"
   },
   "lint-staged": {
     "*.{ts,tsx,mjs,cjs,js}": [

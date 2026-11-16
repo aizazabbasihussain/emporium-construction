@@ -10,6 +10,8 @@ export default defineConfig({
     globals: true,
     // Ant Design forms render slowly when the whole suite runs in parallel.
     testTimeout: 15_000,
+    // Fetch mocks match on bare paths ('/me'); a local, gitignored apps/web/.env must not prefix them.
+    env: { VITE_API_URL: '' },
     setupFiles: ['./src/test-setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
   },

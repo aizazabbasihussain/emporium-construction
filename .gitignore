@@ -22,3 +22,6 @@ docs/archive/
 # Autonomous run
 .agent-logs/
 .agent-stop
+
+# Local file store driver uploads
+/uploads/

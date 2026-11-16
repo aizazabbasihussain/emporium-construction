@@ -3,6 +3,7 @@ import { Alert, Button, Form, Input, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDate, masterdataPermissions, registrationTypes } from '@emporium/shared';
+import { useServerFieldErrors } from '../errors/fieldErrors';
 import { ApiError } from '../admin/api';
 import { useAuth } from '../auth/AuthProvider';
 import { masterApi, type Company, type Registration } from './api';
@@ -43,6 +44,7 @@ export function CompanyPage() {
       await queryClient.invalidateQueries({ queryKey: ['master-company'] });
     },
   });
+  useServerFieldErrors(form, save.error);
   let failure: string | null = null;
   if (save.error instanceof ApiError) {
     failure = t(`master.errors.${save.error.code}`, { defaultValue: save.error.message });

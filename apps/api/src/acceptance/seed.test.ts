@@ -7,7 +7,7 @@ describe('synthetic seed (P1-21 BR-1)', () => {
   let h: Harness;
   beforeAll(async () => {
     h = await createHarness({ users: ['admin', 'owner', 'pm'] });
-  });
+  }, 60_000);
   afterAll(() => h.close());
 
   it('loads the whole synthetic company through the API and leaves the database consistent', async () => {

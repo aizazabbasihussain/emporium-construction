@@ -4,6 +4,7 @@ import { Alert, Input, Modal, Select, Space } from 'antd';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ApiError } from '../admin/api';
+import { masterApi, type Party } from '../master/api';
 import { estimationApi, type Estimate } from './api';
 
 export interface NewEstimateDialogProps {
@@ -18,12 +19,17 @@ export function NewEstimateDialog({ open, onClose, onCreated }: NewEstimateDialo
   const [templateId, setTemplateId] = useState<string | undefined>(undefined);
   const [title, setTitle] = useState('');
   const [sector, setSector] = useState<string>('private');
+  const [partyId, setPartyId] = useState<string | undefined>(undefined);
   const [values, setValues] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
 
   const templates = useQuery({
     queryKey: ['estimation', 'templates', 'active'],
     queryFn: () => estimationApi.templates({ active: true, limit: 200 }),
+  });
+  const clients = useQuery({
+    queryKey: ['master-parties', 'clients'],
+    queryFn: () => masterApi.list<Party>('/master/parties', { role: 'client', limit: 200 }),
   });
   const template = useQuery({
     queryKey: ['estimation', 'template', templateId],
@@ -33,7 +39,7 @@ export function NewEstimateDialog({ open, onClose, onCreated }: NewEstimateDialo
 
   const create = useMutation({
     mutationFn: () =>
-      estimationApi.fromTemplate({ templateId, title, sector, parameterValues: values }),
+      estimationApi.fromTemplate({ templateId, title, sector, partyId, parameterValues: values }),
     onSuccess: (estimate) => {
       setError(null);
       onCreated(estimate);
@@ -82,6 +88,20 @@ export function NewEstimateDialog({ open, onClose, onCreated }: NewEstimateDialo
           placeholder={t('estimation.field.title')}
           value={title}
           onChange={(event) => setTitle(event.target.value)}
+        />
+        <Select
+          showSearch
+          allowClear
+          optionFilterProp="label"
+          aria-label={t('estimation.field.client')}
+          placeholder={t('estimation.field.client')}
+          style={{ width: '100%' }}
+          value={partyId}
+          onChange={setPartyId}
+          options={(clients.data?.items ?? []).map((party) => ({
+            value: party.id,
+            label: party.name,
+          }))}
         />
         <Select
           aria-label={t('estimation.field.sector')}

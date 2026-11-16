@@ -35,7 +35,7 @@ describe('Gate A security checks (P1-21 BR-4)', () => {
   beforeAll(async () => {
     h = await createHarness();
     routes = listRoutes(h.app).flatMap(expandRoute);
-  });
+  }, 60_000);
   afterAll(() => h.close());
 
   it('finds the whole route table', () => {

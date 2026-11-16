@@ -126,7 +126,10 @@ export async function buildApp({
   });
 
   registerErrorHandling(app);
-  await app.register(cors, { origin: config.corsOrigins });
+  await app.register(cors, {
+    origin: config.corsOrigins,
+    methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  });
   // One registration for every upload route (importer, files); the plugin can only be added once.
   await app.register(multipart, { limits: { fileSize: MAX_FILE_BYTES, files: 1, fields: 8 } });
 

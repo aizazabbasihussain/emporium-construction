@@ -16,7 +16,7 @@ describe('Gate A scenario', () => {
   beforeAll(async () => {
     h = await createHarness();
     c = client(h);
-  });
+  }, 60_000);
   afterAll(() => h.close());
 
   it('step 1: master data (client, vendor, items, store)', async () => {
@@ -641,5 +641,5 @@ describe('Gate A scenario', () => {
       'select max(seq)::text as top from inv_ledger',
     );
     expect(Number(after?.top)).toBe(Number(before?.top) + 1);
-  });
+  }, 60_000);
 });

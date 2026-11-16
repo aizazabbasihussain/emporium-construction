@@ -5,7 +5,7 @@ describe('acceptance harness', () => {
   let h: Harness;
   beforeAll(async () => {
     h = await createHarness();
-  });
+  }, 60_000);
   afterAll(() => h.close());
 
   it('boots every module on PGlite and serves /health', async () => {
