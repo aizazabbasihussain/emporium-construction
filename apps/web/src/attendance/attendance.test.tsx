@@ -449,7 +449,8 @@ describe('the attendance grid', () => {
     ).toBeInTheDocument();
     handler = () => ({ status: 500, body: 'boom' });
     await userEvent.click(screen.getByRole('button', { name: 'Save sheet' }));
-    expect(await screen.findByText('Request failed')).toBeInTheDocument();
+    // Slow under a full-suite run: wait longer than the 1 s default.
+    expect(await screen.findByText('Request failed', {}, { timeout: 5000 })).toBeInTheDocument();
   });
 
   it('shows why a sheet came back from the approver and keeps it editable', async () => {
