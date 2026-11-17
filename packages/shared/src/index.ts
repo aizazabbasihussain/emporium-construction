@@ -274,3 +274,23 @@ export {
   type ReportsPermission,
 } from './reports.js';
 export * from './offline/index.js';
+export {
+  supplyKinds,
+  taxPermissionGrants,
+  taxPermissions,
+  taxRegions,
+  taxRoundingModes,
+  taxRuleDocType,
+  taxRuleKinds,
+  taxRuleStatuses,
+  withholdingBases,
+  withholdingDirections,
+  type SupplyKind,
+  type TaxPermission,
+  type TaxRegion,
+  type TaxRoundingMode,
+  type TaxRuleKind,
+  type TaxRuleStatus,
+  type WithholdingBase,
+  type WithholdingDirection,
+} from './tax.js';

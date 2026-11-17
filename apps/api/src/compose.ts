@@ -38,6 +38,7 @@ import { createInventory, type Inventory } from './modules/inventory/index.js';
 import { createProcurement, type Procurement } from './modules/procurement/index.js';
 import { createVariations, type Variations } from './modules/variations/index.js';
 import { createValuation, type Valuation } from './modules/valuation/index.js';
+import { createTax, type Tax } from './modules/tax/index.js';
 import { createReports, type Reports } from './modules/reports/index.js';
 import {
   approvalsPermissions,
@@ -58,6 +59,7 @@ import {
   projectsPermissions,
   quotationsPermissions,
   reportsPermissions,
+  taxPermissions,
   valuationPermissions,
   variationsPermissions,
   wagesPermissions,
@@ -96,6 +98,7 @@ export interface Runtime {
   masterData: MasterData;
   crm: Crm;
   valuation: Valuation;
+  tax: Tax;
   estimation: Estimation;
   quotations: Quotations;
   projects: Projects;
@@ -146,6 +149,7 @@ export async function wireRuntime(
   identity.registerPermissions('master', Object.values(masterdataPermissions));
   identity.registerPermissions('crm', Object.values(crmPermissions));
   identity.registerPermissions('valuation', Object.values(valuationPermissions));
+  identity.registerPermissions('tax', Object.values(taxPermissions));
   identity.registerPermissions('estimation', Object.values(estimationPermissions));
   identity.registerPermissions('quotations', Object.values(quotationsPermissions));
   identity.registerPermissions('projects', Object.values(projectsPermissions));
@@ -220,6 +224,13 @@ export async function wireRuntime(
     files,
   });
   const valuation = createValuation({
+    platform,
+    clock,
+    newId: () => uuidv7(clock.now()),
+    masterData,
+    approvals,
+  });
+  const tax = createTax({
     platform,
     clock,
     newId: () => uuidv7(clock.now()),
@@ -376,6 +387,7 @@ export async function wireRuntime(
     masterData,
     crm,
     valuation,
+    tax,
     estimation,
     quotations,
     projects,
@@ -411,6 +423,7 @@ export function routeDeps(runtime: Runtime) {
     masterData: { db, masterData: runtime.masterData, platform },
     crm: { db, crm: runtime.crm, platform },
     valuation: { db, valuation: runtime.valuation, platform },
+    tax: { db, tax: runtime.tax, platform },
     estimation: { db, estimation: runtime.estimation, platform },
     quotations: { db, quotations: runtime.quotations, platform },
     projects: { db, projects: runtime.projects, platform },

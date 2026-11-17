@@ -1,0 +1,38 @@
+{
+  "name": "tax",
+  "tablePrefix": "tax_",
+  "ownedTables": [
+    "tax_authorities",
+    "tax_region_map",
+    "tax_rules",
+    "tax_withholding_rules",
+    "tax_settings"
+  ],
+  "exports": [
+    "createTax",
+    "registerTaxRoutes",
+    "resolveAuthority",
+    "calculateSalesTax",
+    "calculateWithholding",
+    "getTaxRules",
+    "taxReportData",
+    "registerReportSource"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.events.subscribe",
+    "platform.idempotency.execute",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "masterdata.listLocations",
+    "masterdata.getRegistration",
+    "approvals.requestApproval",
+    "approvals.getApprovalState"
+  ],
+  "eventsIn": ["approval.approved", "approval.rejected", "approval.returned", "approval.cancelled"],
+  "eventsOut": ["tax.rule.changed"],
+  "permissions": ["tax.rule.read", "tax.rule.manage", "tax.report.read"],
+  "notes": "Ships with no rates and no rules (BR-9): the migration seeds only the authorities FBR and PRA and the two settings (H-08 default per document, prices exclusive). Every rule, region mapping and withholding rule is data requested through the API and approved by the owner (approval doc type tax_rule, rule seeded in migration 0024); rules are never edited or deleted (database trigger), a successor closes its predecessor the day before it starts. Beyond the spec's route list the module adds POST /tax/region-map, because the region map has to be entered somewhere, and GET /tax/rules also returns the authorities, the region map and the settings for the screens. The report (BR-8) reads stored snapshots through TaxReportSource views that billing (P2-02) and payables (P2-05) register; until they do the report is empty. H-02, H-03 and H-08 defaults are used as answered on 2026-11-15; no withholding rules exist until an admin enters them."
+}

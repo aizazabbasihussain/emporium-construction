@@ -627,6 +627,13 @@
     "coordinator",
     "nobody"
   ],
+  "POST /tax/calculate": ["admin", "owner", "accountant"],
+  "POST /tax/region-map": ["accountant"],
+  "GET /tax/reports": ["admin", "owner", "accountant"],
+  "GET /tax/rules": ["admin", "owner", "accountant"],
+  "POST /tax/rules": ["accountant"],
+  "GET /tax/withholding-rules": ["admin", "owner", "accountant"],
+  "POST /tax/withholding-rules": ["accountant"],
   "GET /valuation/movements": ["admin", "owner", "accountant"],
   "GET /valuation/policies": ["admin", "owner", "storekeeper", "accountant"],
   "POST /valuation/policies": ["admin", "accountant"],
