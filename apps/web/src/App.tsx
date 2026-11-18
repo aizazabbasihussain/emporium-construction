@@ -52,6 +52,8 @@ import { PurchaseOrderPage, PurchaseOrdersPage } from './procurement/OrderPages'
 import { RequisitionPage, RequisitionsPage } from './procurement/RequisitionPages';
 import { RfqPage } from './procurement/RfqPage';
 import { VariationEditorPage } from './variations/VariationEditorPage';
+import { InvoicePage } from './billing/InvoicePage';
+import { InvoicesPage } from './billing/InvoicesPage';
 import { ProjectsPage } from './projects/ProjectsPage';
 import { QuotationEditorPage } from './quotations/QuotationEditorPage';
 import { QuotationsPage } from './quotations/QuotationsPage';
@@ -214,6 +216,11 @@ export function AppRoutes() {
               <VariationEditorPage />
             </RequirePermission>
           }
+        />
+        <Route path="/billing/invoices" element={guarded('/billing/invoices', <InvoicesPage />)} />
+        <Route
+          path="/billing/invoices/:id"
+          element={guarded('/billing/invoices', <InvoicePage />)}
         />
         <Route
           path="/procurement/requisitions"

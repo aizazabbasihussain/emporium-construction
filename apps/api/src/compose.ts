@@ -37,6 +37,7 @@ import { createExpenses, type Expenses } from './modules/expenses/index.js';
 import { createInventory, type Inventory } from './modules/inventory/index.js';
 import { createProcurement, type Procurement } from './modules/procurement/index.js';
 import { createVariations, type Variations } from './modules/variations/index.js';
+import { createBilling, type Billing } from './modules/billing/index.js';
 import { createValuation, type Valuation } from './modules/valuation/index.js';
 import { createTax, type Tax } from './modules/tax/index.js';
 import { createReports, type Reports } from './modules/reports/index.js';
@@ -62,6 +63,7 @@ import {
   taxPermissions,
   valuationPermissions,
   variationsPermissions,
+  billingPermissions,
   wagesPermissions,
   workerportalPermissions,
 } from '@emporium/shared';
@@ -103,6 +105,7 @@ export interface Runtime {
   quotations: Quotations;
   projects: Projects;
   variations: Variations;
+  billing: Billing;
   procurement: Procurement;
   inventory: Inventory;
   expenses: Expenses;
@@ -154,6 +157,7 @@ export async function wireRuntime(
   identity.registerPermissions('quotations', Object.values(quotationsPermissions));
   identity.registerPermissions('projects', Object.values(projectsPermissions));
   identity.registerPermissions('variations', Object.values(variationsPermissions));
+  identity.registerPermissions('billing', Object.values(billingPermissions));
   identity.registerPermissions('procurement', Object.values(procurementPermissions));
   identity.registerPermissions('inventory', Object.values(inventoryPermissions));
   identity.registerPermissions('expenses', Object.values(expensesPermissions));
@@ -271,6 +275,17 @@ export async function wireRuntime(
     approvals,
     masterData,
     files,
+  });
+  const billing = createBilling({
+    platform,
+    clock,
+    newId: () => uuidv7(clock.now()),
+    projects,
+    variations,
+    quotations,
+    tax,
+    approvals,
+    masterData,
   });
   const inventory = createInventory({
     platform,
@@ -392,6 +407,7 @@ export async function wireRuntime(
     quotations,
     projects,
     variations,
+    billing,
     procurement,
     inventory,
     expenses,
@@ -428,6 +444,7 @@ export function routeDeps(runtime: Runtime) {
     quotations: { db, quotations: runtime.quotations, platform },
     projects: { db, projects: runtime.projects, platform },
     variations: { db, variations: runtime.variations, platform },
+    billing: { db, billing: runtime.billing, platform },
     procurement: { db, procurement: runtime.procurement, platform },
     inventory: { db, inventory: runtime.inventory, platform },
     expenses: { db, expenses: runtime.expenses, platform },

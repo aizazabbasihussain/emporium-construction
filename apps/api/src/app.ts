@@ -41,6 +41,7 @@ import {
   type ProcurementRouteDeps,
 } from './modules/procurement/index.js';
 import { registerVariationsRoutes, type VariationsRouteDeps } from './modules/variations/index.js';
+import { registerBillingRoutes, type BillingRouteDeps } from './modules/billing/index.js';
 import { registerValuationRoutes, type ValuationRouteDeps } from './modules/valuation/index.js';
 import { registerTaxRoutes, type TaxRouteDeps } from './modules/tax/index.js';
 
@@ -76,6 +77,8 @@ export interface AppDeps {
   projects?: ProjectsRouteDeps;
   /** The variation endpoints; they rely on the authentication hook of `identity`. */
   variations?: VariationsRouteDeps;
+  /** The billing endpoints; they rely on the authentication hook of `identity`. */
+  billing?: BillingRouteDeps;
   /** The procurement endpoints; they rely on the authentication hook of `identity`. */
   procurement?: ProcurementRouteDeps;
   /** The inventory endpoints; they rely on the authentication hook of `identity`. */
@@ -108,6 +111,7 @@ export async function buildApp({
   quotations,
   projects,
   variations,
+  billing,
   procurement,
   inventory,
   expenses,
@@ -160,6 +164,7 @@ export async function buildApp({
   if (quotations) registerQuotationsRoutes(app, quotations);
   if (projects) registerProjectsRoutes(app, projects);
   if (variations) registerVariationsRoutes(app, variations);
+  if (billing) registerBillingRoutes(app, billing);
   if (procurement) registerProcurementRoutes(app, procurement);
   if (inventory) registerInventoryRoutes(app, inventory);
   if (expenses) registerExpensesRoutes(app, expenses);

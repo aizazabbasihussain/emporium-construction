@@ -1,4 +1,5 @@
 import {
+  billingPermissions,
   formatAmount,
   projectStatuses,
   projectsPermissions as perm,
@@ -34,6 +35,7 @@ import {
   type SummaryLine,
   type Task,
 } from './api';
+import { ProjectBilling } from '../billing/ProjectBilling';
 import { ProjectVariations } from '../variations/ProjectVariations';
 import { BudgetEditor } from './BudgetEditor';
 
@@ -303,6 +305,15 @@ export function ProjectPage() {
                   key: 'variations',
                   label: t('projects.tabs.variations'),
                   children: <ProjectVariations projectId={id} active={data.status === 'active'} />,
+                },
+              ]
+            : []),
+          ...(can(billingPermissions.scheduleRead)
+            ? [
+                {
+                  key: 'billing',
+                  label: t('projects.tabs.billing'),
+                  children: <ProjectBilling projectId={id} />,
                 },
               ]
             : []),

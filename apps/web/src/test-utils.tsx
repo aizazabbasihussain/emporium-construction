@@ -1,6 +1,7 @@
 import {
   approvalsPermissions,
   attendancePermissions,
+  billingPermissions,
   crmPermissions,
   dprPermissions,
   estimationPermissions,
@@ -41,6 +42,7 @@ export const allPermissions: string[] = [
   ...Object.values(quotationsPermissions),
   ...Object.values(projectsPermissions),
   ...Object.values(variationsPermissions),
+  ...Object.values(billingPermissions),
   ...Object.values(procurementPermissions),
   ...Object.values(inventoryPermissions),
   ...Object.values(expensesPermissions),
