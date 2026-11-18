@@ -15,6 +15,7 @@ import {
   procurementPermissions,
   projectsPermissions,
   reportsPermissions,
+  taxPermissions,
   valuationPermissions,
   wagesPermissions,
   workerportalPermissions,
@@ -241,6 +242,10 @@ export const navItems: readonly NavItem[] = [
     label: 'nav.valuationTransitions',
     permission: valuationPermissions.reportRead,
   },
+  { path: '/tax/region-map', label: 'nav.taxRegionMap', permission: taxPermissions.ruleRead },
+  { path: '/tax/rules', label: 'nav.taxRules', permission: taxPermissions.ruleRead },
+  { path: '/tax/withholding', label: 'nav.taxWithholding', permission: taxPermissions.ruleRead },
+  { path: '/tax/report', label: 'nav.taxReport', permission: taxPermissions.reportRead },
   { path: '/reports', label: 'nav.reports', anyPermission: Object.values(reportsPermissions) },
   {
     path: '/admin/settings',

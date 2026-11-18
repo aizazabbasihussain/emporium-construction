@@ -74,6 +74,10 @@ import { ReportsHubPage } from './reports/ReportsHubPage';
 import { ValuationReportPage } from './valuation/ReportPage';
 import { ValuationSettingsPage } from './valuation/SettingsPage';
 import { TransitionsPage } from './valuation/TransitionsPage';
+import { RegionMapPage } from './tax/RegionMapPage';
+import { TaxReportPage } from './tax/ReportPage';
+import { RulesPage } from './tax/RulesPage';
+import { WithholdingPage } from './tax/WithholdingPage';
 import { GridPage } from './attendance/GridPage';
 import { MissingPage } from './attendance/MissingPage';
 import { SheetsPage } from './attendance/SheetsPage';
@@ -341,6 +345,10 @@ export function AppRoutes() {
           path="/valuation/transitions"
           element={guarded('/valuation/transitions', <TransitionsPage />)}
         />
+        <Route path="/tax/region-map" element={guarded('/tax/region-map', <RegionMapPage />)} />
+        <Route path="/tax/rules" element={guarded('/tax/rules', <RulesPage />)} />
+        <Route path="/tax/withholding" element={guarded('/tax/withholding', <WithholdingPage />)} />
+        <Route path="/tax/report" element={guarded('/tax/report', <TaxReportPage />)} />
         <Route path="/crm/follow-ups" element={guarded('/crm/follow-ups', <FollowUpsPage />)} />
         <Route
           path="/reports"

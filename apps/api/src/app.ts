@@ -42,6 +42,7 @@ import {
 } from './modules/procurement/index.js';
 import { registerVariationsRoutes, type VariationsRouteDeps } from './modules/variations/index.js';
 import { registerValuationRoutes, type ValuationRouteDeps } from './modules/valuation/index.js';
+import { registerTaxRoutes, type TaxRouteDeps } from './modules/tax/index.js';
 
 export interface AppDeps {
   config: Pick<AppConfig, 'corsOrigins'>;
@@ -63,6 +64,8 @@ export interface AppDeps {
   masterData?: MasterDataRouteDeps;
   /** The CRM endpoints; they rely on the authentication hook of `identity`. */
   crm?: CrmRouteDeps;
+  /** The tax endpoints; they rely on the authentication hook of `identity`. */
+  tax?: TaxRouteDeps;
   /** The valuation endpoints; they rely on the authentication hook of `identity`. */
   valuation?: ValuationRouteDeps;
   /** The estimation endpoints; they rely on the authentication hook of `identity`. */
@@ -100,6 +103,7 @@ export async function buildApp({
   masterData,
   crm,
   valuation,
+  tax,
   estimation,
   quotations,
   projects,
@@ -151,6 +155,7 @@ export async function buildApp({
   if (masterData) registerMasterDataRoutes(app, masterData);
   if (crm) registerCrmRoutes(app, crm);
   if (valuation) registerValuationRoutes(app, valuation);
+  if (tax) registerTaxRoutes(app, tax);
   if (estimation) registerEstimationRoutes(app, estimation);
   if (quotations) registerQuotationsRoutes(app, quotations);
   if (projects) registerProjectsRoutes(app, projects);
