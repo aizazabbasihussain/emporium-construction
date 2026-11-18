@@ -1,0 +1,74 @@
+{
+  "name": "billing",
+  "tablePrefix": "bil_",
+  "ownedTables": [
+    "bil_billing_schedule",
+    "bil_schedule_edits",
+    "bil_invoices",
+    "bil_invoice_lines",
+    "bil_advances",
+    "bil_credit_notes"
+  ],
+  "views": ["bil_v_invoices"],
+  "exports": [
+    "createBilling",
+    "registerBillingRoutes",
+    "getInvoice",
+    "listInvoicesForProject",
+    "getBilledAmount",
+    "registerInvoiceSource",
+    "markAdvanceReceived"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.events.subscribe",
+    "platform.idempotency.execute",
+    "platform.numbering.next",
+    "platform.numbering.list",
+    "platform.settings.get",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "projects.getProject",
+    "variations.getCurrentContractValue",
+    "variations.listApprovedVariations",
+    "quotations.getQuotation",
+    "tax.calculateSalesTax",
+    "tax.calculateWithholding",
+    "tax.registerReportSource",
+    "approvals.requestApproval",
+    "approvals.getApprovalState",
+    "approvals.cancelApproval",
+    "masterdata.getParty",
+    "masterdata.company",
+    "masterdata.getRegistration"
+  ],
+  "eventsIn": [
+    "approval.approved",
+    "approval.rejected",
+    "approval.returned",
+    "approval.cancelled",
+    "project.created",
+    "variation.approved"
+  ],
+  "eventsOut": [
+    "invoice.issued",
+    "invoice.cancelled",
+    "creditnote.issued",
+    "billing.invoice.changed",
+    "billing.schedule.changed",
+    "billing.advance.changed",
+    "billing.creditnote.changed"
+  ],
+  "permissions": [
+    "billing.schedule.read",
+    "billing.schedule.manage",
+    "billing.invoice.read",
+    "billing.invoice.create",
+    "billing.invoice.issue",
+    "billing.creditnote.create",
+    "billing.advance.manage"
+  ],
+  "notes": "Beyond the spec's route list the module adds GET /billing/invoices/:id/preview (the builder's tax preview), POST and GET /billing/invoices/:id/credit-notes, GET /billing/credit-notes/:id, POST /billing/credit-notes/:id/submit|issue and GET /billing/advances, because a credit note is drafted, approved and issued as separate steps. markAdvanceReceived is the call receipts (P2-04) make when the money of an advance invoice arrives. Payment terms come from the setting billing.default_payment_days or a per-invoice override; the quotation terms are free text. Advance invoices are taxed like any invoice. The tax report (P2-01 BR-8) reads the stored snapshots through the report source this module registers."
+}

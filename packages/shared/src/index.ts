@@ -144,6 +144,31 @@ export {
   type VariationStatus,
   type VariationsPermission,
 } from './variations.js';
+export {
+  advanceRecoveryMethods,
+  billingAdvanceStatuses,
+  billingPermissionGrants,
+  billingPermissions,
+  billingSettingKeys,
+  creditNoteDocType,
+  creditNoteSeries,
+  creditNoteStatuses,
+  invoiceDocType,
+  invoiceSeries,
+  invoiceSourceTypes,
+  invoiceStatuses,
+  scheduleDocType,
+  scheduleSources,
+  scheduleStatuses,
+  type AdvanceRecoveryMethod,
+  type BillingAdvanceStatus,
+  type BillingPermission,
+  type CreditNoteStatus,
+  type InvoiceSourceType,
+  type InvoiceStatus,
+  type ScheduleSource,
+  type ScheduleStatus,
+} from './billing.js';
 export { fileStoreDrivers, type FileStoreDriver } from './enums.js';
 export {
   fileOperations,

@@ -136,6 +136,37 @@ export const settingRegistry: SettingRegistry = {
     description: 'Whether net pay is rounded to the nearest rupee (H-11)',
     default: true,
   },
+  // P2-02 BR-3, H-28: proportional by default; an admin can switch to a fixed percentage.
+  'billing.advance_recovery_method': {
+    type: 'string',
+    description: 'Advance recovery on stage invoices: proportional or fixed_percent (H-28)',
+    default: 'proportional',
+  },
+  'billing.advance_fixed_percent': {
+    type: 'string',
+    description: 'Percent of each invoice base recovered when the method is fixed_percent',
+    default: '0',
+  },
+  // P2-02 BR-3: true means advance tax was charged at receipt, so the invoice taxes the full base.
+  'billing.tax_on_advance_at_receipt': {
+    type: 'boolean',
+    description: 'Whether tax was charged when the advance was invoiced (default) or at recovery',
+    default: true,
+  },
+  // P2-02 BR-10
+  'billing.default_payment_days': {
+    type: 'integer',
+    description: 'Days after the invoice date that payment is due',
+    default: 30,
+    min: 0,
+    max: 365,
+  },
+  // P2-02 BR-11: printed on every invoice.
+  'billing.payment_instructions': {
+    type: 'string',
+    description: 'Payment instructions printed on invoices (bank, account title)',
+    default: '',
+  },
   // P1-12 BR-7, H-21: salvaged material enters stock at zero value unless the owner chooses estimates.
   'inventory.salvage_value_mode': {
     type: 'string',

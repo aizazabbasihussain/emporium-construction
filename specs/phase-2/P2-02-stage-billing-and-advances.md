@@ -3,7 +3,7 @@ id: P2-02
 title: Stage billing, advances and credit notes
 phase: 2
 module: billing
-status: not-started
+status: done
 depends_on: [P2-01, P1-08, P1-09, P1-10, P1-03]
 requires_inputs: [H-04, H-28]
 ---
