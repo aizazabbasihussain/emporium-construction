@@ -3,7 +3,7 @@ id: P2-03
 title: Cash and bank book
 phase: 2
 module: cashbook
-status: not-started
+status: done
 depends_on: [P1-05, P1-14]
 requires_inputs: [H-05, H-13]
 ---

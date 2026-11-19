@@ -167,6 +167,18 @@ export const settingRegistry: SettingRegistry = {
     description: 'Payment instructions printed on invoices (bank, account title)',
     default: '',
   },
+  // P2-03 BR-5, H-09: the owner approves every payment; the accountant may raise the threshold.
+  'cashbook.payment_approval_threshold': {
+    type: 'string',
+    description: 'Payments above this amount (PKR) need an approved payment request; 0 means all',
+    default: '0',
+  },
+  // P2-03 BR-6: the account that custodian advances are paid from; empty leaves the choice open.
+  'cashbook.advance_account_id': {
+    type: 'string',
+    description: 'Cash account that advances to custodians are paid from (empty: choose each time)',
+    default: '',
+  },
   // P1-12 BR-7, H-21: salvaged material enters stock at zero value unless the owner chooses estimates.
   'inventory.salvage_value_mode': {
     type: 'string',
