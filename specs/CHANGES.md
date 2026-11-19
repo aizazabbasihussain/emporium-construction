@@ -50,6 +50,18 @@ P1-12 stays `not-started`; P1-14, P1-15 and others that do not depend on it can 
 
 ## Proposed
 
+### 2026-11-20: P2-03 permission code and additions beyond the spec text (PR #53)
+
+P2-03 is built and open as PR #53, not merged, because it deviates from the spec text in two ways.
+
+1. **Permission code.** Section 6 names `cashbook.reconcile`, but `sys_role_permissions` only accepts three-part codes (`^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*){2}$`). The build uses `cashbook.reconciliation.manage` (accountant and admin).
+   - Option A: change section 6 of P2-03 to `cashbook.reconciliation.manage`.
+   - Option B: relax the identity constraint in a human-reviewed change.
+2. **Additions beyond section 5 and the Provides line** (listed in the module's `module.json`): `POST /cashbook/adjustments` (BR-1 dated, approved adjustment), `POST /cashbook/approval-requests` (BR-5), `PUT /cashbook/transactions/:id/tag` (BR-7), `GET /cashbook/pending` and `POST /cashbook/pending/:id/record` (BR-6), `POST /cashbook/reconciliations/:id/reopen` (BR-8 un-reconcile); settings `cashbook.payment_approval_threshold` and `cashbook.advance_account_id`; table `cbk_pending_sources`; columns `allow_overdraft`, `transfer_pair_id`, `approval_doc_id`; events `cash.transaction.recorded|reversed|tagged`, `cashbook.account.changed`, `cashbook.reconciliation.changed`; approval document type `cash_adjustment`. `expense.posted` has no handler because it moves no cash (BR-6).
+   - Option: approve and add these to the P2-03 text, or list which to remove.
+
+Human review needed: `specs/` is protected, so this is not auto-merged.
+
 ### 2026-10-24: P0-02 proposes a pre-project survey record for demolition and restructuring (GAP-01)
 
 Found while mapping the demolition workflow (`docs/discovery/workflows/demolition-job.md`, `docs/discovery/gaps.md` GAP-01). Plan v2 section 9 lists "survey and inspection records with before/after photos" for demolition and restructuring, but no Phase 1 spec holds a record of the structure before a job is quoted or started. P1-06 has site visits, P1-15 has daily reports (only after a project exists), and before and after photos exist only on Phase 3 work orders (P3-02).
