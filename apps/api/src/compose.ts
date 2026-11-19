@@ -38,6 +38,7 @@ import { createInventory, type Inventory } from './modules/inventory/index.js';
 import { createProcurement, type Procurement } from './modules/procurement/index.js';
 import { createVariations, type Variations } from './modules/variations/index.js';
 import { createBilling, type Billing } from './modules/billing/index.js';
+import { createCashbook, type Cashbook } from './modules/cashbook/index.js';
 import { createValuation, type Valuation } from './modules/valuation/index.js';
 import { createTax, type Tax } from './modules/tax/index.js';
 import { createReports, type Reports } from './modules/reports/index.js';
@@ -64,6 +65,7 @@ import {
   valuationPermissions,
   variationsPermissions,
   billingPermissions,
+  cashbookPermissions,
   wagesPermissions,
   workerportalPermissions,
 } from '@emporium/shared';
@@ -106,6 +108,7 @@ export interface Runtime {
   projects: Projects;
   variations: Variations;
   billing: Billing;
+  cashbook: Cashbook;
   procurement: Procurement;
   inventory: Inventory;
   expenses: Expenses;
@@ -158,6 +161,7 @@ export async function wireRuntime(
   identity.registerPermissions('projects', Object.values(projectsPermissions));
   identity.registerPermissions('variations', Object.values(variationsPermissions));
   identity.registerPermissions('billing', Object.values(billingPermissions));
+  identity.registerPermissions('cashbook', Object.values(cashbookPermissions));
   identity.registerPermissions('procurement', Object.values(procurementPermissions));
   identity.registerPermissions('inventory', Object.values(inventoryPermissions));
   identity.registerPermissions('expenses', Object.values(expensesPermissions));
@@ -287,6 +291,12 @@ export async function wireRuntime(
     approvals,
     masterData,
   });
+  const cashbook = createCashbook({
+    platform,
+    clock,
+    newId: () => uuidv7(clock.now()),
+    approvals,
+  });
   const inventory = createInventory({
     platform,
     clock,
@@ -408,6 +418,7 @@ export async function wireRuntime(
     projects,
     variations,
     billing,
+    cashbook,
     procurement,
     inventory,
     expenses,
@@ -445,6 +456,7 @@ export function routeDeps(runtime: Runtime) {
     projects: { db, projects: runtime.projects, platform },
     variations: { db, variations: runtime.variations, platform },
     billing: { db, billing: runtime.billing, platform },
+    cashbook: { db, cashbook: runtime.cashbook, platform },
     procurement: { db, procurement: runtime.procurement, platform },
     inventory: { db, inventory: runtime.inventory, platform },
     expenses: { db, expenses: runtime.expenses, platform },

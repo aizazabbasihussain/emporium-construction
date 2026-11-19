@@ -1,0 +1,54 @@
+{
+  "name": "cashbook",
+  "tablePrefix": "cbk_",
+  "ownedTables": [
+    "cbk_accounts",
+    "cbk_transactions",
+    "cbk_reconciliations",
+    "cbk_reconciliation_items",
+    "cbk_statement_lines",
+    "cbk_pending_sources"
+  ],
+  "views": ["cbk_v_transactions"],
+  "exports": [
+    "createCashbook",
+    "registerCashbookRoutes",
+    "recordReceipt",
+    "recordPayment",
+    "recordTransfer",
+    "getAccountBalance",
+    "getCashPosition"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.events.subscribe",
+    "platform.idempotency.execute",
+    "platform.numbering.next",
+    "platform.settings.get",
+    "platform.backdating.check",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "approvals.requestApproval",
+    "approvals.getApprovalState"
+  ],
+  "eventsIn": ["advance.issued"],
+  "eventsOut": [
+    "cash.receipt.recorded",
+    "cash.payment.recorded",
+    "cash.transaction.recorded",
+    "cash.transaction.reversed",
+    "cash.transaction.tagged",
+    "cashbook.account.changed",
+    "cashbook.reconciliation.changed"
+  ],
+  "permissions": [
+    "cashbook.account.manage",
+    "cashbook.txn.read",
+    "cashbook.txn.create",
+    "cashbook.txn.reverse",
+    "cashbook.reconciliation.manage"
+  ],
+  "notes": "Beyond the spec's route list the module adds POST /cashbook/adjustments (BR-1: the dated, owner-approved adjustment that replaces editing an opening balance), POST /cashbook/approval-requests (BR-5: asks the owner to approve a payment or adjustment and returns the approval doc id that recordPayment takes), PUT /cashbook/transactions/:id/tag (BR-7), GET /cashbook/pending and POST /cashbook/pending/:id/record (BR-6: an advance waits here until a cash account is chosen unless the setting cashbook.advance_account_id names one), POST /cashbook/reconciliations/:id/reopen (BR-8: un-reconcile) and the read endpoints for accounts, transactions and reconciliations. Payments need an approved request when the amount is above the setting cashbook.payment_approval_threshold (default 0, so every payment: H-09). expense.posted moves no cash (BR-6), so the module has no handler for it. A transfer reversal reverses both legs. A transaction of a reconciled statement cannot be reversed until the statement is reopened. Tags are free codes until the chart of accounts is editable from the UI (P2-09)."
+}

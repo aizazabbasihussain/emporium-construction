@@ -169,6 +169,26 @@ export {
   type ScheduleSource,
   type ScheduleStatus,
 } from './billing.js';
+export {
+  cashAccountKinds,
+  cashDirections,
+  cashMethods,
+  cashTxnTypes,
+  cashbookPermissionGrants,
+  cashbookPermissions,
+  cashbookSeries,
+  cashbookSettingKeys,
+  paymentDocType,
+  pendingSourceStatuses,
+  reconciliationStatusValues,
+  type CashAccountKind,
+  type CashDirection,
+  type CashMethod,
+  type CashTxnType,
+  type CashbookPermission,
+  type PendingSourceStatus,
+  type ReconciliationStatusValue,
+} from './cashbook.js';
 export { fileStoreDrivers, type FileStoreDriver } from './enums.js';
 export {
   fileOperations,

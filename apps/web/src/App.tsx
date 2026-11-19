@@ -1,4 +1,5 @@
 import {
+  cashbookPermissions,
   dprPermissions,
   expensesPermissions,
   procurementPermissions,
@@ -52,6 +53,13 @@ import { PurchaseOrderPage, PurchaseOrdersPage } from './procurement/OrderPages'
 import { RequisitionPage, RequisitionsPage } from './procurement/RequisitionPages';
 import { RfqPage } from './procurement/RfqPage';
 import { VariationEditorPage } from './variations/VariationEditorPage';
+import { AccountsPage } from './cashbook/AccountsPage';
+import { CashBookPage } from './cashbook/CashBookPage';
+import { EntryPage } from './cashbook/EntryPage';
+import { PendingPage } from './cashbook/PendingPage';
+import { PositionPage } from './cashbook/PositionPage';
+import { ReconciliationPage } from './cashbook/ReconciliationPage';
+import { ReconciliationsPage } from './cashbook/ReconciliationsPage';
 import { InvoicePage } from './billing/InvoicePage';
 import { InvoicesPage } from './billing/InvoicesPage';
 import { ProjectsPage } from './projects/ProjectsPage';
@@ -222,6 +230,39 @@ export function AppRoutes() {
           path="/billing/invoices/:id"
           element={guarded('/billing/invoices', <InvoicePage />)}
         />
+        <Route
+          path="/cashbook/accounts"
+          element={guarded('/cashbook/accounts', <AccountsPage />)}
+        />
+        <Route path="/cashbook/book" element={guarded('/cashbook/book', <CashBookPage />)} />
+        <Route
+          path="/cashbook/position"
+          element={guarded('/cashbook/position', <PositionPage />)}
+        />
+        <Route
+          path="/cashbook/needs-tag"
+          element={guarded('/cashbook/needs-tag', <CashBookPage needsTag />)}
+        />
+        <Route path="/cashbook/pending" element={guarded('/cashbook/pending', <PendingPage />)} />
+        <Route
+          path="/cashbook/reconciliations"
+          element={guarded('/cashbook/reconciliations', <ReconciliationsPage />)}
+        />
+        <Route
+          path="/cashbook/reconciliations/:id"
+          element={guarded('/cashbook/reconciliations', <ReconciliationPage />)}
+        />
+        {(['receipt', 'payment', 'transfer'] as const).map((kind) => (
+          <Route
+            key={kind}
+            path={`/cashbook/${kind}s/new`}
+            element={
+              <RequirePermission permission={cashbookPermissions.txnCreate}>
+                <EntryPage kind={kind} />
+              </RequirePermission>
+            }
+          />
+        ))}
         <Route
           path="/procurement/requisitions"
           element={guarded('/procurement/requisitions', <RequisitionsPage />)}
