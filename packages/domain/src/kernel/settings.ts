@@ -179,6 +179,27 @@ export const settingRegistry: SettingRegistry = {
     description: 'Cash account that advances to custodians are paid from (empty: choose each time)',
     default: '',
   },
+  // P2-04 BR-11: the largest balance the accountant may write off with approval; 0 allows none.
+  'receivables.small_balance_limit': {
+    type: 'string',
+    description:
+      'Largest remaining balance (PKR) that may be written off with approval; 0 allows none',
+    default: '0',
+  },
+  // P2-04 BR-4: a withholding difference above this amount is flagged for the accountant.
+  'receivables.withholding_tolerance': {
+    type: 'string',
+    description:
+      'Withholding difference (PKR) above which an invoice is flagged for the accountant',
+    default: '0',
+  },
+  // P2-04 BR-8, H-30: upper day limits of the aging buckets (0-30, 31-60, 61-90, 90+).
+  'receivables.aging_buckets': {
+    type: 'string',
+    description:
+      'Upper day limits of the aging buckets, comma separated; the last bucket is open-ended',
+    default: '30,60,90',
+  },
   // P1-12 BR-7, H-21: salvaged material enters stock at zero value unless the owner chooses estimates.
   'inventory.salvage_value_mode': {
     type: 'string',
