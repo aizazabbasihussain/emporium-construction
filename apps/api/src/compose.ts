@@ -39,6 +39,7 @@ import { createProcurement, type Procurement } from './modules/procurement/index
 import { createVariations, type Variations } from './modules/variations/index.js';
 import { createBilling, type Billing } from './modules/billing/index.js';
 import { createCashbook, type Cashbook } from './modules/cashbook/index.js';
+import { createReceivables, type Receivables } from './modules/receivables/index.js';
 import { createValuation, type Valuation } from './modules/valuation/index.js';
 import { createTax, type Tax } from './modules/tax/index.js';
 import { createReports, type Reports } from './modules/reports/index.js';
@@ -60,6 +61,7 @@ import {
   procurementPermissions,
   projectsPermissions,
   quotationsPermissions,
+  receivablesPermissions,
   reportsPermissions,
   taxPermissions,
   valuationPermissions,
@@ -109,6 +111,7 @@ export interface Runtime {
   variations: Variations;
   billing: Billing;
   cashbook: Cashbook;
+  receivables: Receivables;
   procurement: Procurement;
   inventory: Inventory;
   expenses: Expenses;
@@ -162,6 +165,7 @@ export async function wireRuntime(
   identity.registerPermissions('variations', Object.values(variationsPermissions));
   identity.registerPermissions('billing', Object.values(billingPermissions));
   identity.registerPermissions('cashbook', Object.values(cashbookPermissions));
+  identity.registerPermissions('receivables', Object.values(receivablesPermissions));
   identity.registerPermissions('procurement', Object.values(procurementPermissions));
   identity.registerPermissions('inventory', Object.values(inventoryPermissions));
   identity.registerPermissions('expenses', Object.values(expensesPermissions));
@@ -297,6 +301,17 @@ export async function wireRuntime(
     newId: () => uuidv7(clock.now()),
     approvals,
   });
+  const receivables = createReceivables({
+    platform,
+    clock,
+    newId: () => uuidv7(clock.now()),
+    cashbook,
+    billing,
+    approvals,
+    notifications,
+    masterData,
+    projects,
+  });
   const inventory = createInventory({
     platform,
     clock,
@@ -419,6 +434,7 @@ export async function wireRuntime(
     variations,
     billing,
     cashbook,
+    receivables,
     procurement,
     inventory,
     expenses,
@@ -457,6 +473,7 @@ export function routeDeps(runtime: Runtime) {
     variations: { db, variations: runtime.variations, platform },
     billing: { db, billing: runtime.billing, platform },
     cashbook: { db, cashbook: runtime.cashbook, platform },
+    receivables: { db, receivables: runtime.receivables, platform },
     procurement: { db, procurement: runtime.procurement, platform },
     inventory: { db, inventory: runtime.inventory, platform },
     expenses: { db, expenses: runtime.expenses, platform },

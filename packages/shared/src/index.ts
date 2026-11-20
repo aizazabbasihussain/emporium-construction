@@ -189,6 +189,27 @@ export {
   type PendingSourceStatus,
   type ReconciliationStatusValue,
 } from './cashbook.js';
+export {
+  allocationKinds,
+  followupStatuses,
+  pdcActions,
+  pdcStatuses,
+  receiptMethods,
+  receiptSeries,
+  receiptStatuses,
+  receivablesNotificationTemplates,
+  receivablesPermissionGrants,
+  receivablesPermissions,
+  receivablesSettingKeys,
+  writeOffDocType,
+  type AllocationKind,
+  type FollowupStatus,
+  type PdcAction,
+  type PdcStatus,
+  type ReceiptMethod,
+  type ReceiptStatus,
+  type ReceivablesPermission,
+} from './receivables.js';
 export { fileStoreDrivers, type FileStoreDriver } from './enums.js';
 export {
   fileOperations,

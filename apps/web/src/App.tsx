@@ -53,6 +53,11 @@ import { PurchaseOrderPage, PurchaseOrdersPage } from './procurement/OrderPages'
 import { RequisitionPage, RequisitionsPage } from './procurement/RequisitionPages';
 import { RfqPage } from './procurement/RfqPage';
 import { VariationEditorPage } from './variations/VariationEditorPage';
+import { AgingPage } from './receivables/AgingPage';
+import { CustomerLedgerPage } from './receivables/CustomerLedgerPage';
+import { FollowupsPage } from './receivables/FollowupsPage';
+import { PdcRegisterPage } from './receivables/PdcRegisterPage';
+import { ReceiptEntryPage } from './receivables/ReceiptEntryPage';
 import { AccountsPage } from './cashbook/AccountsPage';
 import { CashBookPage } from './cashbook/CashBookPage';
 import { EntryPage } from './cashbook/EntryPage';
@@ -263,6 +268,23 @@ export function AppRoutes() {
             }
           />
         ))}
+        <Route
+          path="/receivables/receipts/new"
+          element={guarded('/receivables/receipts/new', <ReceiptEntryPage />)}
+        />
+        <Route
+          path="/receivables/pdcs"
+          element={guarded('/receivables/pdcs', <PdcRegisterPage />)}
+        />
+        <Route
+          path="/receivables/customers"
+          element={guarded('/receivables/customers', <CustomerLedgerPage />)}
+        />
+        <Route path="/receivables/aging" element={guarded('/receivables/aging', <AgingPage />)} />
+        <Route
+          path="/receivables/followups"
+          element={guarded('/receivables/followups', <FollowupsPage />)}
+        />
         <Route
           path="/procurement/requisitions"
           element={guarded('/procurement/requisitions', <RequisitionsPage />)}

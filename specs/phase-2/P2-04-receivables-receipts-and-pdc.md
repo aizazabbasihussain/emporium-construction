@@ -3,7 +3,7 @@ id: P2-04
 title: Receivables, receipts and PDC register
 phase: 2
 module: receivables
-status: not-started
+status: done
 depends_on: [P2-02, P2-03, P2-01]
 requires_inputs: [H-03, H-30]
 ---

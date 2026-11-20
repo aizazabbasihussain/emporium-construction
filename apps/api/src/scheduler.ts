@@ -8,7 +8,10 @@ export interface SchedulerState {
   lastPurgeAt: number;
 }
 
-type Jobs = Pick<Runtime, 'db' | 'platform' | 'notifications' | 'files' | 'quotations' | 'dpr'>;
+type Jobs = Pick<
+  Runtime,
+  'db' | 'platform' | 'notifications' | 'files' | 'quotations' | 'dpr' | 'receivables'
+>;
 
 /**
  * One scheduler tick (spec P1-04 BR-8): deliver due outbox events, deliver due reminders, tell the
@@ -32,6 +35,10 @@ export async function runSchedulerTick(
   await run('events', () => jobs.platform.events.dispatchDue(jobs.db));
   await run('reminders', () => jobs.notifications.tickReminders(jobs.db));
   await run('dpr-missing', () => jobs.db.transaction((tx) => jobs.dpr.notifyMissingDprs(tx, now)));
+  // P2-04 BR-7: cheques due in the next seven days, once a day from 09:00 Asia/Karachi.
+  await run('pdc-reminder', () =>
+    jobs.db.transaction((tx) => jobs.receivables.remindUpcomingPdcs(tx, now)),
+  );
   if (now.getTime() - state.lastPurgeAt >= PURGE_EVERY_MS) {
     state.lastPurgeAt = now.getTime();
     await run('files-purge', () => jobs.files.purgeExpired(jobs.db));

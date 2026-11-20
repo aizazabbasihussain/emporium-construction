@@ -1,0 +1,68 @@
+{
+  "name": "receivables",
+  "tablePrefix": "rcv_",
+  "ownedTables": [
+    "rcv_receipts",
+    "rcv_allocations",
+    "rcv_pdcs",
+    "rcv_adjustments",
+    "rcv_followups",
+    "rcv_reminder_runs"
+  ],
+  "views": ["rcv_v_customer_ledger"],
+  "exports": [
+    "createReceivables",
+    "registerReceivablesRoutes",
+    "getCustomerBalance",
+    "getOpenInvoices",
+    "getCollectedAmount",
+    "remindUpcomingPdcs"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.idempotency.execute",
+    "platform.numbering.next",
+    "platform.settings.get",
+    "platform.backdating.check",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "approvals.requestApproval",
+    "approvals.getApprovalState",
+    "billing.markAdvanceReceived",
+    "billing.advances.list",
+    "billing.creditNotes.listForInvoice",
+    "billing.bil_v_invoices",
+    "cashbook.recordReceipt",
+    "cashbook.transactions.get",
+    "cashbook.transactions.reverse",
+    "cashbook.accounts.get",
+    "masterdata.getParty",
+    "projects.getProject",
+    "notifications.notifyRole",
+    "notifications.registerTemplate"
+  ],
+  "eventsIn": [],
+  "eventsOut": [
+    "receipt.recorded",
+    "receipt.allocated",
+    "receipt.cancelled",
+    "receipt.bounced",
+    "pdc.deposited",
+    "pdc.cleared",
+    "pdc.bounced",
+    "pdc.returned",
+    "pdc.replaced",
+    "adjustment.recorded",
+    "followup.changed"
+  ],
+  "permissions": [
+    "receivables.receipt.create",
+    "receivables.receipt.cancel",
+    "receivables.pdc.manage",
+    "receivables.ledger.read",
+    "receivables.adjustment.create"
+  ],
+  "notes": "Beyond the spec's route list the module adds GET /receivables/receipts and /receivables/receipts/:id, GET /receivables/customers/:id/open-invoices|balance|suggest-allocation, GET /receivables/pdcs/:id, POST /receivables/pdcs (not provided: cheques are created with their receipt), POST /receivables/adjustments/approval-requests (BR-11: asks the owner to approve a write-off and returns the approval doc id that POST /receivables/adjustments takes) and GET /receivables/adjustments. A cleared cheque can still bounce (AC-2: the cash movement is then reversed through the cash book); a bounce or cancellation is refused when billing has already recorded an advance of that receipt as received, because billing cannot take it back. Aging and balances read the issued-invoice view bil_v_invoices: credit notes count in full from the day they exist (the view has no issue date). The reconciled check and the reversal use the cash book's transactions service."
+}
