@@ -15,7 +15,7 @@ Turn the approved monthly wage sheet into payments and payslips, confirm labour 
 
 ## 2. Boundary
 - Owns: tables `pyr_*`, module `payroll`.
-- Provides: `getPayrollRun(periodId)`, `getUnpaidWages()`, events `payroll.finalized`, `payroll.paid`.
+- Provides: `getPayrollRun(periodId)`, `getUnpaidWages()`, events `payroll.finalized`, `payroll.paid`. Added 2026-11-21 by approved CHANGES entry (P2-08 interfaces), built in the P2-08 PR with tests in this module: `getPaidWagesForProject(projectId, asOf)` (finalized and paid wages spread to the project, up to `asOf`).
 - Consumes: wages (approved sheet, reconciliation), cash book (`recordPayment`), projects (`transitionCost`, `postCost`), approvals, files, kernel numbering.
 - Must not: recalculate wages (wages module is the only calculator) or change attendance.
 - Out of scope: statutory deductions and filings (BACKLOG), bank file formats, mobile wallet integrations, final settlement of leavers.

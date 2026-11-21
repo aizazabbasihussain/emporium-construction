@@ -15,7 +15,7 @@ Bill clients against the lump-sum contract by stages, record and recover advance
 
 ## 2. Boundary
 - Owns: tables `bil_*`, module `billing`, invoice print model and PDF.
-- Provides: `getInvoice`, `listInvoicesForProject`, `getBilledAmount(projectId)`, invoice source provider registry (`registerInvoiceSource(type, provider)`), events `invoice.issued`, `invoice.cancelled`, `creditnote.issued`; view `bil_v_invoices` for receivables.
+- Provides: `getInvoice`, `listInvoicesForProject`, `getBilledAmount(projectId)`, invoice source provider registry (`registerInvoiceSource(type, provider)`), events `invoice.issued`, `invoice.cancelled`, `creditnote.issued`; view `bil_v_invoices` for receivables. Added 2026-11-21 by approved CHANGES entry (P2-08 interfaces), built in the P2-08 PR with tests in this module: `getProjectBilling(projectId, asOf)` returning base, tax and gross billed, net of credit notes and before advance recovery.
 - Consumes: quotations (stage schedule), projects (contract value), variations (approved), tax engine, approvals, kernel numbering, files.
 - Must not: record payments (P2-04), post cash or touch the cost ledger.
 - Out of scope: retention (BACKLOG), running-bill measurement sheets, work-order and service invoices (added by P3-04 through the source registry), e-invoicing.

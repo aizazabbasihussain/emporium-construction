@@ -15,7 +15,7 @@ Record vendor bills, match them to purchase orders and goods received, handle ta
 
 ## 2. Boundary
 - Owns: tables `pay_*`, module `payables`, bill source registry.
-- Provides: `getVendorBalance(partyId, date)`, `getOpenBills(partyId)`, `getPaidAmount(source)`, `registerBillSource(type, provider)` (used by P2-06), `isGrnBilled(grnId)` (used by procurement to block GRN cancellation), events `bill.posted`, `payment.recorded`; view `pay_v_vendor_ledger`.
+- Provides: `getVendorBalance(partyId, date)`, `getOpenBills(partyId)`, `getPaidAmount(source)`, `registerBillSource(type, provider)` (used by P2-06), `isGrnBilled(grnId)` (used by procurement to block GRN cancellation), events `bill.posted`, `payment.recorded`; view `pay_v_vendor_ledger`. Added 2026-11-21 by approved CHANGES entry (P2-08 interfaces), built in the P2-08 PR with tests in this module: `getPaidForProject(projectId, asOf)` (vendor and subcontractor payments, resolved through the registered bill sources).
 - Consumes: procurement (POs, GRNs), inventory (receipt cost lines through GRN data), projects (`transitionCost`, `postCost`), tax engine (input tax, withholding we deduct), cash book (`recordPayment`), approvals, files.
 - Must not: write stock or POs; money movement always through the cash book.
 - Out of scope: purchase returns and debit notes to vendors (BACKLOG), prepayment to vendors beyond a simple advance bill, retention.

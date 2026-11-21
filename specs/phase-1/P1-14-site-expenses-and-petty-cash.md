@@ -15,7 +15,7 @@ Handle small site spending: cash advances to custodians, expense claims with rec
 
 ## 2. Boundary
 - Owns: tables `exp_*`, module `expenses`.
-- Provides: `getCustodianBalance(userId)`, events `expense.approved`, `expense.posted`, `advance.issued`; cost postings to the cost ledger.
+- Provides: `getCustodianBalance(userId)`, events `expense.approved`, `expense.posted`, `advance.issued`; cost postings to the cost ledger. Added 2026-11-21 by approved CHANGES entry (P2-08 interfaces), built in the P2-08 PR with tests in this module: `getReimbursedForProject(projectId, asOf)` (expenses reimbursed and advances settled that are attributable to the project, up to `asOf`).
 - Consumes: projects (`postCost`, scope), approvals, files, identity, master data (cost codes).
 - Must not: move cash or bank balances (cash book arrives in P2-03, which consumes `advance.issued` and `expense.posted`).
 - Out of scope: reimbursements and payments through the cash book (P2-03), vendor bills (P2-05).

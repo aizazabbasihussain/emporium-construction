@@ -15,7 +15,7 @@ Track what each client owes, record receipts (cash, cheque, bank transfer, post-
 
 ## 2. Boundary
 - Owns: tables `rcv_*`, module `receivables`.
-- Provides: `getCustomerBalance(partyId, date)`, `getOpenInvoices(partyId)`, `getCollectedAmount(projectId)`, events `receipt.recorded`, `pdc.cleared`, `pdc.bounced`; view `rcv_v_customer_ledger`.
+- Provides: `getCustomerBalance(partyId, date)`, `getOpenInvoices(partyId)`, `getCollectedAmount(projectId)`, events `receipt.recorded`, `pdc.cleared`, `pdc.bounced`; view `rcv_v_customer_ledger`. Added 2026-11-21 by approved CHANGES entry (P2-08 interfaces), built in the P2-08 PR with tests in this module: `getProjectCollected(projectId, asOf)` returning gross collected, base collected and withheld tax certified (unapplied advances excluded), and `getProjectAging(projectId, asOf)` exported on the `Receivables` interface.
 - Consumes: billing (issued invoices, credit notes, advances), cash and bank book (`recordReceipt`), tax engine (client withholding), files, notifications.
 - Must not: write invoices or edit tax; money movement is always performed through the cash book.
 - Out of scope: retention release (BACKLOG), write-offs beyond an approved adjustment, dunning letters.

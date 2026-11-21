@@ -52,6 +52,8 @@ P1-12 stays `not-started`; P1-14, P1-15 and others that do not depend on it can 
 
 ### 2026-11-21: P2-08 needs per-project, as-of query interfaces that six dependency modules do not provide
 
+**Decision 2026-11-21: option 1 accepted by the owner.** The interfaces below are added to variations, projects, billing, receivables, payables, payroll and expenses in the P2-08 PR, with tests in the owning modules; the Provides lines of P1-09, P1-10, P1-14, P2-02, P2-04, P2-05 and P2-07 and the Boundary of P2-08 are updated to match. The cash book line is dropped from P2-08 Consumes. Questions settled with it: "billed" for margin is base before advance recovery; the receivable age alert uses the invoice due date; unapplied advances are not part of collected.
+
 Found while starting P2-08 (project profitability). The Boundary forbids reading other modules' tables and BR-6 asks for figures "from the owning modules' interfaces", reproducible for any `asOf`. Checked against the `index.ts` of each dependency, same situation as the P1-19 entry above. The agent stopped before writing code; P2-08 stays `not-started`.
 
 | Figure (BR) | Source available | Gap |

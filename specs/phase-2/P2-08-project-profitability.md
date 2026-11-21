@@ -16,7 +16,7 @@ Show, per project, contract value against cost, billing and cash collected, so t
 ## 2. Boundary
 - Owns: tables `pft_*` (alert settings only), module `profitability`.
 - Provides: `getProjectFinancials(projectId, asOf)`, `listProjectFinancials(filters)`, event `profitability.alert.raised`.
-- Consumes: projects (current contract value, budget, cost summary), billing (billed net of credit notes), receivables (collected), payables and subcontracts (paid amounts), payroll (paid wages), cash book (project-tagged payments through source documents).
+- Consumes, all through exported query functions with an `asOf` date (added by the approved CHANGES entry of 2026-11-21): variations `getCurrentContractValue`, projects `getCostSummary`, billing `getProjectBilling`, receivables `getProjectCollected` and `getProjectAging`, payables `getPaidForProject` (vendor and subcontractor payments), payroll `getPaidWagesForProject`, expenses `getReimbursedForProject`. The cash book is not consumed: it holds no project, and the three paid-out queries cover cash going out.
 - Must not: store copies of financial data except alert state and saved forecasts; must not read other modules' tables directly.
 - Out of scope: general ledger statements, tax profitability, maintenance job profit (P3-05 adds work-order profit through the same cost summary interface), forecasting models beyond cost-to-complete.
 
