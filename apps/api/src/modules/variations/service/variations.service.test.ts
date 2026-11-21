@@ -375,6 +375,21 @@ describe('client approval (BR-4, BR-5, T-3, T-4)', () => {
     expect(original[0]?.original_contract_value).toBe('1000000.00');
   });
 
+  it('gives the contract value of an earlier date, ignoring variations approved later (P2-08)', async () => {
+    const project = await kit.project();
+    const early = await kit.draft(project.id, { lines: [line({ priceAmount: '100000' })] });
+    const late = await kit.draft(project.id, { lines: [line({ priceAmount: '50000' })] });
+    await kit.approved(early, '2026-10-10');
+    await kit.approved(late, '2026-10-20');
+    const at = (asOf: string | undefined) =>
+      kit.variations.getCurrentContractValue(kit.db, project.id, asOf);
+    expect(await at('2026-10-09')).toBe('1000000.00');
+    expect(await at('2026-10-10')).toBe('1100000.00');
+    expect(await at('2026-10-19')).toBe('1100000.00');
+    expect(await at('2026-10-20')).toBe('1150000.00');
+    expect(await at(undefined)).toBe('1150000.00');
+  });
+
   it('an unknown project has no contract value', async () => {
     expect(await codeOf(service().contractValue(kit.db, MISSING))).toBe('project_not_found');
   });

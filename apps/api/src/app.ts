@@ -35,6 +35,10 @@ import {
   type WorkerPortalRouteDeps,
 } from './modules/workerportal/index.js';
 import { registerReportsRoutes, type ReportsRouteDeps } from './modules/reports/index.js';
+import {
+  registerProfitabilityRoutes,
+  type ProfitabilityRouteDeps,
+} from './modules/profitability/index.js';
 import { registerExpensesRoutes, type ExpensesRouteDeps } from './modules/expenses/index.js';
 import { registerInventoryRoutes, type InventoryRouteDeps } from './modules/inventory/index.js';
 import {
@@ -112,6 +116,7 @@ export interface AppDeps {
   payroll?: PayrollRouteDeps;
   workerPortal?: WorkerPortalRouteDeps;
   reports?: ReportsRouteDeps;
+  profitability?: ProfitabilityRouteDeps;
 }
 
 export async function buildApp({
@@ -147,6 +152,7 @@ export async function buildApp({
   payroll,
   workerPortal,
   reports,
+  profitability,
 }: AppDeps): Promise<FastifyInstance> {
   const loggerInstance: FastifyBaseLogger = logger;
   const app = Fastify({
@@ -205,6 +211,7 @@ export async function buildApp({
   if (payroll) registerPayrollRoutes(app, payroll);
   if (workerPortal) registerWorkerPortalRoutes(app, workerPortal);
   if (reports) registerReportsRoutes(app, reports);
+  if (profitability) registerProfitabilityRoutes(app, profitability);
 
   return app;
 }

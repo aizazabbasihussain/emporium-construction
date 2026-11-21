@@ -286,6 +286,33 @@ export async function netBilled(
   return (rows[0] as { net: string }).net;
 }
 
+/**
+ * Issued invoices of a project dated on or before `asOf`, net of the credit notes issued by then, before
+ * advance recovery. Advance invoices are left out: the advance is not billing, and the stage invoice
+ * that recovers it carries the full base.
+ */
+export async function billedAsOf(
+  db: Db,
+  projectId: string,
+  asOf: string,
+): Promise<{ base: string; tax: string; gross: string }> {
+  const rows = await db.query<{ base: string; tax: string; gross: string }>(
+    `select (coalesce(i.base, 0) - coalesce(c.base, 0))::numeric(18,2)::text as base,
+            (coalesce(i.tax, 0) - coalesce(c.tax, 0))::numeric(18,2)::text as tax,
+            (coalesce(i.gross, 0) - coalesce(c.gross, 0))::numeric(18,2)::text as gross
+       from (select sum(base_amount) as base, sum(tax_total) as tax, sum(gross_total) as gross
+               from bil_invoices
+              where project_id = $1 and status = 'issued' and deleted_at is null
+                and source_type <> 'advance' and invoice_date <= $2::date) i,
+            (select sum(cn.base_amount) as base, sum(cn.tax_total) as tax, sum(cn.gross_total) as gross
+               from bil_credit_notes cn join bil_invoices inv on inv.id = cn.invoice_id
+              where inv.project_id = $1 and inv.source_type <> 'advance' and inv.deleted_at is null
+                and cn.status = 'issued' and cn.deleted_at is null and cn.issued_on <= $2::date) c`,
+    [projectId, asOf],
+  );
+  return rows[0] as { base: string; tax: string; gross: string };
+}
+
 export const countInvoices = (db: Db, projectId: string) =>
   db
     .query<{ n: string }>(

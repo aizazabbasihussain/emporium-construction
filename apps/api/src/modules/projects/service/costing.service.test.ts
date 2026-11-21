@@ -27,6 +27,54 @@ const tx = <T>(run: (db: ProjectsKit['db']) => Promise<T>) => kit.db.transaction
 const summaryOf = (projectId: string) =>
   kit.projects.getCostSummary(kit.db, { type: 'project', id: projectId });
 
+describe('getCostSummary as of a date (P2-08 T-4)', () => {
+  it('ignores later entries and shows the status a chain had on the date', async () => {
+    const project = await kit.activeProject();
+    const first = await kit.cost(project.id, {
+      amount: '100.00',
+      status: 'committed',
+      entryDate: '2026-10-01',
+      sourceLineId: uid(9101),
+    });
+    await kit.cost(project.id, {
+      amount: '40.00',
+      status: 'posted',
+      entryDate: '2026-10-20',
+      sourceLineId: uid(9102),
+    });
+    // A move to a later status is dated by the day it happens (the kit's clock: 25 October).
+    kit.now.current = new Date('2026-10-22T10:00:00Z');
+    const approved = await tx((db) => kit.projects.transitionCost(first, 'approved', db));
+    kit.now.current = new Date('2026-10-25T10:00:00Z');
+    await tx((db) => kit.projects.transitionCost(approved.id, 'posted', db));
+    const at = (asOf?: string) =>
+      kit.projects.getCostSummary(kit.db, { type: 'project', id: project.id }, asOf);
+    expect((await at('2026-09-30')).totals).toEqual({
+      committed: '0.00',
+      approved: '0.00',
+      posted: '0.00',
+    });
+    expect((await at('2026-10-05')).totals).toEqual({
+      committed: '100.00',
+      approved: '0.00',
+      posted: '0.00',
+    });
+    expect((await at('2026-10-20')).totals).toEqual({
+      committed: '100.00',
+      approved: '0.00',
+      posted: '40.00',
+    });
+    expect((await at('2026-10-22')).totals).toEqual({
+      committed: '0.00',
+      approved: '100.00',
+      posted: '40.00',
+    });
+    expect((await at('2026-10-25')).totals.posted).toBe('140.00');
+    expect((await at()).totals.posted).toBe('140.00');
+    expect(await codeOf(() => at('2026-13-01'))).toBeDefined();
+  });
+});
+
 describe('postCost (BR-5, T-4)', () => {
   it('posts a cost, returns it again for the same idempotency key, and audits it', async () => {
     const project = await kit.activeProject();

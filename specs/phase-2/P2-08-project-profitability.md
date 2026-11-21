@@ -3,7 +3,7 @@ id: P2-08
 title: Project profitability and contract tracking
 phase: 2
 module: profitability
-status: not-started
+status: done
 depends_on: [P2-04, P2-05, P2-06, P2-07, P1-09]
 requires_inputs: []
 ---

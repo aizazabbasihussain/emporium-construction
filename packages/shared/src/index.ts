@@ -392,6 +392,16 @@ export {
   type ReportFormat,
   type ReportsPermission,
 } from './reports.js';
+export {
+  profitabilityAlertCodes,
+  profitabilityNotificationTemplates,
+  profitabilityPermissionGrants,
+  profitabilityPermissions,
+  thresholdScopes,
+  type ProfitabilityAlertCode,
+  type ProfitabilityPermission,
+  type ThresholdScope,
+} from './profitability.js';
 export * from './offline/index.js';
 export {
   supplyKinds,

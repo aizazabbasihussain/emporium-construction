@@ -17,4 +17,6 @@ export function createReports(deps: ReportsDeps): Reports {
 export { registerReportsRoutes, type ReportsRouteDeps } from './routes/reports.routes.js';
 export type { ReportsDeps } from './service/context.js';
 export type { DownloadDto } from './service/reports.service.js';
+/** The shared export helper (CSV and Excel with the header block) that other modules use for BR-10. */
+export { toCsv, toXlsx, type ExportInput, type ExportMeta } from './service/export.js';
 export type { Cell, Column, ReportPageDto, Row, SavedFilterDto, Section } from './types.js';

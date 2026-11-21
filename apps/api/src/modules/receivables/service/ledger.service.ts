@@ -9,6 +9,7 @@ import { receivablesSettingKeys } from '@emporium/shared';
 import { assertFound } from '../policy/receivables.policy.js';
 import {
   collectedForProject,
+  collectedSplitForProject,
   listAdjustments,
   listAdvanceAllocations,
   listInvoiceFigures,
@@ -33,6 +34,23 @@ export interface LedgerService {
   getCustomerBalance(db: Db, partyId: string, date: string): Promise<CustomerBalanceDto>;
   /** Cash and advances collected against the invoices of a project, as of a date. */
   getCollectedAmount(db: Db, projectId: string, date?: string): Promise<string>;
+  /** Collected against the project's invoices as of a date: gross (with withholding certified), the withholding part, and base. */
+  getProjectCollected(
+    db: Db,
+    projectId: string,
+    asOf: string,
+  ): Promise<{ gross: string; withheld: string; base: string }>;
+  /** What is still owed on the project's invoices as of a date and the oldest due date among them. */
+  getProjectAging(
+    db: Db,
+    projectId: string,
+    asOf: string,
+  ): Promise<{
+    asOf: string;
+    outstanding: string;
+    openInvoices: number;
+    oldestDueDate: string | null;
+  }>;
   /** The customer ledger screen: balance with credit, and the open invoices, as of a date (default today). */
   overview(
     db: Db,
@@ -142,6 +160,25 @@ export function createLedgerService(ctx: Context): LedgerService {
 
     async getCollectedAmount(db, projectId, date) {
       return Money.of(await collectedForProject(db, projectId, date ?? ctx.today())).toString();
+    },
+
+    async getProjectCollected(db, projectId, asOf) {
+      return collectedSplitForProject(db, projectId, BusinessDate.parse(asOf).toString());
+    },
+
+    async getProjectAging(db, projectId, asOf) {
+      const date = BusinessDate.parse(asOf).toString();
+      const open = (await listInvoiceFigures(db, { asOf: date, projectId }))
+        .filter((row) => row.source_type !== 'advance')
+        .map(openInvoiceDto)
+        .filter((row) => Money.of(row.outstanding).compare(Money.zero()) > 0);
+      // Invoices come ordered by due date, so the first one is the oldest.
+      return {
+        asOf: date,
+        outstanding: sum(open.map((row) => row.outstanding)).toString(),
+        openInvoices: open.length,
+        oldestDueDate: open[0]?.dueDate ?? null,
+      };
     },
 
     async statement(db, partyId, from, to) {

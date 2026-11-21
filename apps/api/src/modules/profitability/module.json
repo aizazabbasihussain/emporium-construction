@@ -1,0 +1,48 @@
+{
+  "name": "profitability",
+  "tablePrefix": "pft_",
+  "ownedTables": ["pft_thresholds", "pft_forecasts", "pft_alert_state"],
+  "ownedViews": [],
+  "exports": [
+    "createProfitability",
+    "registerProfitabilityRoutes",
+    "getProjectFinancials",
+    "listProjectFinancials",
+    "evaluateAlerts"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.idempotency.execute",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "notifications.notify",
+    "notifications.notifyRole",
+    "notifications.registerTemplate",
+    "projects.getProject",
+    "projects.listProjectsForUser",
+    "projects.getCostSummary",
+    "variations.getCurrentContractValue",
+    "billing.getProjectBilling",
+    "receivables.getProjectCollected",
+    "receivables.getProjectAging",
+    "payables.getPaidForProject",
+    "payroll.getPaidWagesForProject",
+    "expenses.getReimbursedForProject",
+    "reports.toCsv",
+    "reports.toXlsx"
+  ],
+  "eventsIn": [],
+  "eventsOut": [
+    "profitability.alert.raised",
+    "profitability.alert.cleared",
+    "profitability.forecast.changed",
+    "profitability.threshold.changed"
+  ],
+  "permissions": [
+    "profitability.project.read",
+    "profitability.forecast.set",
+    "profitability.threshold.manage"
+  ],
+  "notes": "Owns alert thresholds, saved cost-to-complete forecasts and alert state only. Every figure is composed at read time from the owning modules' query interfaces with an as-of date; nothing is copied (AC-3). 'Billed' is the issued, non-advance invoices net of credit notes before advance recovery; 'collected' is the receipts allocated to those invoices (gross includes the tax withheld and certified); unapplied advances are not collected; the receivable age alert uses the invoice due date. Paid-out figures are the project's share of each payment (bill lines, run cost allocation, posted expense lines). No thresholds are seeded, so no alert is raised until management sets them. Exports reuse the reports export helper."
+}

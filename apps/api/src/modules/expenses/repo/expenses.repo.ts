@@ -385,3 +385,17 @@ export async function upsertCategory(
   );
   return rows[0] as CategoryRow;
 }
+
+/** Total of the lines on a project in claims posted on or before `asOf` (Asia/Karachi date). */
+export const reimbursedForProject = (db: Db, projectId: string, asOf: string) =>
+  db
+    .query<{ total: string }>(
+      `select coalesce(sum(l.amount), 0)::numeric(18,2)::text as total
+         from exp_claim_lines l
+         join exp_claims c on c.id = l.claim_id
+        where l.cost_object_type = 'project' and l.cost_object_id = $1
+          and c.status = 'posted' and c.deleted_at is null
+          and (c.updated_at at time zone 'Asia/Karachi')::date <= $2::date`,
+      [projectId, asOf],
+    )
+    .then((rows) => rows[0]?.total ?? '0');

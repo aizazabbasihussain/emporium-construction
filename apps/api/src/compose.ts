@@ -46,6 +46,7 @@ import { createSubcontracts, type Subcontracts } from './modules/subcontracts/in
 import { createValuation, type Valuation } from './modules/valuation/index.js';
 import { createTax, type Tax } from './modules/tax/index.js';
 import { createReports, type Reports } from './modules/reports/index.js';
+import { createProfitability, type Profitability } from './modules/profitability/index.js';
 import {
   approvalsPermissions,
   crmPermissions,
@@ -68,6 +69,7 @@ import {
   projectsPermissions,
   quotationsPermissions,
   receivablesPermissions,
+  profitabilityPermissions,
   reportsPermissions,
   taxPermissions,
   valuationPermissions,
@@ -130,6 +132,7 @@ export interface Runtime {
   payroll: Payroll;
   workerPortal: WorkerPortal;
   reports: Reports;
+  profitability: Profitability;
   approvals: Approvals;
   files: Files;
   /** Set when FILE_STORE_DRIVER=local: it serves its own signed download links. */
@@ -186,6 +189,7 @@ export async function wireRuntime(
   identity.registerPermissions('wages', Object.values(wagesPermissions));
   identity.registerPermissions('payroll', Object.values(payrollPermissions));
   identity.registerPermissions('reports', Object.values(reportsPermissions));
+  identity.registerPermissions('profitability', Object.values(profitabilityPermissions));
   identity.registerPermissions('workerportal', Object.values(workerportalPermissions));
   await ensureWorkerRole(identity, db);
   const importer = createImporter({ platform, clock, newId: () => uuidv7(clock.now()) });
@@ -467,6 +471,19 @@ export async function wireRuntime(
     dpr,
     masterData,
   });
+  const profitability = createProfitability({
+    platform,
+    clock,
+    newId: () => uuidv7(clock.now()),
+    projects,
+    variations,
+    billing,
+    receivables,
+    payables,
+    payroll,
+    expenses,
+    notifications,
+  });
   if (config.adminEmail !== undefined) {
     const email = config.adminEmail;
     await db.transaction((tx) => identity.users.ensureAdmin(email, tx));
@@ -498,6 +515,7 @@ export async function wireRuntime(
     payroll,
     workerPortal,
     reports,
+    profitability,
     approvals,
     files,
     localFileStore: local,
@@ -540,5 +558,6 @@ export function routeDeps(runtime: Runtime) {
     payroll: { db, payroll: runtime.payroll, platform },
     workerPortal: { db, workerPortal: runtime.workerPortal, platform },
     reports: { db, reports: runtime.reports.service, platform },
+    profitability: { db, profitability: runtime.profitability.service, platform },
   };
 }

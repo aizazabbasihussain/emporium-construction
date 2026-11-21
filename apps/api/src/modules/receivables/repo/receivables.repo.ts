@@ -366,6 +366,27 @@ export const listAdvanceAllocations = (db: Db, partyId: string, asOf: string) =>
     [partyId, asOf],
   );
 
+/**
+ * What was collected against the invoices of a project as of a date: gross (cash and withholding
+ * certified), the part of it that is withholding, and the base (gross less the tax share of each
+ * invoice). Advance invoices are left out, as in the billed figure of billing.
+ */
+export const collectedSplitForProject = (db: Db, projectId: string, asOf: string) =>
+  db
+    .query<{ gross: string; withheld: string; base: string }>(
+      `select coalesce(sum(a.amount), 0)::numeric(18,2)::text as gross,
+              coalesce(sum(a.amount) filter (where a.kind = 'withholding'), 0)::numeric(18,2)::text as withheld,
+              coalesce(sum(round(a.amount * (v.gross_total - v.tax_total) / v.gross_total, 2))
+                       filter (where v.gross_total <> 0), 0)::numeric(18,2)::text as base
+         from rcv_allocations a
+         join rcv_receipts r on r.id = a.receipt_id
+         join bil_v_invoices v on v.id = a.invoice_id
+        where v.project_id = $1 and v.source_type <> 'advance' and a.kind <> 'advance'
+          and ${COUNTED('r', '$2')}`,
+      [projectId, asOf],
+    )
+    .then((rows) => rows[0] as { gross: string; withheld: string; base: string });
+
 /** What was collected (cash and advances, not withholding) against the invoices of a project. */
 export const collectedForProject = (db: Db, projectId: string, asOf: string) =>
   db

@@ -18,6 +18,7 @@ const makeJobs = (overrides: { failing?: string } = {}) => {
     dpr: { notifyMissingDprs: job('dpr-missing') },
     receivables: { remindUpcomingPdcs: job('pdc-reminder') },
     payables: { postDueCheques: job('payables-cheques') },
+    profitability: { evaluateAlerts: job('profitability-alerts') },
   } as unknown as Parameters<typeof runSchedulerTick>[0];
   return { jobs, calls };
 };
@@ -40,6 +41,7 @@ describe('runSchedulerTick (BR-8)', () => {
       'dpr-missing',
       'pdc-reminder',
       'payables-cheques',
+      'profitability-alerts',
       'files-purge',
       'notifications-purge',
       'quotations-expire',
@@ -56,6 +58,18 @@ describe('runSchedulerTick (BR-8)', () => {
     ]);
 
     calls.length = 0;
+    // The alerts run again an hour later, not before.
+    await runSchedulerTick(jobs, state, new Date(day + 3_600_000), logger().logger);
+    expect(calls).toEqual([
+      'events',
+      'reminders',
+      'dpr-missing',
+      'pdc-reminder',
+      'payables-cheques',
+      'profitability-alerts',
+    ]);
+
+    calls.length = 0;
     await runSchedulerTick(jobs, state, new Date(2 * day), logger().logger);
     expect(calls).toEqual([
       'events',
@@ -63,6 +77,7 @@ describe('runSchedulerTick (BR-8)', () => {
       'dpr-missing',
       'pdc-reminder',
       'payables-cheques',
+      'profitability-alerts',
       'files-purge',
       'notifications-purge',
       'quotations-expire',
@@ -79,6 +94,7 @@ describe('runSchedulerTick (BR-8)', () => {
       'dpr-missing',
       'pdc-reminder',
       'payables-cheques',
+      'profitability-alerts',
       'files-purge',
       'notifications-purge',
       'quotations-expire',

@@ -70,7 +70,7 @@ export function createProjects(deps: {
     postCost: (entry, tx) => costing.postCost(entry, tx),
     reverseCost: (entryId, reason, tx, by) => costing.reverseCost(entryId, reason, tx, by),
     transitionCost: (entryId, to, tx, by) => costing.transitionCost(entryId, to, tx, by),
-    getCostSummary: (db, costObject) => costing.getCostSummary(db, costObject),
+    getCostSummary: (db, costObject, asOf) => costing.getCostSummary(db, costObject, asOf),
   };
 }
 

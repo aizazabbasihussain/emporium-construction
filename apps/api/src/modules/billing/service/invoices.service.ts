@@ -46,6 +46,7 @@ import {
   issuedCreditBase,
   listLines,
   lockedAdvances,
+  billedAsOf,
   netBilled,
   replaceLines,
   searchInvoices,
@@ -106,6 +107,12 @@ export interface InvoiceService {
   getInvoice(db: Db, id: string): Promise<InvoiceDto>;
   listInvoicesForProject(db: Db, projectId: string): Promise<InvoiceHeaderDto[]>;
   getBilledAmount(db: Db, projectId: string): Promise<string>;
+  /** Billed base, tax and gross as of a date, net of credit notes, before advance recovery. */
+  getProjectBilling(
+    db: Db,
+    projectId: string,
+    asOf: string,
+  ): Promise<{ base: string; tax: string; gross: string }>;
   registerInvoiceSource(type: string, provider: InvoiceSourceProvider): void;
 
   list(db: Db, query: InvoiceQuery, actor: Actor): Promise<PageResult<InvoiceHeaderDto>>;
@@ -466,6 +473,10 @@ export function createInvoiceService(deps: {
     },
 
     getBilledAmount: (db, projectId) => netBilled(db, projectId, ['issued'], null),
+
+    async getProjectBilling(db, projectId, asOf) {
+      return billedAsOf(db, projectId, BusinessDate.parse(asOf).toString());
+    },
 
     registerInvoiceSource: (type, provider) => registry.register(type, provider),
 
