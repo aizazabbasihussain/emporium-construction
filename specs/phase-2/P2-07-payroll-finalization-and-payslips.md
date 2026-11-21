@@ -3,7 +3,7 @@ id: P2-07
 title: Payroll finalization, payment and payslips
 phase: 2
 module: payroll
-status: not-started
+status: done
 depends_on: [P1-18, P2-03, P1-09]
 requires_inputs: [H-29, H-09]
 ---

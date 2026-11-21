@@ -29,6 +29,7 @@ import { registerDprRoutes, type DprRouteDeps } from './modules/dpr/index.js';
 import { registerWorkforceRoutes, type WorkforceRouteDeps } from './modules/workforce/index.js';
 import { registerAttendanceRoutes, type AttendanceRouteDeps } from './modules/attendance/index.js';
 import { registerWagesRoutes, type WagesRouteDeps } from './modules/wages/index.js';
+import { registerPayrollRoutes, type PayrollRouteDeps } from './modules/payroll/index.js';
 import {
   registerWorkerPortalRoutes,
   type WorkerPortalRouteDeps,
@@ -107,6 +108,8 @@ export interface AppDeps {
   workforce?: WorkforceRouteDeps;
   attendance?: AttendanceRouteDeps;
   wages?: WagesRouteDeps;
+  /** The payroll endpoints; they rely on the authentication hook of `identity`. */
+  payroll?: PayrollRouteDeps;
   workerPortal?: WorkerPortalRouteDeps;
   reports?: ReportsRouteDeps;
 }
@@ -141,6 +144,7 @@ export async function buildApp({
   workforce,
   attendance,
   wages,
+  payroll,
   workerPortal,
   reports,
 }: AppDeps): Promise<FastifyInstance> {
@@ -198,6 +202,7 @@ export async function buildApp({
   if (workforce) registerWorkforceRoutes(app, workforce);
   if (attendance) registerAttendanceRoutes(app, attendance);
   if (wages) registerWagesRoutes(app, wages);
+  if (payroll) registerPayrollRoutes(app, payroll);
   if (workerPortal) registerWorkerPortalRoutes(app, workerPortal);
   if (reports) registerReportsRoutes(app, reports);
 

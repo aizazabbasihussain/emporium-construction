@@ -1,0 +1,60 @@
+{
+  "name": "payroll",
+  "tablePrefix": "pyr_",
+  "ownedTables": [
+    "pyr_runs",
+    "pyr_lines",
+    "pyr_payments",
+    "pyr_cost_entries",
+    "pyr_cost_adjustments"
+  ],
+  "views": [],
+  "exports": [
+    "createPayroll",
+    "registerPayrollRoutes",
+    "getPayrollRun",
+    "getUnpaidWages",
+    "hasPaidLines"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.idempotency.execute",
+    "platform.numbering.next",
+    "platform.settings.get",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "approvals.requestApproval",
+    "approvals.getApprovalState",
+    "wages.getApprovedWageSheet",
+    "wages.periods.get",
+    "wages.periods.reconciliation",
+    "attendance.getApprovedAttendance",
+    "projects.postCost",
+    "projects.transitionCost",
+    "projects.reverseCost",
+    "projects.costing.listEntries",
+    "cashbook.recordPayment",
+    "cashbook.transactions.reverse",
+    "masterdata.costing.listCostCodes"
+  ],
+  "eventsIn": [],
+  "eventsOut": [
+    "payroll.run.created",
+    "payroll.finalized",
+    "payroll.reopened",
+    "payroll.paid",
+    "payroll.payment.reversed"
+  ],
+  "permissions": [
+    "payroll.run.read",
+    "payroll.run.create",
+    "payroll.run.finalize",
+    "payroll.payment.create",
+    "payroll.payment.reverse",
+    "payroll.run.reopen",
+    "payroll.payslip.read"
+  ],
+  "notes": "Turns an approved wage period into a run (one per period, lines copy the net pay of the wage sheet; a worker with nothing to pay has no line). Finalizing locks the run, moves the month's approved attendance cost entries to posted (found through the projects of the workers' approved attendance and the cost ledger of each project, and checked against the wage reconciliation so nothing is missed), posts the difference between the wage sheet gross and that cost as source `payroll_adjustment` entries (spread to the projects pro rata to their attendance cost with the largest-remainder method, or to overhead; H-29 default: projects), numbers the payslips from series PSL and emits payroll.finalized once. Reopening an unpaid finalized run reverses the posted entries and the adjustments and books the attendance cost as approved again. A run that is no longer a draft refuses wages.periods.reopen (the interface wages calls hasPaidLines). Paying marks lines paid with a date, method and cash account and records one cash book payment per call (or per line when the setting payroll_cash_txn_per_line is on) with the payslip numbers in the reference; above the cash book's approval band (H-09: every payment) the accountant first asks for approval with POST /payroll/runs/:id/payment-requests and passes the approved request (a `payment` document of the cash book, because the cash book honours only that document type; its context names the run) to /pay; the approver can be neither the finalizer (here) nor the person recording the payment (the cash book). Reversing a payment (POST /payroll/payments/:id/reverse, payroll.payment.reverse) reverses the cash book entries and makes the lines unpaid again; the run status follows the lines. Payslips (GET /payroll/payslips/:id and the run set as PDF) show the rate only to the worker themself; payroll stores no bank or wallet details."
+}

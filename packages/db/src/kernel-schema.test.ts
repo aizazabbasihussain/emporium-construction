@@ -33,6 +33,7 @@ describe('platform kernel schema (P1-01)', () => {
       'LEAD',
       'PO',
       'PRJ',
+      'PSL',
       'PV',
       'QUO',
       'RV',

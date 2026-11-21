@@ -15,6 +15,9 @@ export const PRICE_VARIANCE_DOC_TYPE = 'price_variance';
 /** P2-06 BR-4: a back-charge that recovers a company cost offsets it with a negative entry. */
 export const BACK_CHARGE_DOC_TYPE = 'subcontract_back_charge';
 
+/** P2-07 BR-2: the difference between payroll and attendance cost is negative when payroll is lower. */
+export const PAYROLL_ADJUSTMENT_DOC_TYPE = 'payroll_adjustment';
+
 /** Constitution 5.4: money is a decimal string with at most two decimals, never a float. */
 export function normalizeAmount(text: string): string {
   const trimmed = text.trim();
@@ -30,11 +33,12 @@ export function assertAmountAllowed(amount: string, sourceDocType: string): void
     new Dec(amount).isNegative() &&
     sourceDocType !== SALVAGE_DOC_TYPE &&
     sourceDocType !== PRICE_VARIANCE_DOC_TYPE &&
-    sourceDocType !== BACK_CHARGE_DOC_TYPE
+    sourceDocType !== BACK_CHARGE_DOC_TYPE &&
+    sourceDocType !== PAYROLL_ADJUSTMENT_DOC_TYPE
   ) {
     throw new RuleViolationError(
       'amount_negative',
-      'Only a salvage credit, a price variance or a back-charge recovery can have a negative amount',
+      'Only a salvage credit, a price variance, a back-charge recovery or a payroll adjustment can have a negative amount',
     );
   }
 }

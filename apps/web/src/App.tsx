@@ -3,6 +3,7 @@ import {
   dprPermissions,
   expensesPermissions,
   payablesPermissions,
+  payrollPermissions,
   subcontractsPermissions,
   procurementPermissions,
   reportsPermissions,
@@ -57,6 +58,7 @@ import { RfqPage } from './procurement/RfqPage';
 import { VariationEditorPage } from './variations/VariationEditorPage';
 import { BillEntryPage, BillPage, BillsPage } from './payables/BillPages';
 import { PaymentBuilderPage, PaymentRunsPage, PaymentsPage } from './payables/PaymentPages';
+import { PayslipPage, RunPage, RunsPage, UnpaidPage } from './payroll/PayrollPages';
 import { PayablesAgingPage, VendorLedgerPage, WithholdingReportPage } from './payables/ReportPages';
 import { CertificateNewPage, CertificatePage } from './subcontracts/CertificatePages';
 import { StatementPage, WorkOrderLedgerPage } from './subcontracts/LedgerPages';
@@ -334,6 +336,24 @@ export function AppRoutes() {
         <Route
           path="/payables/withholding"
           element={guarded('/payables/withholding', <WithholdingReportPage />)}
+        />
+        <Route path="/payroll/runs" element={guarded('/payroll/runs', <RunsPage />)} />
+        <Route
+          path="/payroll/runs/:id"
+          element={
+            <RequirePermission permission={payrollPermissions.runRead}>
+              <RunPage />
+            </RequirePermission>
+          }
+        />
+        <Route path="/payroll/unpaid" element={guarded('/payroll/unpaid', <UnpaidPage />)} />
+        <Route
+          path="/payroll/payslips/:id"
+          element={
+            <RequirePermission permission={payrollPermissions.payslipRead}>
+              <PayslipPage />
+            </RequirePermission>
+          }
         />
         <Route
           path="/subcontracts/work-orders"

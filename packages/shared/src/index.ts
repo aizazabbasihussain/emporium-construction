@@ -247,6 +247,22 @@ export {
   type SubcontractsPermission,
   type WorkOrderStatus,
 } from './subcontracts.js';
+export {
+  costDifferenceTreatments,
+  payrollAdjustmentDocType,
+  payrollLineStatuses,
+  payrollPaymentMethods,
+  payrollPermissionGrants,
+  payrollPermissions,
+  payrollRunStatuses,
+  payrollSettingKeys,
+  payslipSeries,
+  type CostDifferenceTreatment,
+  type PayrollLineStatus,
+  type PayrollPaymentMethod,
+  type PayrollPermission,
+  type PayrollRunStatus,
+} from './payroll.js';
 export { fileStoreDrivers, type FileStoreDriver } from './enums.js';
 export {
   fileOperations,

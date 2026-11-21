@@ -218,6 +218,12 @@ export const settingRegistry: SettingRegistry = {
     description: 'Overhead cost code that takes a price variance on goods still in stock (H-22)',
     default: '600',
   },
+  // P2-07 BR-4: one cash book transaction per paid line instead of one per method and account.
+  payroll_cash_txn_per_line: {
+    type: 'boolean',
+    description: 'Record one cash book transaction for each paid payroll line',
+    default: false,
+  },
   // P1-12 BR-7, H-21: salvaged material enters stock at zero value unless the owner chooses estimates.
   'inventory.salvage_value_mode': {
     type: 'string',
