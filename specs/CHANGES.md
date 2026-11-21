@@ -50,6 +50,41 @@ P1-12 stays `not-started`; P1-14, P1-15 and others that do not depend on it can 
 
 ## Proposed
 
+### 2026-11-21: P2-08 needs per-project, as-of query interfaces that six dependency modules do not provide
+
+Found while starting P2-08 (project profitability). The Boundary forbids reading other modules' tables and BR-6 asks for figures "from the owning modules' interfaces", reproducible for any `asOf`. Checked against the `index.ts` of each dependency, same situation as the P1-19 entry above. The agent stopped before writing code; P2-08 stays `not-started`.
+
+| Figure (BR) | Source available | Gap |
+|---|---|---|
+| Contract value (BR-1) | variations `getCurrentContractValue(db, projectId)` | no `asOf` |
+| Budget and cost by status (BR-2) | projects `getCostSummary(db, costObject)` | no `asOf`; a reproducible earlier date (T-4) is impossible for cost |
+| Billed, base excluding tax (BR-1, BR-2) | billing `getBilledAmount(db, projectId)` | no `asOf`; it nets advance recovery; no gross figure, so outstanding receivable = billed gross - collected gross cannot be formed |
+| Collected, gross and base (BR-1) | receivables `getCollectedAmount(db, projectId, date)` | one number only; no base/gross split, no withheld-tax part |
+| Receivable older than the age limit (BR-4) | receivables `ledger.aging(db, asOf, 'project')` | reached through `ledger`, not on the `Receivables` interface; bucketed, not "oldest due date per project" |
+| Vendor and subcontractor paid (BR-1, BR-3) | payables `getPaidAmount(db, {type, id}, date)` | per source document only; no total per project, so the module would have to enumerate every bill source itself |
+| Payroll paid (BR-1) | payroll `getPayrollRun(periodId)`, `getUnpaidWages()` | no wages paid per project and date; lines are per worker and run |
+| Expenses reimbursed (BR-1) | none | no per-project query in expenses |
+| Cash book project-tagged payments (Consumes) | cashbook `getCashPosition`, `getAccountBalance` | transactions carry no project; only reachable through source documents, which no interface lists |
+
+Building BR-1 to BR-3 and T-1, T-4, T-5 inside `profitability` would mean reading `bil_*`, `rcv_*`, `pay_*`, `pyr_*`, `exp_*` or `cbk_*` tables, which constitution 3 and 13 forbid. Adding the missing exports changes modules that are already `done`.
+
+Options for the human to decide:
+1. **Add the missing interfaces, then build P2-08.** Each is an exported query with tests in the owning module; the Provides lines of the owning specs are updated to match:
+   - variations: `getCurrentContractValue(db, projectId, asOf?)`.
+   - projects: `getCostSummary(db, costObject, asOf?)` (filter the append-only ledger by `entry_date`).
+   - billing: `getProjectBilling(db, projectId, asOf)` returning base, tax and gross billed, net of credit notes, before advance recovery.
+   - receivables: `getProjectCollected(db, projectId, asOf)` returning gross, base, and withheld tax certified; `getProjectAging` exported on the `Receivables` interface.
+   - payables: `getPaidForProject(db, projectId, asOf)` (vendor and subcontractor payments, resolved through the registered bill sources).
+   - payroll: `getPaidWagesForProject(db, projectId, asOf)`.
+   - expenses: `getReimbursedForProject(db, projectId, asOf)`.
+   - The "cash book (project-tagged payments through source documents)" line of P2-08 Consumes is dropped, since the three paid-out queries above already cover it and the cash book holds no project.
+2. **Split P2-08.** Build now only what the current interfaces support (contract value, cost by status, billed and collected as of today, margin, forecast, alerts) and mark paid-out, cash position (BR-3) and the as-of tests (T-4, T-5) as a follow-up spec after the interfaces exist. AC-1 changes accordingly.
+3. **Allow `profitability` to read published `<prefix>_v_*` views** of the owning modules, and add the views listed in option 1 in one human-reviewed change.
+
+Smaller points the agent would settle in code unless told otherwise: "billed" for margin is base before advance recovery; the alert "receivable older than the age limit" uses the invoice due date; the owning modules' unapplied advances are not part of collected.
+
+Human review needed: `specs/` is protected, so this is not auto-merged.
+
 ### 2026-11-20: P2-03 permission code and additions beyond the spec text (PR #53)
 
 P2-03 is built and open as PR #53, not merged, because it deviates from the spec text in two ways.
