@@ -10,7 +10,7 @@ export interface SchedulerState {
 
 type Jobs = Pick<
   Runtime,
-  'db' | 'platform' | 'notifications' | 'files' | 'quotations' | 'dpr' | 'receivables'
+  'db' | 'platform' | 'notifications' | 'files' | 'quotations' | 'dpr' | 'receivables' | 'payables'
 >;
 
 /**
@@ -38,6 +38,10 @@ export async function runSchedulerTick(
   // P2-04 BR-7: cheques due in the next seven days, once a day from 09:00 Asia/Karachi.
   await run('pdc-reminder', () =>
     jobs.db.transaction((tx) => jobs.receivables.remindUpcomingPdcs(tx, now)),
+  );
+  // P2-05 BR-7: post-dated cheques we issued reach the cash book on their date.
+  await run('payables-cheques', () =>
+    jobs.db.transaction((tx) => jobs.payables.postDueCheques(tx)),
   );
   if (now.getTime() - state.lastPurgeAt >= PURGE_EVERY_MS) {
     state.lastPurgeAt = now.getTime();

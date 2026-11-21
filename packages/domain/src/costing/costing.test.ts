@@ -109,6 +109,7 @@ describe('amounts (BR-5)', () => {
   it('allows a negative amount only for salvage', () => {
     expect(() => assertAmountAllowed('5.00', 'goods_receipt')).not.toThrow();
     expect(() => assertAmountAllowed('-5.00', 'salvage')).not.toThrow();
+    expect(() => assertAmountAllowed('-5.00', 'price_variance')).not.toThrow();
     expect(codeOf(() => assertAmountAllowed('-5.00', 'goods_receipt'))).toBe('amount_negative');
   });
 

@@ -110,6 +110,7 @@ export function createReceiptService(ctx: Context, commitments: Commitments) {
         rejectedQty: line.rejected_qty,
         note: line.note,
         costAmount: line.cost_amount,
+        costEntryId: line.cost_entry_id,
       })),
     };
   }

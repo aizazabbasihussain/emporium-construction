@@ -40,6 +40,7 @@ describe('platform kernel schema (P1-01)', () => {
       'STR',
       'TM',
       'VAR',
+      'VB',
       'VN',
       'WK',
     ]);

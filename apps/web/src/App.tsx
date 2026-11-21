@@ -2,6 +2,7 @@ import {
   cashbookPermissions,
   dprPermissions,
   expensesPermissions,
+  payablesPermissions,
   procurementPermissions,
   reportsPermissions,
   variationsPermissions,
@@ -53,6 +54,9 @@ import { PurchaseOrderPage, PurchaseOrdersPage } from './procurement/OrderPages'
 import { RequisitionPage, RequisitionsPage } from './procurement/RequisitionPages';
 import { RfqPage } from './procurement/RfqPage';
 import { VariationEditorPage } from './variations/VariationEditorPage';
+import { BillEntryPage, BillPage, BillsPage } from './payables/BillPages';
+import { PaymentBuilderPage, PaymentRunsPage, PaymentsPage } from './payables/PaymentPages';
+import { PayablesAgingPage, VendorLedgerPage, WithholdingReportPage } from './payables/ReportPages';
 import { AgingPage } from './receivables/AgingPage';
 import { CustomerLedgerPage } from './receivables/CustomerLedgerPage';
 import { FollowupsPage } from './receivables/FollowupsPage';
@@ -284,6 +288,48 @@ export function AppRoutes() {
         <Route
           path="/receivables/followups"
           element={guarded('/receivables/followups', <FollowupsPage />)}
+        />
+        <Route path="/payables/bills" element={guarded('/payables/bills', <BillsPage />)} />
+        <Route
+          path="/payables/bills/new"
+          element={
+            <RequirePermission permission={payablesPermissions.billCreate}>
+              <BillEntryPage />
+            </RequirePermission>
+          }
+        />
+        <Route
+          path="/payables/bills/:id"
+          element={
+            <RequirePermission permission={payablesPermissions.billRead}>
+              <BillPage />
+            </RequirePermission>
+          }
+        />
+        <Route
+          path="/payables/payments"
+          element={guarded('/payables/payments', <PaymentsPage />)}
+        />
+        <Route
+          path="/payables/payments/new"
+          element={
+            <RequirePermission permission={payablesPermissions.paymentCreate}>
+              <PaymentBuilderPage />
+            </RequirePermission>
+          }
+        />
+        <Route
+          path="/payables/payment-runs"
+          element={guarded('/payables/payment-runs', <PaymentRunsPage />)}
+        />
+        <Route
+          path="/payables/vendors"
+          element={guarded('/payables/vendors', <VendorLedgerPage />)}
+        />
+        <Route path="/payables/aging" element={guarded('/payables/aging', <PayablesAgingPage />)} />
+        <Route
+          path="/payables/withholding"
+          element={guarded('/payables/withholding', <WithholdingReportPage />)}
         />
         <Route
           path="/procurement/requisitions"
