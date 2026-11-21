@@ -12,6 +12,9 @@ export const SALVAGE_DOC_TYPE = 'salvage';
 /** P2-05 BR-5: a vendor price variance corrects a cost and is negative when the bill is cheaper. */
 export const PRICE_VARIANCE_DOC_TYPE = 'price_variance';
 
+/** P2-06 BR-4: a back-charge that recovers a company cost offsets it with a negative entry. */
+export const BACK_CHARGE_DOC_TYPE = 'subcontract_back_charge';
+
 /** Constitution 5.4: money is a decimal string with at most two decimals, never a float. */
 export function normalizeAmount(text: string): string {
   const trimmed = text.trim();
@@ -26,11 +29,12 @@ export function assertAmountAllowed(amount: string, sourceDocType: string): void
   if (
     new Dec(amount).isNegative() &&
     sourceDocType !== SALVAGE_DOC_TYPE &&
-    sourceDocType !== PRICE_VARIANCE_DOC_TYPE
+    sourceDocType !== PRICE_VARIANCE_DOC_TYPE &&
+    sourceDocType !== BACK_CHARGE_DOC_TYPE
   ) {
     throw new RuleViolationError(
       'amount_negative',
-      'Only a salvage credit or a price variance can have a negative amount',
+      'Only a salvage credit, a price variance or a back-charge recovery can have a negative amount',
     );
   }
 }

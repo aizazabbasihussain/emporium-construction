@@ -3,6 +3,7 @@ import {
   dprPermissions,
   expensesPermissions,
   payablesPermissions,
+  subcontractsPermissions,
   procurementPermissions,
   reportsPermissions,
   variationsPermissions,
@@ -57,6 +58,9 @@ import { VariationEditorPage } from './variations/VariationEditorPage';
 import { BillEntryPage, BillPage, BillsPage } from './payables/BillPages';
 import { PaymentBuilderPage, PaymentRunsPage, PaymentsPage } from './payables/PaymentPages';
 import { PayablesAgingPage, VendorLedgerPage, WithholdingReportPage } from './payables/ReportPages';
+import { CertificateNewPage, CertificatePage } from './subcontracts/CertificatePages';
+import { StatementPage, WorkOrderLedgerPage } from './subcontracts/LedgerPages';
+import { WorkOrderFormPage, WorkOrderPage, WorkOrdersPage } from './subcontracts/OrderPages';
 import { AgingPage } from './receivables/AgingPage';
 import { CustomerLedgerPage } from './receivables/CustomerLedgerPage';
 import { FollowupsPage } from './receivables/FollowupsPage';
@@ -330,6 +334,54 @@ export function AppRoutes() {
         <Route
           path="/payables/withholding"
           element={guarded('/payables/withholding', <WithholdingReportPage />)}
+        />
+        <Route
+          path="/subcontracts/work-orders"
+          element={guarded('/subcontracts/work-orders', <WorkOrdersPage />)}
+        />
+        <Route
+          path="/subcontracts/work-orders/new"
+          element={
+            <RequirePermission permission={subcontractsPermissions.orderCreate}>
+              <WorkOrderFormPage />
+            </RequirePermission>
+          }
+        />
+        <Route
+          path="/subcontracts/work-orders/:id"
+          element={
+            <RequirePermission permission={subcontractsPermissions.orderRead}>
+              <WorkOrderPage />
+            </RequirePermission>
+          }
+        />
+        <Route
+          path="/subcontracts/work-orders/:id/ledger"
+          element={
+            <RequirePermission permission={subcontractsPermissions.amountRead}>
+              <WorkOrderLedgerPage />
+            </RequirePermission>
+          }
+        />
+        <Route
+          path="/subcontracts/work-orders/:orderId/certificates/new"
+          element={
+            <RequirePermission permission={subcontractsPermissions.certificateCreate}>
+              <CertificateNewPage />
+            </RequirePermission>
+          }
+        />
+        <Route
+          path="/subcontracts/certificates/:id"
+          element={
+            <RequirePermission permission={subcontractsPermissions.orderRead}>
+              <CertificatePage />
+            </RequirePermission>
+          }
+        />
+        <Route
+          path="/subcontracts/statement"
+          element={guarded('/subcontracts/statement', <StatementPage />)}
         />
         <Route
           path="/procurement/requisitions"

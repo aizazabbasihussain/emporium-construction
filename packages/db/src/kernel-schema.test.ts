@@ -37,6 +37,8 @@ describe('platform kernel schema (P1-01)', () => {
       'QUO',
       'RV',
       'SC',
+      'SCC',
+      'SCO',
       'STR',
       'TM',
       'VAR',

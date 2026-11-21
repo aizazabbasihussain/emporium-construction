@@ -1,0 +1,60 @@
+{
+  "name": "subcontracts",
+  "tablePrefix": "sub_",
+  "ownedTables": [
+    "sub_work_orders",
+    "sub_work_order_variations",
+    "sub_certificates",
+    "sub_back_charges"
+  ],
+  "views": [],
+  "exports": [
+    "createSubcontracts",
+    "registerSubcontractsRoutes",
+    "getWorkOrder",
+    "getCertifiedAmount"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.events.subscribe",
+    "platform.idempotency.execute",
+    "platform.numbering.next",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "approvals.requestApproval",
+    "approvals.getApprovalState",
+    "approvals.cancelApproval",
+    "projects.getProject",
+    "projects.postCost",
+    "projects.transitionCost",
+    "projects.reverseCost",
+    "masterdata.getParty",
+    "masterdata.getCostCode",
+    "payables.registerBillSource",
+    "payables.getPaidAmount",
+    "payables.bills.createFromSource",
+    "payables.bills.get"
+  ],
+  "eventsIn": ["approval.approved", "approval.rejected", "approval.returned", "approval.cancelled"],
+  "eventsOut": [
+    "subcontract.committed",
+    "subcontract.certified",
+    "subcontracts.work_order.changed",
+    "subcontracts.certificate.changed",
+    "subcontracts.back_charge.changed"
+  ],
+  "permissions": [
+    "subcontracts.order.read",
+    "subcontracts.order.create",
+    "subcontracts.order.update",
+    "subcontracts.order.close",
+    "subcontracts.certificate.create",
+    "subcontracts.certificate.submit",
+    "subcontracts.certificate.bill",
+    "subcontracts.variation.approve",
+    "subcontracts.amount.read"
+  ],
+  "notes": "Beyond the spec's route list the module adds POST /subcontracts/certificates/:id/bill (BR-5, the accountant's step), PUT /subcontracts/certificates/:id, GET /subcontracts/work-orders/:id/certificates, GET /subcontracts/work-orders/:id/back-charges, GET /subcontracts/subcontractors/:id/statement, and the variation decision endpoints POST /subcontracts/variations/:id/approve|reject. Only one certificate of a work order is open at a time (so the previous cumulative is the latest certified one); an order becomes `completed` when its whole current contract is certified; closing an order before that needs a reason (the closing adjustment, BR-6) and the `subcontracts.order.close` permission. Certification is approved by the project manager role and the order by the owner (management role), both editable rules (H-09). The certificate becomes `billed` when its bill is posted; a bill cancelled before posting leaves it `certified` for a new bill."
+}

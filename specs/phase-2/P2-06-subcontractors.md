@@ -3,7 +3,7 @@ id: P2-06
 title: Subcontractor orders and payments
 phase: 2
 module: subcontracts
-status: not-started
+status: done
 depends_on: [P2-05, P1-09, P1-03]
 requires_inputs: [H-03, H-09]
 ---

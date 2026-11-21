@@ -41,11 +41,21 @@ export function assertPositive(amount: string, field: string): void {
   }
 }
 
-/** BR-10 of procurement and BR-2: only an active vendor or subcontractor is billed against. */
+/**
+ * BR-10 of procurement and BR-2: only an active vendor, subcontractor or labour contractor (P2-06
+ * orders work from both kinds of contractor) is billed against.
+ */
 export function assertVendor(party: { roles: string[]; status: string } | undefined): void {
   if (party === undefined) throw new NotFoundError('vendor_not_found', 'The vendor does not exist');
-  if (!party.roles.some((role) => role === 'vendor' || role === 'subcontractor')) {
-    throw new RuleViolationError('not_a_vendor', 'The party is not a vendor or subcontractor');
+  if (
+    !party.roles.some(
+      (role) => role === 'vendor' || role === 'subcontractor' || role === 'labour_contractor',
+    )
+  ) {
+    throw new RuleViolationError(
+      'not_a_vendor',
+      'The party is not a vendor, subcontractor or labour contractor',
+    );
   }
   if (party.status !== 'active') {
     throw new RuleViolationError('vendor_inactive', 'The vendor is not active');

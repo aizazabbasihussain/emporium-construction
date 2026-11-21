@@ -41,6 +41,7 @@ import { createBilling, type Billing } from './modules/billing/index.js';
 import { createCashbook, type Cashbook } from './modules/cashbook/index.js';
 import { createReceivables, type Receivables } from './modules/receivables/index.js';
 import { createPayables, type Payables } from './modules/payables/index.js';
+import { createSubcontracts, type Subcontracts } from './modules/subcontracts/index.js';
 import { createValuation, type Valuation } from './modules/valuation/index.js';
 import { createTax, type Tax } from './modules/tax/index.js';
 import { createReports, type Reports } from './modules/reports/index.js';
@@ -60,6 +61,7 @@ import {
   platformPermissions,
   inventoryPermissions,
   payablesPermissions,
+  subcontractsPermissions,
   procurementPermissions,
   projectsPermissions,
   quotationsPermissions,
@@ -115,6 +117,7 @@ export interface Runtime {
   cashbook: Cashbook;
   receivables: Receivables;
   payables: Payables;
+  subcontracts: Subcontracts;
   procurement: Procurement;
   inventory: Inventory;
   expenses: Expenses;
@@ -170,6 +173,7 @@ export async function wireRuntime(
   identity.registerPermissions('cashbook', Object.values(cashbookPermissions));
   identity.registerPermissions('receivables', Object.values(receivablesPermissions));
   identity.registerPermissions('payables', Object.values(payablesPermissions));
+  identity.registerPermissions('subcontracts', Object.values(subcontractsPermissions));
   identity.registerPermissions('procurement', Object.values(procurementPermissions));
   identity.registerPermissions('inventory', Object.values(inventoryPermissions));
   identity.registerPermissions('expenses', Object.values(expensesPermissions));
@@ -356,6 +360,15 @@ export async function wireRuntime(
     masterData,
   });
   latePayables.current = payables;
+  const subcontracts = createSubcontracts({
+    platform,
+    clock,
+    newId: () => uuidv7(clock.now()),
+    projects,
+    masterData,
+    approvals,
+    payables,
+  });
   const expenses = createExpenses({
     platform,
     clock,
@@ -455,6 +468,7 @@ export async function wireRuntime(
     cashbook,
     receivables,
     payables,
+    subcontracts,
     procurement,
     inventory,
     expenses,
@@ -495,6 +509,7 @@ export function routeDeps(runtime: Runtime) {
     cashbook: { db, cashbook: runtime.cashbook, platform },
     receivables: { db, receivables: runtime.receivables, platform },
     payables: { db, payables: runtime.payables, platform },
+    subcontracts: { db, subcontracts: runtime.subcontracts, platform },
     procurement: { db, procurement: runtime.procurement, platform },
     inventory: { db, inventory: runtime.inventory, platform },
     expenses: { db, expenses: runtime.expenses, platform },

@@ -229,6 +229,24 @@ export {
   type PaymentStatus,
   type VarianceTreatment,
 } from './payables.js';
+export {
+  certificateBases,
+  certificateStatuses,
+  subVariationStatuses,
+  subcontractBillSource,
+  subcontractCertificateDocType,
+  subcontractCertificateSeries,
+  subcontractOrderDocType,
+  subcontractOrderSeries,
+  subcontractsPermissionGrants,
+  subcontractsPermissions,
+  workOrderStatuses,
+  type CertificateBasis,
+  type CertificateStatus,
+  type SubVariationStatus,
+  type SubcontractsPermission,
+  type WorkOrderStatus,
+} from './subcontracts.js';
 export { fileStoreDrivers, type FileStoreDriver } from './enums.js';
 export {
   fileOperations,
