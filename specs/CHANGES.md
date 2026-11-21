@@ -50,6 +50,17 @@ P1-12 stays `not-started`; P1-14, P1-15 and others that do not depend on it can 
 
 ## Proposed
 
+### 2026-11-22: P2-08 built (PR #62); points the spec text does not settle
+
+Human decision needed on each; the code follows the choice stated.
+
+1. **Permission code.** `profitability.read` has two parts and `sys_role_permissions` accepts three. Built as `profitability.project.read`. Option: approve and update P2-08 section 6, or choose another three-part code.
+2. **No default thresholds.** The spec and the register give none, so nothing is seeded and no alert is raised until management sets thresholds. Option: approve, or supply defaults (margin floor, overspend, age days).
+3. **Percent definitions.** Billed % and collected % are of contract value on base amounts; cost % is committed + approved + posted over budget. Advance invoices are left out of billed and collected. Collected base is each allocation less its invoice's tax share (migration 0031 adds `tax_total` to `bil_v_invoices`).
+4. **Paid-out attribution.** Payables by the project's part of the bill lines (not by enumerating registered bill sources); payroll by the project's part of the run's cost allocation; expenses by posted claims counted from the claim's last-update day, since `exp_claims` has no posted date, so a later reversal is not reproduced as-of. Option: approve, or add a posted date to expenses.
+5. **Budget is not dated**; as-of figures use the current budget lines.
+6. **Beyond the spec text:** events `profitability.alert.cleared`, `.forecast.changed`, `.threshold.changed`; `GET /profitability/alerts` and `/profitability/thresholds`; an hourly scheduler job for alerts; the reports export helper takes an optional title and is exported through the reports index. Option: approve and add them to the P2-08 text.
+
 ### 2026-11-21: P2-08 needs per-project, as-of query interfaces that six dependency modules do not provide
 
 **Decision 2026-11-21: option 1 accepted by the owner.** The interfaces below are added to variations, projects, billing, receivables, payables, payroll and expenses in the P2-08 PR, with tests in the owning modules; the Provides lines of P1-09, P1-10, P1-14, P2-02, P2-04, P2-05 and P2-07 and the Boundary of P2-08 are updated to match. The cash book line is dropped from P2-08 Consumes. Questions settled with it: "billed" for margin is base before advance recovery; the receivable age alert uses the invoice due date; unapplied advances are not part of collected.
