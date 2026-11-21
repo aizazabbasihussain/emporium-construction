@@ -3,14 +3,24 @@ import type { Runtime } from './compose.js';
 
 const TICK_MS = 60_000;
 const PURGE_EVERY_MS = 24 * 60 * 60 * 1000;
+const ALERTS_EVERY_MS = 60 * 60 * 1000;
 
 export interface SchedulerState {
   lastPurgeAt: number;
+  lastAlertsAt?: number | undefined;
 }
 
 type Jobs = Pick<
   Runtime,
-  'db' | 'platform' | 'notifications' | 'files' | 'quotations' | 'dpr' | 'receivables' | 'payables'
+  | 'db'
+  | 'platform'
+  | 'notifications'
+  | 'files'
+  | 'quotations'
+  | 'dpr'
+  | 'receivables'
+  | 'payables'
+  | 'profitability'
 >;
 
 /**
@@ -43,6 +53,13 @@ export async function runSchedulerTick(
   await run('payables-cheques', () =>
     jobs.db.transaction((tx) => jobs.payables.postDueCheques(tx)),
   );
+  // P2-08 BR-4: profitability alerts are raised and cleared at most once an hour.
+  if (state.lastAlertsAt === undefined || now.getTime() - state.lastAlertsAt >= ALERTS_EVERY_MS) {
+    state.lastAlertsAt = now.getTime();
+    await run('profitability-alerts', () =>
+      jobs.db.transaction((tx) => jobs.profitability.evaluateAlerts(tx)),
+    );
+  }
   if (now.getTime() - state.lastPurgeAt >= PURGE_EVERY_MS) {
     state.lastPurgeAt = now.getTime();
     await run('files-purge', () => jobs.files.purgeExpired(jobs.db));

@@ -82,7 +82,8 @@ export interface CostingService {
     tx: Db,
     actorUserId?: string | null,
   ): Promise<CostEntryDto>;
-  getCostSummary(db: Db, costObject: CostObjectRef): Promise<CostSummaryDto>;
+  /** `asOf` (a business date) gives the state of the ledger on that date; omitted means now. */
+  getCostSummary(db: Db, costObject: CostObjectRef, asOf?: string): Promise<CostSummaryDto>;
   listEntries(
     db: Db,
     costObject: CostObjectRef,
@@ -245,8 +246,13 @@ export function createCostingService(deps: {
       return transition(tx, entryId, 'reversed', requiredText(reason, 'reason'), actorUserId);
     },
 
-    async getCostSummary(db, costObject) {
-      const rows = await summaryRows(db, costObject.type, costObject.id);
+    async getCostSummary(db, costObject, asOf) {
+      const rows = await summaryRows(
+        db,
+        costObject.type,
+        costObject.id,
+        asOf === undefined ? undefined : BusinessDate.parse(asOf).toString(),
+      );
       const isProject = costObject.type === 'project' && costObject.id !== null;
       const budgets = new Map(
         (isProject ? await budgetByCode(db, costObject.id as string) : []).map((row) => [

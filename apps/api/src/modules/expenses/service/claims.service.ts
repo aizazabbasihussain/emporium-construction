@@ -11,7 +11,7 @@ import {
   type ClaimLine,
   type ClaimLineInput,
 } from '@emporium/domain/expenses';
-import { BusinessDate } from '@emporium/domain/kernel';
+import { BusinessDate, Money } from '@emporium/domain/kernel';
 import { expenseClaimDocType, expenseClaimEntityType, expensesPermissions } from '@emporium/shared';
 import {
   assertApplied,
@@ -34,6 +34,7 @@ import {
   listCategories,
   listLines,
   listPriorLines,
+  reimbursedForProject,
   replaceLines,
   searchClaims,
   setLineEntry,
@@ -262,6 +263,16 @@ export function createClaimService(ctx: Context) {
       const row = assertFound(await findClaim(db, id), 'claim');
       assertCanReadClaim(actor, row.claimant_id);
       return dtoOf(db, row);
+    },
+
+    /**
+     * Module interface for P2-08: what posted claims reimbursed on a project, as of a date. A claim
+     * counts from the day the accountant posted it (its last update, in Asia/Karachi).
+     */
+    async getReimbursedForProject(db: Db, projectId: string, asOf: string): Promise<string> {
+      return Money.of(
+        await reimbursedForProject(db, projectId, BusinessDate.parse(asOf).toString()),
+      ).toString();
     },
 
     /** The claimant of a claim, for the receipt access rule. */

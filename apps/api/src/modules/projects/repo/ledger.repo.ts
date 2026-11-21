@@ -155,7 +155,29 @@ export async function summaryRows(
   db: Db,
   costObjectType: string,
   costObjectId: string | null,
+  asOf?: string,
 ): Promise<SummaryRow[]> {
+  if (asOf !== undefined) {
+    // The state of every chain on that date: its latest row dated on or before `asOf`.
+    return db.query<SummaryRow>(
+      `with current_entries as (
+         select distinct on (chain_key) cost_code_id, amount, status
+           from prj_cost_entries
+          where cost_object_type = $1 and cost_object_id is not distinct from $2::uuid
+            and entry_date <= $3::date
+          order by chain_key, seq desc
+       )
+       select cost_code_id,
+              coalesce(sum(amount) filter (where status = 'committed'), 0)::text as committed,
+              coalesce(sum(amount) filter (where status = 'approved'), 0)::text as approved,
+              coalesce(sum(amount) filter (where status = 'posted'), 0)::text as posted
+         from current_entries
+        where status <> 'reversed'
+        group by cost_code_id
+        order by cost_code_id`,
+      [costObjectType, costObjectId, asOf],
+    );
+  }
   return db.query<SummaryRow>(
     `select cost_code_id, committed::text as committed, approved::text as approved,
             posted::text as posted

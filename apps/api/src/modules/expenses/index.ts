@@ -13,6 +13,8 @@ export interface Expenses {
   categories: CategoryService;
   /** Query interface for other modules (spec P1-14 section 2, BR-1). */
   getCustodianBalance: AdvanceService['balance'];
+  /** Spec P2-08: claims posted for a project, as of a date. */
+  getReimbursedForProject: ClaimService['getReimbursedForProject'];
 }
 
 /**
@@ -37,7 +39,14 @@ export function createExpenses(deps: ExpensesDeps): Expenses {
     // A receipt backs a cost entry: its files are kept after removal.
     { retainForever: true },
   );
-  return { claims, advances, categories, getCustodianBalance: advances.balance };
+  return {
+    claims,
+    advances,
+    categories,
+    getCustodianBalance: advances.balance,
+    getReimbursedForProject: (db, projectId, asOf) =>
+      claims.getReimbursedForProject(db, projectId, asOf),
+  };
 }
 
 export { registerExpensesRoutes, type ExpensesRouteDeps } from './routes/expenses.routes.js';

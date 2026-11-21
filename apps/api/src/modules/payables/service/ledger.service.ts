@@ -1,4 +1,4 @@
-import { Money } from '@emporium/domain/kernel';
+import { BusinessDate, Money } from '@emporium/domain/kernel';
 import { vendorBalance, withholdingMonth } from '@emporium/domain/payables';
 import { ageItems, parseBuckets } from '@emporium/domain/receivables';
 import { receivablesSettingKeys } from '@emporium/shared';
@@ -8,6 +8,7 @@ import {
   listLedgerRows,
   listWithholding,
   paidAgainstSource,
+  paidForProject,
 } from '../repo/payables.repo.js';
 import type {
   AgingReportDto,
@@ -26,6 +27,8 @@ export interface LedgerService {
   getOpenBills(db: Db, partyId: string, asOf?: string): Promise<OpenBillDto[]>;
   /** What payments have taken of the bills of one source document (P2-06 reads this). */
   getPaidAmount(db: Db, source: { type: string; id: string }, date?: string): Promise<string>;
+  /** Vendor and subcontractor payments attributable to a project as of a date (P2-08). */
+  getPaidForProject(db: Db, projectId: string, asOf: string): Promise<string>;
   overview(db: Db, partyId: string, date?: string): Promise<VendorLedgerDto>;
   /** BR-9: open bills by due date in the receivables buckets. */
   aging(db: Db, asOf?: string): Promise<AgingReportDto>;
@@ -79,6 +82,12 @@ export function createLedgerService(ctx: Context): LedgerService {
 
     getPaidAmount: (db, source, date = ctx.today()) =>
       paidAgainstSource(db, source.type, source.id, date),
+
+    async getPaidForProject(db, projectId, asOf) {
+      return Money.of(
+        await paidForProject(db, projectId, BusinessDate.parse(asOf).toString()),
+      ).toString();
+    },
 
     async overview(db, partyId, date = ctx.today()) {
       let running = Money.zero();

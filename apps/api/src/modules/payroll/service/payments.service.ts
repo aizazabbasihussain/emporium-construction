@@ -1,3 +1,4 @@
+import { BusinessDate } from '@emporium/domain/kernel';
 import {
   assertApproverIsNotFinalizer,
   assertLinesPayable,
@@ -28,6 +29,7 @@ import {
   markLinePaid,
   markPaymentLinesUnpaid,
   paidTotal,
+  paidWagesForProject,
   updatePayment,
   updateRun,
   type LineRow,
@@ -76,6 +78,8 @@ export interface PaymentsService {
   listPayments(db: Db, runId: string): Promise<PaymentDto[]>;
   /** BR-6: the unpaid lines of finalized runs, with their age. */
   unpaid(db: Db): Promise<UnpaidWagesDto>;
+  /** Spec P2-08: wages paid for a project as of a date, by the project's share of each run. */
+  getPaidWagesForProject(db: Db, projectId: string, asOf: string): Promise<string>;
 }
 
 export function createPaymentsService(ctx: Context): PaymentsService {
@@ -291,6 +295,12 @@ export function createPaymentsService(ctx: Context): PaymentsService {
       return Promise.all(
         payments.map(async (row) => paymentDto(row, await listLinesOfPayment(db, row.id))),
       );
+    },
+
+    async getPaidWagesForProject(db, projectId, asOf) {
+      return sumMoney([
+        await paidWagesForProject(db, projectId, BusinessDate.parse(asOf).toString()),
+      ]);
     },
 
     async unpaid(db) {

@@ -80,7 +80,7 @@ export interface VariationService {
   /** Module interface `listApprovedVariations(projectId)` (spec section 2). */
   listApproved(db: Db, projectId: string): Promise<VariationHeaderDto[]>;
   /** Module interface `getCurrentContractValue(projectId)` (spec section 2, BR-5). */
-  contractValue(db: Db, projectId: string): Promise<ContractValueDto>;
+  contractValue(db: Db, projectId: string, asOf?: string): Promise<ContractValueDto>;
   list(
     db: Db,
     projectId: string,
@@ -356,9 +356,17 @@ export function createVariationService(deps: {
   }
 
   /** BR-5: the original value plus the price impacts of the client-approved variations. */
-  async function contractValueOf(db: Db, projectId: string): Promise<ContractValueDto> {
+  async function contractValueOf(
+    db: Db,
+    projectId: string,
+    asOf?: string,
+  ): Promise<ContractValueDto> {
     const project = await projects.getProject(db, projectId);
-    const approved = await listApproved(db, projectId);
+    const approved = await listApproved(
+      db,
+      projectId,
+      asOf === undefined ? undefined : BusinessDate.parse(asOf).toString(),
+    );
     const impacts = approved.map((row) => row.price_impact);
     return {
       projectId,

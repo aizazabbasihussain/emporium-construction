@@ -100,12 +100,13 @@ export async function searchVariations(
 }
 
 /** BR-5: the client-approved variations of a project, oldest first. */
-export const listApproved = (db: Db, projectId: string) =>
+export const listApproved = (db: Db, projectId: string, asOf?: string) =>
   db.query<VariationRow>(
     `select ${COLUMNS} from var_variations
       where project_id = $1 and status = 'client_approved' and deleted_at is null
+        and ($2::date is null or client_approved_on <= $2::date)
       order by seq`,
-    [projectId],
+    [projectId, asOf ?? null],
   );
 
 /** BR-8: the distinct cost codes of the lines of each of the given variations. */

@@ -600,6 +600,25 @@ export const paidAgainstSource = (db: Db, sourceType: string, sourceDocId: strin
     )
     .then((rows) => rows[0]?.total ?? '0');
 
+/**
+ * Cash paid to vendors and subcontractors for a project as of a date. A payment's share for the
+ * project is its allocation to each bill times the project's part of that bill's lines.
+ */
+export const paidForProject = (db: Db, projectId: string, asOf: string) =>
+  db
+    .query<{ total: string }>(
+      `select coalesce(sum(round(a.amount * s.share, 2)), 0)::numeric(18,2)::text as total
+         from pay_payment_allocations a
+         join pay_payments p on p.id = a.payment_id
+         join (select bill_id,
+                      sum(amount) filter (where cost_object_type = 'project' and cost_object_id = $1)
+                        / nullif(sum(amount), 0) as share
+                 from pay_bill_lines group by bill_id) s on s.bill_id = a.bill_id
+        where s.share is not null and ${PAYMENT_COUNTED('p', '$2')}`,
+      [projectId, asOf],
+    )
+    .then((rows) => rows[0]?.total ?? '0');
+
 /** The ledger lines of a vendor up to a date, oldest first (BR-9). */
 export interface LedgerRow {
   kind: string;

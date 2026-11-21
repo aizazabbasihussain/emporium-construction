@@ -331,6 +331,38 @@ export interface UnpaidRow {
   age_days: number;
 }
 
+/**
+ * Wages paid as of a date that belong to a project. A payment counts from its date until it was
+ * reversed; its share for the project is the project's part of the run's allocated cost in the
+ * current revision (attendance entries and the adjustment that spreads the difference).
+ */
+export const paidWagesForProject = (db: Db, projectId: string, asOf: string) =>
+  db
+    .query<{ total: string }>(
+      `with parts as (
+         select r.id as run_id,
+                coalesce((select sum(e.amount) from pyr_cost_entries e
+                           where e.run_id = r.id and e.revision = r.revision and e.project_id = $1), 0)
+              + coalesce((select sum(a.amount) from pyr_cost_adjustments a
+                           where a.run_id = r.id and a.revision = r.revision and a.project_id = $1), 0)
+                as mine,
+                coalesce((select sum(e.amount) from pyr_cost_entries e
+                           where e.run_id = r.id and e.revision = r.revision), 0)
+              + coalesce((select sum(a.amount) from pyr_cost_adjustments a
+                           where a.run_id = r.id and a.revision = r.revision), 0)
+                as everyone
+           from pyr_runs r
+       )
+       select coalesce(sum(round(p.amount * parts.mine / parts.everyone, 2)), 0)::numeric(18,2)::text as total
+         from pyr_payments p
+         join parts on parts.run_id = p.run_id
+        where parts.everyone <> 0 and p.deleted_at is null
+          and p.payment_date <= $2::date
+          and (p.status = 'paid' or p.reversed_on > $2::date)`,
+      [projectId, asOf],
+    )
+    .then((rows) => rows[0]?.total ?? '0');
+
 /** BR-6: the unpaid lines of finalized runs; the age counts from the day the run was finalized. */
 export const listUnpaid = (db: Db, today: string) =>
   db.query<UnpaidRow>(

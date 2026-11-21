@@ -14,6 +14,7 @@ import {
   platformPermissions,
   procurementPermissions,
   projectsPermissions,
+  profitabilityPermissions,
   reportsPermissions,
   billingPermissions,
   cashbookPermissions,
@@ -347,6 +348,16 @@ export const navItems: readonly NavItem[] = [
   { path: '/tax/withholding', label: 'nav.taxWithholding', permission: taxPermissions.ruleRead },
   { path: '/tax/report', label: 'nav.taxReport', permission: taxPermissions.reportRead },
   { path: '/reports', label: 'nav.reports', anyPermission: Object.values(reportsPermissions) },
+  {
+    path: '/profitability',
+    label: 'nav.profitability',
+    permission: profitabilityPermissions.read,
+  },
+  {
+    path: '/profitability/alerts',
+    label: 'nav.profitabilityAlerts',
+    permission: profitabilityPermissions.read,
+  },
   {
     path: '/admin/settings',
     label: 'nav.settings',

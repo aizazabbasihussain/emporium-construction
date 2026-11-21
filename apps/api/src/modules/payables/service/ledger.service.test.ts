@@ -186,6 +186,79 @@ describe('what was paid against a source document (P2-06)', () => {
   });
 });
 
+describe('what was paid for a project as of a date (P2-08)', () => {
+  it('counts the whole payment of a bill whose lines are all on the project', async () => {
+    const received = await kit.receipt();
+    const posted = await kit.postedBill(kit.billInput(received));
+    const project = received.projectId as string;
+    const paid = (asOf: string) => kit.payables.getPaidForProject(kit.db, project, asOf);
+    expect(await paid(TODAY)).toBe('0.00');
+    await pay(received.vendorId, posted.id, '2750');
+    expect(await paid(TODAY)).toBe('2750.00');
+    // The payment is dated today: an earlier date does not see it.
+    expect(await paid('2026-10-24')).toBe('0.00');
+    // Another project has paid nothing.
+    expect(await kit.payables.getPaidForProject(kit.db, (await kit.project()).id, TODAY)).toBe(
+      '0.00',
+    );
+    await expect(paid('2026-02-30')).rejects.toMatchObject({ code: 'invalid_date' });
+  });
+
+  it("takes the project's share of a bill that is split with overhead", async () => {
+    const vendor = await kit.vendor();
+    const project = (await kit.project()).id;
+    kit.payables.registerBillSource('subcontract', {
+      async buildBill() {
+        return {
+          vendorPartyId: vendor,
+          locationId: kit.islamabadId,
+          lines: [
+            {
+              description: 'Certified work on the project',
+              quantity: '1',
+              rate: '600',
+              costObject: { type: 'project', id: project },
+              costCodeId: kit.codes['300'] as string,
+            },
+            {
+              description: 'Share of site overhead',
+              quantity: '1',
+              rate: '400',
+              costObject: { type: 'overhead', id: null },
+              costCodeId: kit.codes['300'] as string,
+            },
+          ],
+        };
+      },
+      async onPosted() {},
+      async onCancelled() {},
+    });
+    const created = await kit.run((tx) =>
+      kit.payables.bills.createFromSource(
+        'subcontract',
+        '018f7c7c-0000-7000-8000-0000000000ee',
+        { vendorInvoiceNo: 'SPLIT-1', billDate: TODAY, dueDate: '2026-11-25' },
+        kit.pactor,
+        tx,
+      ),
+    );
+    const matched = await kit.run((tx) =>
+      kit.payables.bills.match(created.id, { version: created.version }, kit.pactor, tx),
+    );
+    const submitted = await kit.run((tx) =>
+      kit.payables.bills.submit(matched.id, matched.version, kit.pactor, tx),
+    );
+    await kit.decide('vendor_bill', submitted.id, 'approve');
+    const approved = await kit.bill(created.id);
+    const posted = await kit.run((tx) =>
+      kit.payables.bills.post(approved.id, approved.version, kit.pactor, tx),
+    );
+    await pay(vendor, posted.id, '500');
+    // 500 paid on a bill of 600 (project) and 400 (overhead): the project's share is 60%.
+    expect(await kit.payables.getPaidForProject(kit.db, project, TODAY)).toBe('300.00');
+  });
+});
+
 describe('the withholding report (BR-8)', () => {
   it('totals the withholding deducted per authority and month with its certificate', async () => {
     const { posted, vendorId } = await bill({ works: true });

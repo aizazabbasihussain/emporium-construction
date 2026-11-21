@@ -110,6 +110,33 @@ describe('credit notes (T-6, BR-9)', () => {
     expect(await kit.billing.getBilledAmount(kit.db, project.id)).toBe('0.00');
   });
 
+  it('reports the billing of a project as of a date, net of credit notes and before advance recovery (P2-08)', async () => {
+    const project = await kit.project();
+    await kit.receivedAdvance(project.id, '500000');
+    const invoice = await kit.issued(project.id, [1]);
+    expect(invoice).toMatchObject({ advanceRecovery: '150000.00', invoiceDate: '2026-11-18' });
+    kit.now.current = new Date('2026-11-20T10:00:00Z');
+    await issuedCredit(invoice.id, { reason: 'Discount', baseAmount: '500000' });
+    kit.now.current = new Date('2026-11-18T10:00:00Z');
+    const at = (asOf: string) => kit.billing.getProjectBilling(kit.db, project.id, asOf);
+    // The advance invoice is not billing, and the recovery is not taken off the base.
+    expect(await at('2026-11-17')).toEqual({ base: '0.00', tax: '0.00', gross: '0.00' });
+    expect(await at('2026-11-18')).toEqual({
+      base: '1500000.00',
+      tax: '150000.00',
+      gross: invoice.grossTotal,
+    });
+    expect(await at('2026-11-19')).toEqual(await at('2026-11-18'));
+    // The credit note counts from the day it was issued: base 500,000 and tax 50,000, and a gross of
+    // 500,000 because the third of the advance recovery (50,000) goes back to the advance.
+    expect(await at('2026-11-20')).toEqual({
+      base: '1000000.00',
+      tax: '100000.00',
+      gross: '1000000.00',
+    });
+    await expect(kit.billing.getProjectBilling(kit.db, project.id, '2026-13-40')).rejects.toThrow();
+  });
+
   it('gives the advance recovery of the credited invoice back to the advance', async () => {
     const project = await kit.project();
     await kit.receivedAdvance(project.id, '500000');

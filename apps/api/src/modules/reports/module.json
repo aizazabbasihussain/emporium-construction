@@ -3,7 +3,7 @@
   "tablePrefix": "rpt_",
   "ownedTables": ["rpt_saved_filters"],
   "ownedViews": [],
-  "exports": ["createReports", "registerReportsRoutes"],
+  "exports": ["createReports", "registerReportsRoutes", "toCsv", "toXlsx"],
   "consumes": [
     "platform.audit.record",
     "platform.events.publish",

@@ -16,6 +16,7 @@ export interface Payables {
   getVendorBalance: LedgerService['getVendorBalance'];
   getOpenBills: LedgerService['getOpenBills'];
   getPaidAmount: LedgerService['getPaidAmount'];
+  getPaidForProject: LedgerService['getPaidForProject'];
   /** P2-06 registers where its certified work becomes a bill. */
   registerBillSource: BillService['registerBillSource'];
   /** Procurement asks before it cancels a receipt (BR-8 there). */
@@ -59,6 +60,7 @@ export function createPayables(deps: PayablesDeps & { clock: Clock }): Payables 
     getVendorBalance: (db, partyId, date) => ledger.getVendorBalance(db, partyId, date),
     getOpenBills: (db, partyId, asOf) => ledger.getOpenBills(db, partyId, asOf),
     getPaidAmount: (db, source, date) => ledger.getPaidAmount(db, source, date),
+    getPaidForProject: (db, projectId, asOf) => ledger.getPaidForProject(db, projectId, asOf),
     registerBillSource: (type, provider) => bills.registerBillSource(type, provider),
     isGrnBilled: (db, grnId) => bills.isGrnBilled(db, grnId),
     postDueCheques: (tx) => payments.postDueCheques(tx),

@@ -46,8 +46,8 @@ export function createVariations(deps: {
   );
   return {
     service,
-    getCurrentContractValue: async (db, projectId) =>
-      (await service.contractValue(db, projectId)).currentContractValue,
+    getCurrentContractValue: async (db, projectId, asOf) =>
+      (await service.contractValue(db, projectId, asOf)).currentContractValue,
     listApprovedVariations: (db, projectId) => service.listApproved(db, projectId),
   };
 }

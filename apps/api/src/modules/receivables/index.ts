@@ -19,6 +19,8 @@ export interface Receivables {
   getCustomerBalance: LedgerService['getCustomerBalance'];
   getOpenInvoices: LedgerService['getOpenInvoices'];
   getCollectedAmount: LedgerService['getCollectedAmount'];
+  getProjectCollected: LedgerService['getProjectCollected'];
+  getProjectAging: LedgerService['getProjectAging'];
   /** The daily 09:00 cheque reminder (BR-7); the scheduler calls it inside a transaction. */
   remindUpcomingPdcs: PdcService['remindUpcoming'];
 }
@@ -45,6 +47,8 @@ export function createReceivables(deps: ReceivablesDeps & { clock: Clock }): Rec
     getCustomerBalance: (db, partyId, date) => ledger.getCustomerBalance(db, partyId, date),
     getOpenInvoices: (db, partyId, asOf) => ledger.getOpenInvoices(db, partyId, asOf),
     getCollectedAmount: (db, projectId, date) => ledger.getCollectedAmount(db, projectId, date),
+    getProjectCollected: (db, projectId, asOf) => ledger.getProjectCollected(db, projectId, asOf),
+    getProjectAging: (db, projectId, asOf) => ledger.getProjectAging(db, projectId, asOf),
     remindUpcomingPdcs: (tx, now) => pdcs.remindUpcoming(tx, now),
   };
 }

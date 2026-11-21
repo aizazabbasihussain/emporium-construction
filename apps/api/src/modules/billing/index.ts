@@ -27,6 +27,7 @@ export interface Billing {
   getInvoice: InvoiceService['getInvoice'];
   listInvoicesForProject: InvoiceService['listInvoicesForProject'];
   getBilledAmount: InvoiceService['getBilledAmount'];
+  getProjectBilling: InvoiceService['getProjectBilling'];
   /** BR-12: later invoice kinds (P3-04) register a provider for their source type. */
   registerInvoiceSource: InvoiceService['registerInvoiceSource'];
   /** Receipts (P2-04) tell billing that the money of an advance invoice arrived (BR-8). */
@@ -66,6 +67,7 @@ export function createBilling(deps: {
     getInvoice: (db, id) => invoices.getInvoice(db, id),
     listInvoicesForProject: (db, projectId) => invoices.listInvoicesForProject(db, projectId),
     getBilledAmount: (db, projectId) => invoices.getBilledAmount(db, projectId),
+    getProjectBilling: (db, projectId, asOf) => invoices.getProjectBilling(db, projectId, asOf),
     registerInvoiceSource: (type, provider) => invoices.registerInvoiceSource(type, provider),
     markAdvanceReceived: (advanceId, receivedOn, by, tx) =>
       advances.markReceived(advanceId, receivedOn, by, tx),

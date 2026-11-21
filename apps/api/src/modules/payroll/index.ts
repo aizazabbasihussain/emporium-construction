@@ -12,6 +12,7 @@ export interface Payroll {
   /** Module interfaces for other modules (spec P2-07 section 2). */
   getPayrollRun: RunsService['getPayrollRun'];
   getUnpaidWages: PaymentsService['unpaid'];
+  getPaidWagesForProject: PaymentsService['getPaidWagesForProject'];
   /** The check wages makes before it reopens a period (P1-18 BR-11). */
   hasPaidLines: RunsService['hasPaidLines'];
 }
@@ -31,6 +32,8 @@ export function createPayroll(deps: PayrollDeps): Payroll {
     payslips,
     getPayrollRun: (db, periodId) => runs.getPayrollRun(db, periodId),
     getUnpaidWages: (db) => payments.unpaid(db),
+    getPaidWagesForProject: (db, projectId, asOf) =>
+      payments.getPaidWagesForProject(db, projectId, asOf),
     hasPaidLines: (db, periodId) => runs.hasPaidLines(db, periodId),
   };
 }
