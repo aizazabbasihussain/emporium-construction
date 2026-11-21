@@ -111,6 +111,7 @@ describe('amounts (BR-5)', () => {
     expect(() => assertAmountAllowed('-5.00', 'salvage')).not.toThrow();
     expect(() => assertAmountAllowed('-5.00', 'price_variance')).not.toThrow();
     expect(() => assertAmountAllowed('-5.00', 'subcontract_back_charge')).not.toThrow();
+    expect(() => assertAmountAllowed('-5.00', 'payroll_adjustment')).not.toThrow();
     expect(codeOf(() => assertAmountAllowed('-5.00', 'goods_receipt'))).toBe('amount_negative');
   });
 

@@ -28,6 +28,7 @@ import { createDpr, type Dpr } from './modules/dpr/index.js';
 import { createWorkforce, type Workforce } from './modules/workforce/index.js';
 import { createAttendance, type Attendance } from './modules/attendance/index.js';
 import { createWages, type Wages } from './modules/wages/index.js';
+import { createPayroll, type Payroll } from './modules/payroll/index.js';
 import {
   createWorkerPortal,
   ensureWorkerRole,
@@ -61,6 +62,7 @@ import {
   platformPermissions,
   inventoryPermissions,
   payablesPermissions,
+  payrollPermissions,
   subcontractsPermissions,
   procurementPermissions,
   projectsPermissions,
@@ -125,6 +127,7 @@ export interface Runtime {
   workforce: Workforce;
   attendance: Attendance;
   wages: Wages;
+  payroll: Payroll;
   workerPortal: WorkerPortal;
   reports: Reports;
   approvals: Approvals;
@@ -181,6 +184,7 @@ export async function wireRuntime(
   identity.registerPermissions('workforce', Object.values(workforcePermissions));
   identity.registerPermissions('attendance', Object.values(attendancePermissions));
   identity.registerPermissions('wages', Object.values(wagesPermissions));
+  identity.registerPermissions('payroll', Object.values(payrollPermissions));
   identity.registerPermissions('reports', Object.values(reportsPermissions));
   identity.registerPermissions('workerportal', Object.values(workerportalPermissions));
   await ensureWorkerRole(identity, db);
@@ -417,6 +421,7 @@ export async function wireRuntime(
     },
   });
   lateAttendance.current = attendance;
+  const latePayroll: { current?: Payroll } = {};
   const wages = createWages({
     platform,
     clock,
@@ -424,10 +429,24 @@ export async function wireRuntime(
     approvals,
     workforce,
     attendance,
-    // Payment (P2-07) does not exist yet, so no line can have been paid (see BACKLOG).
-    payments: { hasPaidLines: async () => false },
+    // P1-18 BR-11: wages asks payroll whether a run (finalized or paid) locks the period.
+    payments: {
+      hasPaidLines: (tx, periodId) => (latePayroll.current as Payroll).hasPaidLines(tx, periodId),
+    },
   });
   lateWages.current = wages;
+  const payroll = createPayroll({
+    platform,
+    clock,
+    newId: () => uuidv7(clock.now()),
+    wages,
+    attendance,
+    projects,
+    cashbook,
+    approvals,
+    masterData,
+  });
+  latePayroll.current = payroll;
   const workerPortal = createWorkerPortal({
     platform,
     clock,
@@ -476,6 +495,7 @@ export async function wireRuntime(
     workforce,
     attendance,
     wages,
+    payroll,
     workerPortal,
     reports,
     approvals,
@@ -517,6 +537,7 @@ export function routeDeps(runtime: Runtime) {
     workforce: { db, workforce: runtime.workforce, platform },
     attendance: { db, attendance: runtime.attendance, platform },
     wages: { db, wages: runtime.wages, platform },
+    payroll: { db, payroll: runtime.payroll, platform },
     workerPortal: { db, workerPortal: runtime.workerPortal, platform },
     reports: { db, reports: runtime.reports.service, platform },
   };

@@ -19,6 +19,7 @@ import {
   cashbookPermissions,
   receivablesPermissions,
   payablesPermissions,
+  payrollPermissions,
   subcontractsPermissions,
   taxPermissions,
   valuationPermissions,
@@ -329,6 +330,8 @@ export const navItems: readonly NavItem[] = [
     label: 'nav.payablesWithholding',
     permission: payablesPermissions.ledgerRead,
   },
+  { path: '/payroll/runs', label: 'nav.payrollRuns', permission: payrollPermissions.runRead },
+  { path: '/payroll/unpaid', label: 'nav.payrollUnpaid', permission: payrollPermissions.runRead },
   {
     path: '/subcontracts/work-orders',
     label: 'nav.subcontractsOrders',
