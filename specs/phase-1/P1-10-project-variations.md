@@ -15,7 +15,7 @@ Record changes in scope discovered during the job (common in renovation and demo
 
 ## 2. Boundary
 - Owns: tables `var_*`, module `variations`.
-- Provides: `getCurrentContractValue(projectId)`, `listApprovedVariations(projectId)`, events `variation.approved`, `variation.rejected`.
+- Provides: `getCurrentContractValue(projectId)`, `listApprovedVariations(projectId)`, events `variation.approved`, `variation.rejected`. Added 2026-11-21 by approved CHANGES entry (P2-08 interfaces), built in the P2-08 PR with tests in this module: `getCurrentContractValue(projectId, asOf?)` gains an optional `asOf` date (original value plus variations approved on or before it).
 - Consumes: projects (project status, budget lines through interface `addBudgetLine`), approvals, files, master data.
 - Must not: edit `original_contract_value` or write to project tables directly.
 - Out of scope: billing of variations (P2-02), tax (P2-01).

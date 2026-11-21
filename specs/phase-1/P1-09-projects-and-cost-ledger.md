@@ -15,7 +15,7 @@ Hold each project (location, sector, contract value, budget, tasks) and the appe
 
 ## 2. Boundary
 - Owns: tables `prj_*`, module `projects`, `packages/domain/costing`.
-- Provides: `getProject`, `listProjectsForUser`, `postCost(entry)`, `reverseCost(entryId, reason)`, `transitionCost(entryId, toStatus)`, `getCostSummary(costObject)`, `addBudgetLine(projectId, line)` (used by variations; appends a budget line with source `variation`), `getEstimateBudgetSource`, `isReferenced` for master data, events `project.created`, `project.status.changed`.
+- Provides: `getProject`, `listProjectsForUser`, `postCost(entry)`, `reverseCost(entryId, reason)`, `transitionCost(entryId, toStatus)`, `getCostSummary(costObject)`, `addBudgetLine(projectId, line)` (used by variations; appends a budget line with source `variation`), `getEstimateBudgetSource`, `isReferenced` for master data, events `project.created`, `project.status.changed`. Added 2026-11-21 by approved CHANGES entry (P2-08 interfaces), built in the P2-08 PR with tests in this module: `getCostSummary(costObject, asOf?)` gains an optional `asOf` date that filters the append-only ledger by `entry_date`.
 - Consumes: event `quotation.accepted`, estimation cost lines (`getEstimateCostLines`), master data (cost codes, parties, locations), identity scopes.
 - Must not: contain procurement, stock, payroll or billing logic; it only records costs others post.
 - Out of scope: variations (P1-10), contract billing (P2-02), profitability (P2-08); this ledger is not a general ledger.
