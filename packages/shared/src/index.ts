@@ -210,6 +210,25 @@ export {
   type ReceiptStatus,
   type ReceivablesPermission,
 } from './receivables.js';
+export {
+  billSeries,
+  billSourceTypes,
+  billStatuses,
+  paymentMethods,
+  paymentSeries,
+  paymentStatuses,
+  payablesPermissionGrants,
+  payablesPermissions,
+  payablesSettingKeys,
+  varianceTreatments,
+  vendorBillDocType,
+  type BillSourceType,
+  type BillStatus,
+  type PayablesPermission,
+  type PaymentMethod,
+  type PaymentStatus,
+  type VarianceTreatment,
+} from './payables.js';
 export { fileStoreDrivers, type FileStoreDriver } from './enums.js';
 export {
   fileOperations,

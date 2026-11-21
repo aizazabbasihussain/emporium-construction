@@ -1,0 +1,72 @@
+{
+  "name": "payables",
+  "tablePrefix": "pay_",
+  "ownedTables": [
+    "pay_bills",
+    "pay_bill_lines",
+    "pay_matches",
+    "pay_variances",
+    "pay_payment_runs",
+    "pay_payments",
+    "pay_payment_allocations"
+  ],
+  "views": ["pay_v_vendor_ledger"],
+  "exports": [
+    "createPayables",
+    "registerPayablesRoutes",
+    "getVendorBalance",
+    "getOpenBills",
+    "getPaidAmount",
+    "registerBillSource",
+    "isGrnBilled",
+    "postDueCheques"
+  ],
+  "consumes": [
+    "platform.audit.record",
+    "platform.events.publish",
+    "platform.events.subscribe",
+    "platform.idempotency.execute",
+    "platform.numbering.next",
+    "platform.settings.get",
+    "platform.backdating.check",
+    "identity.requirePermission",
+    "identity.currentUser",
+    "identity.registerPermissions",
+    "approvals.requestApproval",
+    "approvals.getApprovalState",
+    "approvals.cancelApproval",
+    "procurement.getGrn",
+    "procurement.getPurchaseOrder",
+    "procurement.listOpenPoLines",
+    "inventory.hasIssuesFromGrn",
+    "projects.getProject",
+    "projects.postCost",
+    "projects.transitionCost",
+    "projects.reverseCost",
+    "tax.calculateSalesTax",
+    "tax.calculateWithholding",
+    "cashbook.recordPayment",
+    "cashbook.transactions.get",
+    "cashbook.transactions.reverse",
+    "masterdata.getParty",
+    "masterdata.getCostCode",
+    "masterdata.costing.listCostCodes"
+  ],
+  "eventsIn": ["approval.approved", "approval.rejected", "approval.returned", "approval.cancelled"],
+  "eventsOut": [
+    "bill.posted",
+    "payment.recorded",
+    "payables.bill.changed",
+    "payables.payment.changed"
+  ],
+  "permissions": [
+    "payables.bill.create",
+    "payables.bill.read",
+    "payables.bill.post",
+    "payables.bill.override_match",
+    "payables.payment.create",
+    "payables.payment.pay",
+    "payables.ledger.read"
+  ],
+  "notes": "Beyond the spec's route list the module adds GET /payables/payments, /payables/payments/:id, PUT /payables/payments/:id/certificate (BR-8), PUT /payables/bills/:id, GET /payables/vendors/:id/open-bills and GET /payables/aging. A bill is entered, matched, submitted (tax and withholding are worked out then), approved by the owner, posted and paid. The permission the spec writes as `payables.bill.override-match` is `payables.bill.override_match` because permission codes allow only [a-z0-9_] (see the deviation in the pull request and the proposal in CHANGES.md). The quantity already billed of a receipt line counts every live bill, drafts included. The commitments warning appears once a bill is matched, because the receipts it covers are known only then. Opening vendor balances (BR-12) are created with bills.createOpening; the importer (P2-10) calls it."
+}

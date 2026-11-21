@@ -40,6 +40,7 @@ import { createVariations, type Variations } from './modules/variations/index.js
 import { createBilling, type Billing } from './modules/billing/index.js';
 import { createCashbook, type Cashbook } from './modules/cashbook/index.js';
 import { createReceivables, type Receivables } from './modules/receivables/index.js';
+import { createPayables, type Payables } from './modules/payables/index.js';
 import { createValuation, type Valuation } from './modules/valuation/index.js';
 import { createTax, type Tax } from './modules/tax/index.js';
 import { createReports, type Reports } from './modules/reports/index.js';
@@ -58,6 +59,7 @@ import {
   notificationsPermissions,
   platformPermissions,
   inventoryPermissions,
+  payablesPermissions,
   procurementPermissions,
   projectsPermissions,
   quotationsPermissions,
@@ -112,6 +114,7 @@ export interface Runtime {
   billing: Billing;
   cashbook: Cashbook;
   receivables: Receivables;
+  payables: Payables;
   procurement: Procurement;
   inventory: Inventory;
   expenses: Expenses;
@@ -166,6 +169,7 @@ export async function wireRuntime(
   identity.registerPermissions('billing', Object.values(billingPermissions));
   identity.registerPermissions('cashbook', Object.values(cashbookPermissions));
   identity.registerPermissions('receivables', Object.values(receivablesPermissions));
+  identity.registerPermissions('payables', Object.values(payablesPermissions));
   identity.registerPermissions('procurement', Object.values(procurementPermissions));
   identity.registerPermissions('inventory', Object.values(inventoryPermissions));
   identity.registerPermissions('expenses', Object.values(expensesPermissions));
@@ -322,6 +326,9 @@ export async function wireRuntime(
     approvals,
     notifications,
   });
+  // Payables needs procurement and procurement asks payables whether a receipt was billed, so
+  // procurement receives a delegate that is filled in once payables exists.
+  const latePayables: { current?: Payables } = {};
   const procurement = createProcurement({
     platform,
     clock,
@@ -330,13 +337,25 @@ export async function wireRuntime(
     approvals,
     masterData,
     files,
-    // BR-8: a receipt whose stock has left the store cannot be cancelled. Payables (P2-05) will
-    // answer the billed question; until then nothing is billed.
+    // BR-8: a receipt whose stock has left the store, or that a bill refers to, cannot be cancelled.
     guards: {
       isIssued: (db, grnId) => inventory.hasIssuesFromGrn(db, grnId),
-      isBilled: async () => false,
+      isBilled: (db, grnId) => (latePayables.current as Payables).isGrnBilled(db, grnId),
     },
   });
+  const payables = createPayables({
+    platform,
+    clock,
+    newId: () => uuidv7(clock.now()),
+    procurement,
+    inventory,
+    projects,
+    tax,
+    cashbook,
+    approvals,
+    masterData,
+  });
+  latePayables.current = payables;
   const expenses = createExpenses({
     platform,
     clock,
@@ -435,6 +454,7 @@ export async function wireRuntime(
     billing,
     cashbook,
     receivables,
+    payables,
     procurement,
     inventory,
     expenses,
@@ -474,6 +494,7 @@ export function routeDeps(runtime: Runtime) {
     billing: { db, billing: runtime.billing, platform },
     cashbook: { db, cashbook: runtime.cashbook, platform },
     receivables: { db, receivables: runtime.receivables, platform },
+    payables: { db, payables: runtime.payables, platform },
     procurement: { db, procurement: runtime.procurement, platform },
     inventory: { db, inventory: runtime.inventory, platform },
     expenses: { db, expenses: runtime.expenses, platform },

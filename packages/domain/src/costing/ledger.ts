@@ -7,8 +7,10 @@ const Dec = Decimal.clone({ precision: 40, rounding: Decimal.ROUND_HALF_UP });
 export const costObjectTypes = ['project', 'work_order', 'overhead'] as const;
 export type CostObjectType = (typeof costObjectTypes)[number];
 
-/** BR-5: the one source document type that may carry a negative amount (besides a reversal). */
+/** BR-5: a salvage credit may carry a negative amount (besides a reversal). */
 export const SALVAGE_DOC_TYPE = 'salvage';
+/** P2-05 BR-5: a vendor price variance corrects a cost and is negative when the bill is cheaper. */
+export const PRICE_VARIANCE_DOC_TYPE = 'price_variance';
 
 /** Constitution 5.4: money is a decimal string with at most two decimals, never a float. */
 export function normalizeAmount(text: string): string {
@@ -21,10 +23,14 @@ export function normalizeAmount(text: string): string {
 
 /** BR-5: a negative amount is allowed only for salvage. */
 export function assertAmountAllowed(amount: string, sourceDocType: string): void {
-  if (new Dec(amount).isNegative() && sourceDocType !== SALVAGE_DOC_TYPE) {
+  if (
+    new Dec(amount).isNegative() &&
+    sourceDocType !== SALVAGE_DOC_TYPE &&
+    sourceDocType !== PRICE_VARIANCE_DOC_TYPE
+  ) {
     throw new RuleViolationError(
       'amount_negative',
-      'Only a salvage credit can have a negative amount',
+      'Only a salvage credit or a price variance can have a negative amount',
     );
   }
 }

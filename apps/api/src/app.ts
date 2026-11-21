@@ -47,6 +47,7 @@ import {
   registerReceivablesRoutes,
   type ReceivablesRouteDeps,
 } from './modules/receivables/index.js';
+import { registerPayablesRoutes, type PayablesRouteDeps } from './modules/payables/index.js';
 import { registerValuationRoutes, type ValuationRouteDeps } from './modules/valuation/index.js';
 import { registerTaxRoutes, type TaxRouteDeps } from './modules/tax/index.js';
 
@@ -88,6 +89,8 @@ export interface AppDeps {
   cashbook?: CashbookRouteDeps;
   /** The receivables endpoints; they rely on the authentication hook of `identity`. */
   receivables?: ReceivablesRouteDeps;
+  /** The payables endpoints; they rely on the authentication hook of `identity`. */
+  payables?: PayablesRouteDeps;
   /** The procurement endpoints; they rely on the authentication hook of `identity`. */
   procurement?: ProcurementRouteDeps;
   /** The inventory endpoints; they rely on the authentication hook of `identity`. */
@@ -123,6 +126,7 @@ export async function buildApp({
   billing,
   cashbook,
   receivables,
+  payables,
   procurement,
   inventory,
   expenses,
@@ -178,6 +182,7 @@ export async function buildApp({
   if (billing) registerBillingRoutes(app, billing);
   if (cashbook) registerCashbookRoutes(app, cashbook);
   if (receivables) registerReceivablesRoutes(app, receivables);
+  if (payables) registerPayablesRoutes(app, payables);
   if (procurement) registerProcurementRoutes(app, procurement);
   if (inventory) registerInventoryRoutes(app, inventory);
   if (expenses) registerExpensesRoutes(app, expenses);

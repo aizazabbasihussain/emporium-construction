@@ -200,6 +200,24 @@ export const settingRegistry: SettingRegistry = {
       'Upper day limits of the aging buckets, comma separated; the last bucket is open-ended',
     default: '30,60,90',
   },
+  // P2-05 BR-1, H-23: the three-way match tolerances; zero until the owner chooses.
+  'payables.match_qty_tolerance_percent': {
+    type: 'string',
+    description:
+      'Billed quantity above what is received and not yet billed that still matches, in percent (H-23)',
+    default: '0',
+  },
+  'payables.match_rate_tolerance_percent': {
+    type: 'string',
+    description: 'Billed rate above or below the order rate that still matches, in percent (H-23)',
+    default: '0',
+  },
+  // P2-05 BR-5, H-22: where a price variance on goods still in stock is charged.
+  'payables.price_variance_cost_code': {
+    type: 'string',
+    description: 'Overhead cost code that takes a price variance on goods still in stock (H-22)',
+    default: '600',
+  },
   // P1-12 BR-7, H-21: salvaged material enters stock at zero value unless the owner chooses estimates.
   'inventory.salvage_value_mode': {
     type: 'string',

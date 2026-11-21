@@ -3,7 +3,7 @@ id: P2-05
 title: Payables, vendor bills and payments
 phase: 2
 module: payables
-status: not-started
+status: done
 depends_on: [P2-01, P2-03, P1-11, P1-12, P1-09]
 requires_inputs: [H-03, H-22, H-23, H-09]
 ---

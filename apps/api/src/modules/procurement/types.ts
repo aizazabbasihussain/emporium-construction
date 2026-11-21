@@ -188,6 +188,8 @@ export interface GrnLineDto {
   rejectedQty: string;
   note: string;
   costAmount: string;
+  /** The approved cost entry of the line in the project ledger (project destinations only); payables posts it. */
+  costEntryId: string | null;
 }
 
 export interface GrnHeaderDto {
