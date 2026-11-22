@@ -50,6 +50,16 @@ P1-12 stays `not-started`; P1-14, P1-15 and others that do not depend on it can 
 
 ## Proposed
 
+### 2026-11-22: P2-09 built (PR #64); points the spec text does not settle
+
+Human decision needed on each; the code follows the choice stated. The PR is not merged until these are answered.
+
+1. **One account per tag.** The spec gives a mapping rule a debit and a credit account but a tag one `account_code`. The tag takes the account the document is about, not the cash side: the credit account of an invoice or receipt, the debit account of a credit note, bill or vendor payment; a cash transaction and a stock movement use their direction (`tagSide` in `packages/domain/src/accounting/rules.ts`). Option: approve, or say which side each document type should tag.
+2. **Tags are per document, not per line.** BR-1 names invoice lines; the owning modules list document headers, so the line reference is blank. The table and the exports already carry a line reference, so line-level tags need only a source that lists lines. Option: approve, or ask for line-level tags (one more call per document).
+3. **Control figures for the registers.** Sales, purchase, receipts, payments, cash book and vendor ledger compare their rows with the owning module's cumulative figure at both ends of the period (billed to date, vendor balance, customer balance, account balance). They tie out on the scripted data; how each owning module dates credit notes, bills and receipts in those figures is not confirmed on real data, and a difference aborts the run. Stock valuation reads today's value because valuation keeps no history. Option: approve, or name the report function to use for a register.
+4. **Beyond the spec text:** `GET /accounting/accounts` and `PUT /accounting/accounts/:code` (switching an account on or off, section 3); the setting `accounting.fiscal_year_start_month` (H-06); the column `acc_export_runs.schema_version` (BR-10); a `net` column in the cash book and ledger exports (what the control compares); the Excel file is `file_id` and the CSV is a second attachment of the run; running an export stores its files without the caller holding the upload permission (management has none); the file headers are the column keys of `docs/exports/<code>.md`. Option: approve and add them to the P2-09 text.
+5. **The chart of accounts stays read-only** except switching an account on or off, as the P2-09 text says. The earlier proposal in this file to make it editable from the UI (H-05) is not built.
+
 ### 2026-11-22: P2-08 built (PR #62); points the spec text does not settle
 
 Human decision needed on each; the code follows the choice stated.
