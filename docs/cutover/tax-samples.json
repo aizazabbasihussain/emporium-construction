@@ -1,0 +1,48 @@
+{
+  "note": "Synthetic samples written by the build to exercise the runner. The accountant's real pack (at least 10 documents with expected tax and withholding, spec P2-10 BR-4) replaces or extends this file; until then the tax sign-off stays open.",
+  "samples": [
+    { "id": "S01", "description": "PRA services 16%, one line", "roundingMode": "per_document", "pricesIncludeTax": false,
+      "lines": [{ "id": "1", "amount": "100000.00", "rule": { "id": "pra-s", "authorityCode": "PRA", "taxCode": "services", "ratePercent": "16" } }],
+      "expected": { "base": "100000.00", "tax": "16000.00", "total": "116000.00" } },
+    { "id": "S02", "description": "FBR services 8%", "roundingMode": "per_document", "pricesIncludeTax": false,
+      "lines": [{ "id": "1", "amount": "250000.00", "rule": { "id": "fbr-s", "authorityCode": "FBR", "taxCode": "services", "ratePercent": "8" } }],
+      "expected": { "base": "250000.00", "tax": "20000.00", "total": "270000.00" } },
+    { "id": "S03", "description": "FBR goods 18% with a rounding remainder", "roundingMode": "per_document", "pricesIncludeTax": false,
+      "lines": [{ "id": "1", "amount": "1234.56", "rule": { "id": "fbr-g", "authorityCode": "FBR", "taxCode": "goods", "ratePercent": "18" } }],
+      "expected": { "base": "1234.56", "tax": "222.22", "total": "1456.78" } },
+    { "id": "S04", "description": "Two lines at 16% per document", "roundingMode": "per_document", "pricesIncludeTax": false,
+      "lines": [
+        { "id": "1", "amount": "333.33", "rule": { "id": "pra-s", "authorityCode": "PRA", "taxCode": "services", "ratePercent": "16" } },
+        { "id": "2", "amount": "666.67", "rule": { "id": "pra-s", "authorityCode": "PRA", "taxCode": "services", "ratePercent": "16" } }
+      ],
+      "expected": { "base": "1000.00", "tax": "160.00", "total": "1160.00" } },
+    { "id": "S05", "description": "Mixed rates, rounded per line", "roundingMode": "per_line", "pricesIncludeTax": false,
+      "lines": [
+        { "id": "1", "amount": "100.05", "rule": { "id": "fbr-s", "authorityCode": "FBR", "taxCode": "services", "ratePercent": "8" } },
+        { "id": "2", "amount": "200.05", "rule": { "id": "fbr-g", "authorityCode": "FBR", "taxCode": "goods", "ratePercent": "18" } }
+      ],
+      "expected": { "base": "300.10", "tax": "44.01", "total": "344.11" } },
+    { "id": "S06", "description": "Price includes 16% tax", "roundingMode": "per_document", "pricesIncludeTax": true,
+      "lines": [{ "id": "1", "amount": "1160.00", "rule": { "id": "pra-s", "authorityCode": "PRA", "taxCode": "services", "ratePercent": "16" } }],
+      "expected": { "base": "1000.00", "tax": "160.00", "total": "1160.00" } },
+    { "id": "S07", "description": "Price includes 8% tax, remainder", "roundingMode": "per_document", "pricesIncludeTax": true,
+      "lines": [{ "id": "1", "amount": "1000.00", "rule": { "id": "fbr-s", "authorityCode": "FBR", "taxCode": "services", "ratePercent": "8" } }],
+      "expected": { "base": "925.93", "tax": "74.07", "total": "1000.00" } },
+    { "id": "S08", "description": "Client withholds 5% of the base", "roundingMode": "per_document", "pricesIncludeTax": false,
+      "lines": [{ "id": "1", "amount": "400000.00", "rule": { "id": "fbr-s", "authorityCode": "FBR", "taxCode": "services", "ratePercent": "8" } }],
+      "withholding": { "rule": { "id": "w-fbr", "ratePercent": "5", "base": "on_base" } },
+      "expected": { "base": "400000.00", "tax": "32000.00", "total": "432000.00", "withholding": "20000.00" } },
+    { "id": "S09", "description": "Client withholds 2% of the tax", "roundingMode": "per_document", "pricesIncludeTax": false,
+      "lines": [{ "id": "1", "amount": "500000.00", "rule": { "id": "pra-s", "authorityCode": "PRA", "taxCode": "services", "ratePercent": "16" } }],
+      "withholding": { "rule": { "id": "w-pra", "ratePercent": "2", "base": "on_tax_amount" } },
+      "expected": { "base": "500000.00", "tax": "80000.00", "total": "580000.00", "withholding": "1600.00" } },
+    { "id": "S10", "description": "We withhold 4% of the base from a subcontractor", "roundingMode": "per_document", "pricesIncludeTax": false,
+      "lines": [{ "id": "1", "amount": "200000.00", "rule": { "id": "fbr-s", "authorityCode": "FBR", "taxCode": "services", "ratePercent": "8" } }],
+      "withholding": { "rule": { "id": "w-sub", "ratePercent": "4", "base": "on_base" } },
+      "expected": { "base": "200000.00", "tax": "16000.00", "total": "216000.00", "withholding": "8000.00" } },
+    { "id": "S11", "description": "Withholding of 1% on the invoice total with rounding", "roundingMode": "per_document", "pricesIncludeTax": false,
+      "lines": [{ "id": "1", "amount": "12345.67", "rule": { "id": "pra-s", "authorityCode": "PRA", "taxCode": "services", "ratePercent": "16" } }],
+      "withholding": { "rule": { "id": "w-1", "ratePercent": "1", "base": "on_invoice_total" } },
+      "expected": { "base": "12345.67", "tax": "1975.31", "total": "14320.98", "withholding": "143.21" } }
+  ]
+}
