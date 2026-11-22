@@ -96,6 +96,9 @@ import { LoginPage } from './shell/LoginPage';
 import { navItems } from './shell/nav';
 import { ReportPage as OperationalReportPage } from './reports/ReportPage';
 import { ReportsHubPage } from './reports/ReportsHubPage';
+import { ExportsPage } from './accounting/ExportsPage';
+import { RulesPage as AccountingRulesPage } from './accounting/RulesPage';
+import { UntaggedPage } from './accounting/UntaggedPage';
 import { AlertsPage as ProfitabilityAlertsPage } from './profitability/AlertsPage';
 import { PortfolioPage } from './profitability/PortfolioPage';
 import { ProjectPage as ProfitabilityProjectPage } from './profitability/ProjectPage';
@@ -558,6 +561,18 @@ export function AppRoutes() {
         <Route
           path="/profitability/alerts"
           element={guarded('/profitability/alerts', <ProfitabilityAlertsPage />)}
+        />
+        <Route
+          path="/accounting/exports"
+          element={guarded('/accounting/exports', <ExportsPage />)}
+        />
+        <Route
+          path="/accounting/untagged"
+          element={guarded('/accounting/untagged', <UntaggedPage />)}
+        />
+        <Route
+          path="/accounting/rules"
+          element={guarded('/accounting/rules', <AccountingRulesPage />)}
         />
         <Route path="/imports" element={guarded('/imports', <ImportPage />)} />
         <Route path="/admin/settings" element={guarded('/admin/settings', <SettingsPage />)} />

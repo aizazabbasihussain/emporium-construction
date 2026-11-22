@@ -161,6 +161,14 @@ export const settingRegistry: SettingRegistry = {
     min: 0,
     max: 365,
   },
+  // P2-09 BR-7, H-06: labels and period filters of the exports only; nothing is closed or locked.
+  'accounting.fiscal_year_start_month': {
+    type: 'integer',
+    description: 'Month the fiscal year starts, 1 to 12 (H-06 default: 7, July)',
+    default: 7,
+    min: 1,
+    max: 12,
+  },
   // P2-02 BR-11: printed on every invoice.
   'billing.payment_instructions': {
     type: 'string',

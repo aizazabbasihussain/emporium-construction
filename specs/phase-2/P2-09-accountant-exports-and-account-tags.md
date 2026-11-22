@@ -3,7 +3,7 @@ id: P2-09
 title: Accountant exports and account tags
 phase: 2
 module: accounting-exports
-status: not-started
+status: done
 depends_on: [P2-04, P2-05, P2-07, P2-03, P1-13, P2-01]
 requires_inputs: [H-05, H-06]
 ---
