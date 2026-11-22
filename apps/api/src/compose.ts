@@ -47,6 +47,7 @@ import { createValuation, type Valuation } from './modules/valuation/index.js';
 import { createTax, type Tax } from './modules/tax/index.js';
 import { createReports, type Reports } from './modules/reports/index.js';
 import { createProfitability, type Profitability } from './modules/profitability/index.js';
+import { createAccounting, type Accounting } from './modules/accounting-exports/index.js';
 import {
   approvalsPermissions,
   crmPermissions,
@@ -70,6 +71,7 @@ import {
   quotationsPermissions,
   receivablesPermissions,
   profitabilityPermissions,
+  accountingPermissions,
   reportsPermissions,
   taxPermissions,
   valuationPermissions,
@@ -133,6 +135,7 @@ export interface Runtime {
   workerPortal: WorkerPortal;
   reports: Reports;
   profitability: Profitability;
+  accounting: Accounting;
   approvals: Approvals;
   files: Files;
   /** Set when FILE_STORE_DRIVER=local: it serves its own signed download links. */
@@ -190,6 +193,7 @@ export async function wireRuntime(
   identity.registerPermissions('payroll', Object.values(payrollPermissions));
   identity.registerPermissions('reports', Object.values(reportsPermissions));
   identity.registerPermissions('profitability', Object.values(profitabilityPermissions));
+  identity.registerPermissions('accounting', Object.values(accountingPermissions));
   identity.registerPermissions('workerportal', Object.values(workerportalPermissions));
   await ensureWorkerRole(identity, db);
   const importer = createImporter({ platform, clock, newId: () => uuidv7(clock.now()) });
@@ -484,6 +488,24 @@ export async function wireRuntime(
     expenses,
     notifications,
   });
+  const accounting = createAccounting({
+    platform,
+    clock,
+    newId: () => uuidv7(clock.now()),
+    files,
+    billing,
+    payables,
+    receivables,
+    cashbook,
+    payroll,
+    valuation,
+    subcontracts,
+    profitability,
+    projects,
+    expenses,
+    masterData,
+    tax,
+  });
   if (config.adminEmail !== undefined) {
     const email = config.adminEmail;
     await db.transaction((tx) => identity.users.ensureAdmin(email, tx));
@@ -516,6 +538,7 @@ export async function wireRuntime(
     workerPortal,
     reports,
     profitability,
+    accounting,
     approvals,
     files,
     localFileStore: local,
@@ -559,5 +582,11 @@ export function routeDeps(runtime: Runtime) {
     workerPortal: { db, workerPortal: runtime.workerPortal, platform },
     reports: { db, reports: runtime.reports.service, platform },
     profitability: { db, profitability: runtime.profitability.service, platform },
+    accounting: {
+      db,
+      exports: runtime.accounting.exports,
+      tagging: runtime.accounting.tagging,
+      platform,
+    },
   };
 }
