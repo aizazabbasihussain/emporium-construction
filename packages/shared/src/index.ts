@@ -402,6 +402,19 @@ export {
   type ProfitabilityPermission,
   type ThresholdScope,
 } from './profitability.js';
+export {
+  accountTypes,
+  accountingDocTypes,
+  accountingPermissionGrants,
+  accountingPermissions,
+  exportCodes,
+  tagMethods,
+  type AccountType,
+  type AccountingDocType,
+  type AccountingPermission,
+  type ExportCode,
+  type TagMethod,
+} from './accounting.js';
 export * from './offline/index.js';
 export {
   supplyKinds,
