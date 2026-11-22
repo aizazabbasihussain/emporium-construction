@@ -1,4 +1,5 @@
 import {
+  accountingPermissions,
   approvalsPermissions,
   attendancePermissions,
   crmPermissions,
@@ -357,6 +358,21 @@ export const navItems: readonly NavItem[] = [
     path: '/profitability/alerts',
     label: 'nav.profitabilityAlerts',
     permission: profitabilityPermissions.read,
+  },
+  {
+    path: '/accounting/exports',
+    label: 'nav.accountingExports',
+    permission: accountingPermissions.exportRead,
+  },
+  {
+    path: '/accounting/untagged',
+    label: 'nav.accountingUntagged',
+    permission: accountingPermissions.tagManage,
+  },
+  {
+    path: '/accounting/rules',
+    label: 'nav.accountingRules',
+    permission: accountingPermissions.rulesManage,
   },
   {
     path: '/admin/settings',
