@@ -50,6 +50,16 @@ P1-12 stays `not-started`; P1-14, P1-15 and others that do not depend on it can 
 
 ## Proposed
 
+### 2026-11-23: P2-10 BR-1 needs opening-data importers that no module provides (PR #66)
+
+Human decision needed. P2-10 BR-1 loads, through the import framework, cash and bank accounts, opening vendor and customer balances, advances, PDCs in hand, open projects with cost to date and opening stock. Importers exist only for parties, items, categories, units, cost codes, vendor prices, tax registrations, workers, pay rates and teams. P2-10 may not change module behaviour, so the PR rehearses and verifies the cash and bank opening balances only (`pnpm cutover:verify-opening`, `docs/cutover/opening-control-sheet.md`). Options:
+
+1. **Add the missing importers to their owning specs** (cashbook, receivables, payables, billing/projects, inventory), then extend the rehearsal and the control sheet. Recommended.
+2. **Add one opening-data spec** for all of them, before P2-10 is signed off.
+3. Accept the narrower rehearsal and load the other balances by hand through the screens (no import-framework check for them).
+
+The P2-10 PR is not auto-merged until this is answered.
+
 ### 2026-11-22: P2-09 built (PR #64); points the spec text does not settle
 
 Human decision needed on each; the code follows the choice stated. The PR is not merged until these are answered.
