@@ -3,7 +3,7 @@ id: P2-10
 title: Phase 2 acceptance (Gate B, financial go-live)
 phase: 2
 module: acceptance-finance
-status: not-started
+status: done
 depends_on: [P2-08, P2-09, P1-21]
 requires_inputs: [H-13, H-19, H-02, H-03, H-04]
 ---
