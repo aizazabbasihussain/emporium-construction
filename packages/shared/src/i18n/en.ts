@@ -1293,6 +1293,8 @@ export const en = {
       title: 'New invoice',
       create: 'Create draft',
       stages: 'Stages to bill',
+      nature: 'Nature of work',
+      natureHint: 'Optional. Needed when a withholding rule is set for a nature of work.',
       incomplete: 'Choose at least one stage and a date.',
     },
     invoice: {

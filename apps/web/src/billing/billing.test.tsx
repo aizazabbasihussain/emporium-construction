@@ -368,6 +368,41 @@ describe('project billing', () => {
     });
   });
 
+  it('sends the nature of work with the new invoice so withholding rules can match', async () => {
+    project((url, init) =>
+      url === '/billing/invoices' && init.method === 'POST'
+        ? { status: 201, body: invoice() }
+        : undefined,
+    );
+    await userEvent.click(await screen.findByRole('button', { name: 'New invoice' }));
+    const dialog = await screen.findByRole('dialog');
+    await userEvent.click(within(dialog).getByRole('checkbox', { name: /2\. Stage 2 name/ }));
+    await userEvent.type(
+      within(dialog).getByRole('textbox', { name: 'Nature of work' }),
+      '  Construction services ',
+    );
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Create draft' }));
+    await waitFor(() => expect(calls.some((c) => c.method === 'POST')).toBe(true));
+    expect(calls.find((c) => c.method === 'POST')?.body).toMatchObject({
+      scheduleIds: ['s2'],
+      nature: 'Construction services',
+    });
+  });
+
+  it('leaves the nature of work out of the request when it is blank', async () => {
+    project((url, init) =>
+      url === '/billing/invoices' && init.method === 'POST'
+        ? { status: 201, body: invoice() }
+        : undefined,
+    );
+    await userEvent.click(await screen.findByRole('button', { name: 'New invoice' }));
+    const dialog = await screen.findByRole('dialog');
+    await userEvent.click(within(dialog).getByRole('checkbox', { name: /2\. Stage 2 name/ }));
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Create draft' }));
+    await waitFor(() => expect(calls.some((c) => c.method === 'POST')).toBe(true));
+    expect(calls.find((c) => c.method === 'POST')?.body).not.toHaveProperty('nature');
+  });
+
   it('requests an advance and opens its invoice', async () => {
     project((url, init) =>
       url === '/billing/advances' && init.method === 'POST'

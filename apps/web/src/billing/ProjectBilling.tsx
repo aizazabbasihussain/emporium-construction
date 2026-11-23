@@ -32,6 +32,7 @@ export function ProjectBilling({ projectId }: { projectId: string }) {
   const [invoiceOpen, setInvoiceOpen] = useState(false);
   const [picked, setPicked] = useState<string[]>([]);
   const [invoiceDate, setInvoiceDate] = useState(today());
+  const [nature, setNature] = useState('');
   const [advanceOpen, setAdvanceOpen] = useState(false);
   const [advanceAmount, setAdvanceAmount] = useState('');
   const [advanceDate, setAdvanceDate] = useState(today());
@@ -58,7 +59,12 @@ export function ProjectBilling({ projectId }: { projectId: string }) {
     },
   });
   const createInvoice = useMutation({
-    mutationFn: () => billingApi.createInvoice(projectId, { scheduleIds: picked, invoiceDate }),
+    mutationFn: () =>
+      billingApi.createInvoice(projectId, {
+        scheduleIds: picked,
+        invoiceDate,
+        ...(nature.trim() !== '' ? { nature: nature.trim() } : {}),
+      }),
     onSuccess: (invoice) => {
       void refresh();
       void navigate(`/billing/invoices/${invoice.id}`);
@@ -297,6 +303,7 @@ export function ProjectBilling({ projectId }: { projectId: string }) {
           style={{ marginBottom: 12 }}
           onClick={() => {
             setPicked([]);
+            setNature('');
             setProblem(null);
             setInvoiceOpen(true);
           }}
@@ -359,6 +366,14 @@ export function ProjectBilling({ projectId }: { projectId: string }) {
             aria-label={t('billing.invoice.date')}
             value={invoiceDate}
             onChange={(event) => setInvoiceDate(event.target.value)}
+          />
+          <Input
+            addonBefore={t('billing.newInvoice.nature')}
+            aria-label={t('billing.newInvoice.nature')}
+            placeholder={t('billing.newInvoice.natureHint')}
+            maxLength={100}
+            value={nature}
+            onChange={(event) => setNature(event.target.value)}
           />
         </Space>
       </Modal>
